@@ -1,0 +1,51 @@
+{
+  "name": "@vueuse/head",
+  "version": "0.0.0",
+  "license": "MIT",
+  "description": "Document head manager for Vue 3. SSR ready.",
+  "keywords": [
+    "vue",
+    "head",
+    "document",
+    "ssr",
+    "meta"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "start-server-and-test example http://localhost:3000 test:e2e",
+    "example": "vite example",
+    "release": "shipjs prepare",
+    "build": "tsup src/index.ts --format esm,cjs --external vue --dts",
+    "test:e2e": "uvu -r esbuild-register"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vueuse/head"
+  },
+  "author": {
+    "name": "EGOIST",
+    "url": "https://egoist.sh"
+  },
+  "devDependencies": {
+    "@egoist/prettier-config": "^0.1.0",
+    "@vitejs/plugin-vue-jsx": "^1.0.2",
+    "@vue/server-renderer": "^3.0.5",
+    "ava": "^3.15.0",
+    "esbuild-register": "^1.2.1",
+    "playwright-chromium": "^1.7.1",
+    "prettier": "^2.2.1",
+    "shipjs": "^0.23.0",
+    "start-server-and-test": "^1.11.7",
+    "tsup": "^3.11.0",
+    "typescript": "^4.1.3",
+    "uvu": "^0.5.1",
+    "vite": "^2.0.0-beta.30",
+    "vue": "^3.0.5",
+    "vue-router": "^4.0.3"
+  }
+}
