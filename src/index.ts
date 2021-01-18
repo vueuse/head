@@ -1,4 +1,4 @@
-import { App, inject, onUnmounted, watchEffect } from 'vue'
+import { App, inject, onBeforeUnmount, watchEffect } from 'vue'
 import { PROVIDE_KEY, HEAD_COUNT_KEY, HEAD_ATTRS_KEY } from './constants'
 import { createElement } from './create-element'
 import { stringifyAttrs } from './stringify-attrs'
@@ -237,7 +237,7 @@ export const useHead = (fn: () => HeadObj) => {
       head.updateDOM()
     })
 
-    onUnmounted(() => {
+    onBeforeUnmount(() => {
       if (tags) {
         head.removeHeadTags(tags)
         head.updateDOM()
