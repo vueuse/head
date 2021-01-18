@@ -105,7 +105,7 @@ interface Attrs {
 For `meta` tags, we use `name` and `property` to prevent duplicated tags, you can instead use the `key` attribute if the same `name` or `property` is allowed:
 
 ```ts
-useHead({
+useHead(() => ({
   meta: [
     {
       property: 'og:locale:alternate',
@@ -118,19 +118,19 @@ useHead({
       key: 'en',
     },
   ],
-})
+}))
 ```
 
 To set the `textContent` of an element, use the `children` attribute:
 
 ```ts
-useHead({
+useHead(() => ({
   style: [
     {
       children: `body {color: red}`,
     },
   ],
-})
+}))
 ```
 
 ### `renderHeadToString(head: Head)`
