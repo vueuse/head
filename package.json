@@ -31,12 +31,24 @@
     "name": "EGOIST",
     "url": "https://egoist.sh"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write"
+    ]
+  },
   "devDependencies": {
     "@egoist/prettier-config": "^0.1.0",
     "@vitejs/plugin-vue-jsx": "^1.0.2",
     "@vue/server-renderer": "^3.0.5",
     "ava": "^3.15.0",
     "esbuild-register": "^1.2.1",
+    "husky": "^4.3.8",
+    "lint-staged": "^10.5.3",
     "playwright-chromium": "^1.7.1",
     "prettier": "^2.2.1",
     "shipjs": "^0.23.0",
