@@ -16,6 +16,9 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "start-server-and-test example http://localhost:3000 test:e2e",
     "example": "vite example",
