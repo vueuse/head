@@ -2,6 +2,8 @@
 
 Document head manager for Vue 3.
 
+[![NPM version](https://img.shields.io/npm/v/@vueuse/head?color=a1b858)](https://www.npmjs.com/package/@vueuse/head)
+
 **💛 Support the ongoing development of this project by [becoming a GitHub Sponsor](https://github.com/sponsors/egoist)**.
 
 ## Installation
