@@ -39,7 +39,7 @@ import { useHead } from '@vueuse/head'
 
 export default defineComponent({
   setup() {
-    useHead(() => ({
+    useHead({
       title: `Website title`,
       meta: [
         {
@@ -47,7 +47,7 @@ export default defineComponent({
           content: `Website description`,
         },
       ],
-    }))
+    })
   },
 })
 </script>
@@ -85,18 +85,18 @@ const finalHTML = `
 
 Create the head manager instance.
 
-### `useHead(() => HeadObject)`
+### `useHead(head: HeadObject | Ref<HeadObject> | (() => HeadObject))`
 
 ```ts
 interface HeadObject {
-  title?: string
-  base?: HeadAttrs
-  meta?: HeadAttrs[]
-  link?: HeadAttrs[]
-  style?: HeadAttrs[]
-  script?: HeadAttrs[]
-  htmlAttrs?: HeadAttrs
-  bodyAttrs?: HeadAttrs
+  title?: MaybeRef<string>
+  meta?: MaybeRef<HeadAttrs[]>
+  link?: MaybeRef<HeadAttrs[]>
+  base?: MaybeRef<HeadAttrs>
+  style?: MaybeRef<HeadAttrs[]>
+  script?: MaybeRef<HeadAttrs[]>
+  htmlAttrs?: MaybeRef<HeadAttrs>
+  bodyAttrs?: MaybeRef<HeadAttrs>
 }
 
 interface HeadAttrs {
@@ -107,7 +107,7 @@ interface HeadAttrs {
 For `meta` tags, we use `name` and `property` to prevent duplicated tags, you can instead use the `key` attribute if the same `name` or `property` is allowed:
 
 ```ts
-useHead(() => ({
+useHead({
   meta: [
     {
       property: 'og:locale:alternate',
@@ -120,19 +120,31 @@ useHead(() => ({
       key: 'en',
     },
   ],
-}))
+})
 ```
 
 To set the `textContent` of an element, use the `children` attribute:
 
 ```ts
-useHead(() => ({
+useHead({
   style: [
     {
       children: `body {color: red}`,
     },
   ],
-}))
+})
+```
+
+`useHead` also takes reactive object or ref as the argument, for example:
+
+```ts
+const head = reactive({ title: 'Website Title' })
+useHead(head)
+```
+
+```ts
+const title = ref('Website Title')
+useHead({ title })
 ```
 
 ### `renderHeadToString(head: Head)`

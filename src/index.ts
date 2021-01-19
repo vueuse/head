@@ -1,20 +1,33 @@
-import { App, inject, onBeforeUnmount, watchEffect } from 'vue'
+import {
+  App,
+  computed,
+  inject,
+  onBeforeUnmount,
+  ref,
+  Ref,
+  UnwrapRef,
+  watchEffect,
+} from 'vue'
 import { PROVIDE_KEY, HEAD_COUNT_KEY, HEAD_ATTRS_KEY } from './constants'
 import { createElement } from './create-element'
 import { stringifyAttrs } from './stringify-attrs'
 
+type MaybeRef<T> = T | Ref<T>
+
 export type HeadAttrs = { [k: string]: any }
 
 export type HeadObject = {
-  title?: string
-  meta?: HeadAttrs[]
-  link?: HeadAttrs[]
-  base?: HeadAttrs
-  style?: HeadAttrs[]
-  script?: HeadAttrs[]
-  htmlAttrs?: HeadAttrs
-  bodyAttrs?: HeadAttrs
+  title?: MaybeRef<string>
+  meta?: MaybeRef<HeadAttrs[]>
+  link?: MaybeRef<HeadAttrs[]>
+  base?: MaybeRef<HeadAttrs>
+  style?: MaybeRef<HeadAttrs[]>
+  script?: MaybeRef<HeadAttrs[]>
+  htmlAttrs?: MaybeRef<HeadAttrs>
+  bodyAttrs?: MaybeRef<HeadAttrs>
 }
+
+export type HeadObjectPlain = UnwrapRef<HeadObject>
 
 export type HeadTag = {
   tag: string
@@ -69,10 +82,10 @@ const injectHead = () => {
   return head
 }
 
-const headObjToTags = (obj: HeadObject) => {
+const headObjToTags = (obj: HeadObjectPlain) => {
   const tags: HeadTag[] = []
 
-  for (const key of Object.keys(obj) as Array<keyof HeadObject>) {
+  for (const key of Object.keys(obj) as Array<keyof HeadObjectPlain>) {
     if (key === 'title') {
       tags.push({ tag: key, props: { children: obj[key] } })
     } else if (key === 'base') {
@@ -230,7 +243,12 @@ export const createHead = () => {
 
 const IS_BROWSER = typeof window !== 'undefined'
 
-export const useHead = (fn: () => HeadObject) => {
+export const useHead = (
+  obj: HeadObject | Ref<HeadObject> | (() => HeadObject),
+) => {
+  const headObj = (typeof obj === 'function'
+    ? computed(obj)
+    : ref(obj)) as Ref<HeadObjectPlain>
   const head = injectHead()
 
   if (IS_BROWSER) {
@@ -240,8 +258,7 @@ export const useHead = (fn: () => HeadObject) => {
       if (tags) {
         head.removeHeadTags(tags)
       }
-      const headObj = fn()
-      tags = headObjToTags(headObj)
+      tags = headObjToTags(headObj.value)
       head.addHeadTags(tags)
       head.updateDOM()
     })
@@ -252,12 +269,9 @@ export const useHead = (fn: () => HeadObject) => {
         head.updateDOM()
       }
     })
-
-    return
+  } else {
+    head.addHeadTags(headObjToTags(headObj.value))
   }
-
-  const headObj = fn()
-  head.addHeadTags(headObjToTags(headObj))
 }
 
 const tagToString = (tag: HeadTag) => {
