@@ -89,14 +89,14 @@ Create the head manager instance.
 
 ```ts
 interface HeadObject {
-  title?: string
-  base?: HeadAttrs
-  meta?: HeadAttrs[]
-  link?: HeadAttrs[]
-  style?: HeadAttrs[]
-  script?: HeadAttrs[]
-  htmlAttrs?: HeadAttrs
-  bodyAttrs?: HeadAttrs
+  title?: MaybeRef<string>
+  meta?: MaybeRef<HeadAttrs[]>
+  link?: MaybeRef<HeadAttrs[]>
+  base?: MaybeRef<HeadAttrs>
+  style?: MaybeRef<HeadAttrs[]>
+  script?: MaybeRef<HeadAttrs[]>
+  htmlAttrs?: MaybeRef<HeadAttrs>
+  bodyAttrs?: MaybeRef<HeadAttrs>
 }
 
 interface HeadAttrs {
