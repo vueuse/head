@@ -5,25 +5,29 @@ import {
   onBeforeUnmount,
   ref,
   Ref,
-  unref,
+  UnwrapRef,
   watchEffect,
 } from 'vue'
 import { PROVIDE_KEY, HEAD_COUNT_KEY, HEAD_ATTRS_KEY } from './constants'
 import { createElement } from './create-element'
 import { stringifyAttrs } from './stringify-attrs'
 
+type MaybeRef<T> = T | Ref<T>
+
 export type HeadAttrs = { [k: string]: any }
 
 export type HeadObject = {
-  title?: string | Ref<string>
-  meta?: HeadAttrs[]
-  link?: HeadAttrs[]
-  base?: HeadAttrs
-  style?: HeadAttrs[]
-  script?: HeadAttrs[]
-  htmlAttrs?: HeadAttrs
-  bodyAttrs?: HeadAttrs
+  title?: MaybeRef<string>
+  meta?: MaybeRef<HeadAttrs[]>
+  link?: MaybeRef<HeadAttrs[]>
+  base?: MaybeRef<HeadAttrs>
+  style?: MaybeRef<HeadAttrs[]>
+  script?: MaybeRef<HeadAttrs[]>
+  htmlAttrs?: MaybeRef<HeadAttrs>
+  bodyAttrs?: MaybeRef<HeadAttrs>
 }
+
+export type HeadObjectPlain = UnwrapRef<HeadObject>
 
 export type HeadTag = {
   tag: string
@@ -78,10 +82,10 @@ const injectHead = () => {
   return head
 }
 
-const headObjToTags = (obj: HeadObject) => {
+const headObjToTags = (obj: HeadObjectPlain) => {
   const tags: HeadTag[] = []
 
-  for (const key of Object.keys(obj) as Array<keyof HeadObject>) {
+  for (const key of Object.keys(obj) as Array<keyof HeadObjectPlain>) {
     if (key === 'title') {
       tags.push({ tag: key, props: { children: obj[key] } })
     } else if (key === 'base') {
@@ -242,7 +246,9 @@ const IS_BROWSER = typeof window !== 'undefined'
 export const useHead = (
   obj: HeadObject | Ref<HeadObject> | (() => HeadObject),
 ) => {
-  const headObj = typeof obj === 'function' ? computed(obj) : ref(obj)
+  const headObj = (typeof obj === 'function'
+    ? computed(obj)
+    : ref(obj)) as Ref<HeadObjectPlain>
   const head = injectHead()
 
   if (IS_BROWSER) {
@@ -252,7 +258,7 @@ export const useHead = (
       if (tags) {
         head.removeHeadTags(tags)
       }
-      tags = headObjToTags(unref(headObj))
+      tags = headObjToTags(headObj.value)
       head.addHeadTags(tags)
       head.updateDOM()
     })
@@ -264,7 +270,7 @@ export const useHead = (
       }
     })
   } else {
-    head.addHeadTags(headObjToTags(unref(headObj)))
+    head.addHeadTags(headObjToTags(headObj.value))
   }
 }
 
