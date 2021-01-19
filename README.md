@@ -34,41 +34,29 @@ Manage `head` with the composition API `useHead` in your component:
 
 ```vue
 <script>
-import { defineComponent } from 'vue'
+import { defineComponent, computed, reactive } from 'vue'
 import { useHead } from '@vueuse/head'
 
 export default defineComponent({
   setup() {
+    const siteData = reactive({
+      title: `My website`
+      description: `My beautiful website`,
+    })
+
     useHead({
-      title: `Website title`,
+      // Can be static or computed
+      title: computed(() => siteData.title),
       meta: [
         {
           name: `description`,
-          content: `Website description`,
+          content: computed(() => siteData.description),
         },
       ],
     })
   },
 })
 </script>
-```
-
-### Reactive data
-
-When passing an object to `useHead`, it will be converted to a `RefObject` using `Vue.ref`, so you can use reactivity API here as well:
-
-```ts
-const count = ref(0)
-
-useHead({
-  title: computed(() => `Clicked ${count.value} times`),
-  meta: [
-    {
-      name: 'description',
-      content: computed(() => someStore.description),
-    },
-  ],
-})
 ```
 
 ### Server-side rendering
