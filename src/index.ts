@@ -3,27 +3,27 @@ import { PROVIDE_KEY, HEAD_COUNT_KEY, HEAD_ATTRS_KEY } from './constants'
 import { createElement } from './create-element'
 import { stringifyAttrs } from './stringify-attrs'
 
-type Attrs = { [k: string]: any }
+export type HeadAttrs = { [k: string]: any }
 
-type HeadObj = {
+export type HeadObject = {
   title?: string
-  meta?: Attrs[]
-  link?: Attrs[]
-  base?: Attrs
-  style?: Attrs[]
-  script?: Attrs[]
-  htmlAttrs?: Attrs
-  bodyAttrs?: Attrs
+  meta?: HeadAttrs[]
+  link?: HeadAttrs[]
+  base?: HeadAttrs
+  style?: HeadAttrs[]
+  script?: HeadAttrs[]
+  htmlAttrs?: HeadAttrs
+  bodyAttrs?: HeadAttrs
 }
 
-type HeadTag = {
+export type HeadTag = {
   tag: string
   props: {
     [k: string]: any
   }
 }
 
-type Head = {
+export type Head = {
   install: (app: App) => void
 
   headTags: HeadTag[]
@@ -60,10 +60,10 @@ const injectHead = () => {
   return head
 }
 
-const headObjToTags = (obj: HeadObj) => {
+const headObjToTags = (obj: HeadObject) => {
   const tags: HeadTag[] = []
 
-  for (const key of Object.keys(obj) as Array<keyof HeadObj>) {
+  for (const key of Object.keys(obj) as Array<keyof HeadObject>) {
     if (key === 'title') {
       tags.push({ tag: key, props: { children: obj[key] } })
     } else if (key === 'base') {
@@ -83,7 +83,7 @@ const headObjToTags = (obj: HeadObj) => {
   return tags
 }
 
-const setAttrs = (el: Element, attrs: Attrs) => {
+const setAttrs = (el: Element, attrs: HeadAttrs) => {
   const existingAttrs = el.getAttribute(HEAD_ATTRS_KEY)
   if (existingAttrs) {
     for (const key of existingAttrs.split(',')) {
@@ -130,8 +130,8 @@ const insertTags = (tags: HeadTag[]) => {
 
   const newElements: Element[] = []
   let title: string | undefined
-  let htmlAttrs: Attrs = {}
-  let bodyAttrs: Attrs = {}
+  let htmlAttrs: HeadAttrs = {}
+  let bodyAttrs: HeadAttrs = {}
 
   for (const tag of tags) {
     if (tag.tag === 'title') {
@@ -221,7 +221,7 @@ export const createHead = () => {
 
 const IS_BROWSER = typeof window !== 'undefined'
 
-export const useHead = (fn: () => HeadObj) => {
+export const useHead = (fn: () => HeadObject) => {
   const head = injectHead()
 
   if (IS_BROWSER) {
@@ -263,8 +263,8 @@ const tagToString = (tag: HeadTag) => {
 export const renderHeadToString = (head: Head) => {
   const tags: string[] = []
   let titleTag = ''
-  let htmlAttrs: Attrs = {}
-  let bodyAttrs: Attrs = {}
+  let htmlAttrs: HeadAttrs = {}
+  let bodyAttrs: HeadAttrs = {}
   for (const tag of head.headTags) {
     if (tag.tag === 'title') {
       titleTag = tagToString(tag)
