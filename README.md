@@ -55,33 +55,21 @@ export default defineComponent({
 
 ### Reactive data
 
-In many cases you want to make head tags dynamic, e.g. update document title when clicked a button:
+When passing an object to `useHead`, it will be converted to a `RefObject` using `Vue.ref`, so you can use reactivity API here as well:
 
-```vue
-<template>
-  <button @click="count++">Click</button>
-</template>
+```ts
+const count = ref(0)
 
-<script>
-import { defineComponent, ref, computed } from 'vue'
-
-export default defineComponent({
-  setup() {
-    const count = ref(0)
-
-    useHead({
-      title: computed(() => `Clicked ${count.value} times`),
-    })
-
-    return {
-      count,
-    }
-  },
+useHead({
+  title: computed(() => `Clicked ${count.value} times`),
+  meta: [
+    {
+      name: 'description',
+      content: computed(() => someStore.description),
+    },
+  ],
 })
-</script>
 ```
-
-`meta`, `base` and other properties can also be a `RefObject` like the `title` here, check out [API](#api) for more.
 
 ### Server-side rendering
 

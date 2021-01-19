@@ -1,4 +1,4 @@
-import { createApp, ref, h, defineComponent } from 'vue'
+import { createApp, ref, h, defineComponent, computed } from 'vue'
 import {
   createRouter,
   createWebHistory,
@@ -10,8 +10,8 @@ import { createHead, useHead } from '../src'
 const Home = defineComponent({
   setup() {
     const count = ref(0)
-    useHead(() => ({
-      title: `count: ${count.value}`,
+    useHead({
+      title: computed(() => `count: ${count.value}`),
       base: { href: '/' },
       style: [{ children: `body {background: red}` }],
       htmlAttrs: {
@@ -37,7 +37,7 @@ const Home = defineComponent({
           key: 'zh',
         },
       ],
-    }))
+    })
     return () => (
       <div>
         <h1>Home</h1>
