@@ -1,3 +1,12 @@
+## [0.2.1](https://github.com/vueuse/head/compare/v0.2.0...v0.2.1) (2021-01-19)
+
+
+### Bug Fixes
+
+* updateDOM with custom document ([#9](https://github.com/vueuse/head/issues/9)) ([20d6d17](https://github.com/vueuse/head/commit/20d6d1757fc64abedcfde1ab14236189d42d1f47))
+
+
+
 # [0.2.0](https://github.com/vueuse/head/compare/v0.1.3...v0.2.0) (2021-01-19)
 
 
