@@ -45,7 +45,7 @@ export type Head = {
 
   removeHeadTags: (tags: HeadTag[]) => void
 
-  updateDOM: () => void
+  updateDOM: (document?: Document) => void
 }
 
 export interface HTMLResult {
@@ -126,7 +126,7 @@ const setAttrs = (el: Element, attrs: HeadAttrs) => {
   el.setAttribute(HEAD_ATTRS_KEY, keys.join(','))
 }
 
-const insertTags = (tags: HeadTag[]) => {
+const insertTags = (tags: HeadTag[], document = window.document) => {
   const head = document.head
   let headCountEl = head.querySelector(`meta[name="${HEAD_COUNT_KEY}"]`)
   const headCount = headCountEl
@@ -234,8 +234,8 @@ export const createHead = () => {
       })
     },
 
-    updateDOM() {
-      insertTags(headTags)
+    updateDOM(document) {
+      insertTags(headTags, document)
     },
   }
   return head
