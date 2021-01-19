@@ -168,7 +168,7 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
       Object.assign(bodyAttrs, tag.props)
       continue
     }
-    newElements.push(createElement(tag.tag, tag.props))
+    newElements.push(createElement(tag.tag, tag.props, document))
   }
 
   oldElements.forEach((el) => {
