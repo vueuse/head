@@ -1,4 +1,13 @@
-import { App, inject, onBeforeUnmount, watchEffect } from 'vue'
+import {
+  App,
+  computed,
+  inject,
+  onBeforeUnmount,
+  ref,
+  Ref,
+  unref,
+  watchEffect,
+} from 'vue'
 import { PROVIDE_KEY, HEAD_COUNT_KEY, HEAD_ATTRS_KEY } from './constants'
 import { createElement } from './create-element'
 import { stringifyAttrs } from './stringify-attrs'
@@ -221,7 +230,9 @@ export const createHead = () => {
 
 const IS_BROWSER = typeof window !== 'undefined'
 
-export const useHead = (fn: () => HeadObj) => {
+export const useHead = (obj: HeadObj | Ref<HeadObj> | (() => HeadObj)) => {
+  const headObj: Ref<HeadObj> =
+    typeof obj === 'function' ? computed(obj) : ref(obj)
   const head = injectHead()
 
   if (IS_BROWSER) {
@@ -231,8 +242,7 @@ export const useHead = (fn: () => HeadObj) => {
       if (tags) {
         head.removeHeadTags(tags)
       }
-      const headObj = fn()
-      tags = headObjToTags(headObj)
+      tags = headObjToTags(unref(headObj))
       head.addHeadTags(tags)
       head.updateDOM()
     })
@@ -243,12 +253,9 @@ export const useHead = (fn: () => HeadObj) => {
         head.updateDOM()
       }
     })
-
-    return
+  } else {
+    head.addHeadTags(headObjToTags(unref(headObj)))
   }
-
-  const headObj = fn()
-  head.addHeadTags(headObjToTags(headObj))
 }
 
 const tagToString = (tag: HeadTag) => {
