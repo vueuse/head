@@ -1,3 +1,19 @@
+# [0.2.0](https://github.com/vueuse/head/compare/v0.1.3...v0.2.0) (2021-01-19)
+
+
+### Bug Fixes
+
+* reset head in onBeforeUnmount instead ([87efe1a](https://github.com/vueuse/head/commit/87efe1a9f6189173765e2199901bf6039a8f512d))
+
+
+### Features
+
+* make `document` of updateDOM configurable ([#7](https://github.com/vueuse/head/issues/7)) ([b48809a](https://github.com/vueuse/head/commit/b48809a8f005159bca7a09f32bdd3ec3213d7024))
+* useHead accepts more types of argument ([#6](https://github.com/vueuse/head/issues/6)) ([76cdda7](https://github.com/vueuse/head/commit/76cdda75a1d69fa7bc8205b079c84af51be29862))
+* **types:** expose types ([#5](https://github.com/vueuse/head/issues/5)) ([081c4a8](https://github.com/vueuse/head/commit/081c4a80e4ab3a8b1513d0a2297877a29a0441fb))
+
+
+
 ## [0.1.3](https://github.com/vueuse/head/compare/v0.1.2...v0.1.3) (2021-01-18)
 
 
