@@ -1,4 +1,8 @@
-export const createElement = (tag: string, attrs: { [k: string]: any }) => {
+export const createElement = (
+  tag: string,
+  attrs: { [k: string]: any },
+  document: Document,
+) => {
   const el = document.createElement(tag)
 
   for (const key of Object.keys(attrs)) {
