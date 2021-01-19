@@ -137,10 +137,10 @@ useHead(() => ({
 
 ### `renderHeadToString(head: Head)`
 
-- Returns: `HtmlResult`
+- Returns: `HTMLResult`
 
 ```ts
-interface HtmlResult {
+interface HTMLResult {
   // Tags in `<head>`
   readonly headTags: string
   // Attributes for `<html>`
