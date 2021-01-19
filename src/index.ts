@@ -44,6 +44,15 @@ export type Head = {
   updateDOM: () => void
 }
 
+export interface HTMLResult {
+  // Tags in `<head>`
+  readonly headTags: string
+  // Attributes for `<html>`
+  readonly htmlAttrs: string
+  // Attributes for `<body>`
+  readonly bodyAttrs: string
+}
+
 const getTagKey = (props: any) => {
   if (props.key !== undefined) {
     return { name: 'key', value: props.key }
@@ -268,7 +277,7 @@ const tagToString = (tag: HeadTag) => {
   return `<${tag.tag}${attrs}/>`
 }
 
-export const renderHeadToString = (head: Head) => {
+export const renderHeadToString = (head: Head): HTMLResult => {
   const tags: string[] = []
   let titleTag = ''
   let htmlAttrs: HeadAttrs = {}
@@ -285,6 +294,7 @@ export const renderHeadToString = (head: Head) => {
     }
   }
   tags.push(`<meta name="${HEAD_COUNT_KEY}" content="${tags.length}" />`)
+
   return {
     get headTags() {
       return titleTag + tags.join('')
