@@ -85,21 +85,21 @@ const finalHTML = `
 
 Create the head manager instance.
 
-### `useHead(() => HeadObj)`
+### `useHead(() => HeadObject)`
 
 ```ts
-interface HeadObj {
+interface HeadObject {
   title?: string
-  base?: Attrs
-  meta?: Attrs[]
-  link?: Attrs[]
-  style?: Attrs[]
-  script?: Attrs[]
-  htmlAttrs?: Attrs
-  bodyAttrs?: Attrs
+  base?: HeadAttrs
+  meta?: HeadAttrs[]
+  link?: HeadAttrs[]
+  style?: HeadAttrs[]
+  script?: HeadAttrs[]
+  htmlAttrs?: HeadAttrs
+  bodyAttrs?: HeadAttrs
 }
 
-interface Attrs {
+interface HeadAttrs {
   [attrName: string]: any
 }
 ```
