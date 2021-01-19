@@ -1,3 +1,4 @@
 module.exports = {
-  publishCommand: ({ defaultCommand }) => `${defaultCommand} --access public`,
+  publishCommand: ({ defaultCommand, tag }) =>
+    `${defaultCommand} --access public --tag ${tag}`,
 }
