@@ -85,7 +85,7 @@ const finalHTML = `
 
 Create the head manager instance.
 
-### `useHead(() => HeadObject)`
+### `useHead(head: HeadObject | Ref<HeadObject> | (() => HeadObject))`
 
 ```ts
 interface HeadObject {
@@ -133,6 +133,18 @@ useHead(() => ({
     },
   ],
 }))
+```
+
+`useHead` also takes reactive object or ref as the argument, for example:
+
+```ts
+const head = reactive({ title: 'Website Title' })
+useHead(head)
+```
+
+```ts
+const title = ref('Website Title')
+useHead({ title })
 ```
 
 ### `renderHeadToString(head: Head)`

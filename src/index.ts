@@ -15,7 +15,7 @@ import { stringifyAttrs } from './stringify-attrs'
 export type HeadAttrs = { [k: string]: any }
 
 export type HeadObject = {
-  title?: string
+  title?: string | Ref<string>
   meta?: HeadAttrs[]
   link?: HeadAttrs[]
   base?: HeadAttrs
