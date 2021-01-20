@@ -62,5 +62,8 @@
     "vite": "^2.0.0-beta.30",
     "vue": "^3.0.5",
     "vue-router": "^4.0.3"
+  },
+  "peerDependencies": {
+    "vue": ">=3"
   }
 }
