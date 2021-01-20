@@ -1,3 +1,12 @@
+## [0.2.2](https://github.com/vueuse/head/compare/v0.2.1...v0.2.2) (2021-01-20)
+
+
+### Bug Fixes
+
+* **pkg:** add vue as peerDependency ([dabca4f](https://github.com/vueuse/head/commit/dabca4fe4206b48a5bca19369180af9ddc31ef86))
+
+
+
 ## [0.2.1](https://github.com/vueuse/head/compare/v0.2.0...v0.2.1) (2021-01-19)
 
 
