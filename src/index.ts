@@ -97,14 +97,11 @@ const headObjToTags = (obj: HeadObjectPlain) => {
   const tags: HeadTag[] = []
 
   for (const key of Object.keys(obj) as Array<keyof HeadObjectPlain>) {
-    if (!acceptFields.includes(key)) {
-      continue
-    }
     if (key === 'title') {
       tags.push({ tag: key, props: { children: obj[key] } })
     } else if (key === 'base') {
       tags.push({ tag: key, props: { key: 'default', ...obj[key] } })
-    } else {
+    } else if (acceptFields.includes(key)) {
       const value = obj[key]
       if (Array.isArray(value)) {
         value.forEach((item) => {
