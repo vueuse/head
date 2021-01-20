@@ -82,10 +82,24 @@ const injectHead = () => {
   return head
 }
 
+const acceptFields: Array<keyof HeadObject> = [
+  'title',
+  'meta',
+  'link',
+  'base',
+  'style',
+  'script',
+  'htmlAttrs',
+  'bodyAttrs',
+]
+
 const headObjToTags = (obj: HeadObjectPlain) => {
   const tags: HeadTag[] = []
 
   for (const key of Object.keys(obj) as Array<keyof HeadObjectPlain>) {
+    if (!acceptFields.includes(key)) {
+      continue
+    }
     if (key === 'title') {
       tags.push({ tag: key, props: { children: obj[key] } })
     } else if (key === 'base') {
