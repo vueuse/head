@@ -44,6 +44,7 @@
       "prettier --write"
     ]
   },
+  "sideEffects": false,
   "devDependencies": {
     "@egoist/prettier-config": "^0.1.0",
     "@vitejs/plugin-vue-jsx": "^1.0.2",
