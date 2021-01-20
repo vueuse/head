@@ -1,3 +1,15 @@
+## [0.2.3](https://github.com/vueuse/head/compare/v0.2.2...v0.2.3) (2021-01-20)
+
+
+### Bug Fixes
+
+* ignore unknown props in headObject ([#14](https://github.com/vueuse/head/issues/14)) ([6911fa7](https://github.com/vueuse/head/commit/6911fa773f529dbc5d5e5477dac9f75379c03cbc))
+
+### Other Changes
+
+* This package is marked as `sideEffects` free now.
+
+
 ## [0.2.2](https://github.com/vueuse/head/compare/v0.2.1...v0.2.2) (2021-01-20)
 
 
