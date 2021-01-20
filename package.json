@@ -1,6 +1,6 @@
 {
   "name": "@vueuse/head",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "license": "MIT",
   "description": "Document head manager for Vue 3. SSR ready.",
   "keywords": [
