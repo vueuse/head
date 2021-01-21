@@ -72,7 +72,11 @@ const getTagKey = (props: any) => {
   }
 }
 
-const injectHead = () => {
+/**
+ * Inject the head manager instance
+ * Exported for advanced usage or library integration, you probably don't need this
+ */
+export const injectHead = () => {
   const head = inject<Head>(PROVIDE_KEY)
 
   if (!head) {
