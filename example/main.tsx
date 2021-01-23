@@ -9,6 +9,7 @@ import { createHead, useHead } from '../src'
 
 const Home = defineComponent({
   setup() {
+    const vueIcon = ref(true)
     const count = ref(0)
     useHead({
       title: computed(() => `count: ${count.value}`),
@@ -37,6 +38,7 @@ const Home = defineComponent({
           key: 'zh',
         },
       ],
+      favicon: computed(() => vueIcon.value ? '/icons/vue.ico' : '/icons/vueuse.ico')
     })
     return () => (
       <div>
@@ -48,7 +50,10 @@ const Home = defineComponent({
             count.value++
           }}
         >
-          {count.value}
+          count: {count.value}
+        </button>
+        <button onClick={() => vueIcon.value = !vueIcon.value}>
+          Toggle favicon
         </button>
       </div>
     )

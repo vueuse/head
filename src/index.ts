@@ -25,6 +25,7 @@ export type HeadObject = {
   script?: MaybeRef<HeadAttrs[]>
   htmlAttrs?: MaybeRef<HeadAttrs>
   bodyAttrs?: MaybeRef<HeadAttrs>
+  favicon?: MaybeRef<string>
 }
 
 export type HeadObjectPlain = UnwrapRef<HeadObject>
@@ -95,6 +96,7 @@ const acceptFields: Array<keyof HeadObject> = [
   'script',
   'htmlAttrs',
   'bodyAttrs',
+  'favicon',
 ]
 
 const headObjToTags = (obj: HeadObjectPlain) => {
@@ -105,6 +107,8 @@ const headObjToTags = (obj: HeadObjectPlain) => {
       tags.push({ tag: key, props: { children: obj[key] } })
     } else if (key === 'base') {
       tags.push({ tag: key, props: { key: 'default', ...obj[key] } })
+    } else if (key === 'favicon') {
+      tags.push({ tag: 'link', props: { rel: 'icon', href: obj[key] } })
     } else if (acceptFields.includes(key)) {
       const value = obj[key]
       if (Array.isArray(value)) {
