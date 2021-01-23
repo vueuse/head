@@ -138,7 +138,11 @@ const setAttrs = (el: Element, attrs: HeadAttrs) => {
     }
   }
 
-  el.setAttribute(HEAD_ATTRS_KEY, keys.join(','))
+  if (keys.length) {
+    el.setAttribute(HEAD_ATTRS_KEY, keys.join(','))
+  } else {
+    el.removeAttribute(HEAD_ATTRS_KEY)
+  }
 }
 
 const insertTags = (tags: HeadTag[], document = window.document) => {
