@@ -1,25 +1,24 @@
-import { suite } from 'uvu'
-import * as assert from 'uvu/assert'
+import anyTest, { TestInterface } from 'ava'
 import { createSSRApp, h } from 'vue'
 import { renderToString } from '@vue/server-renderer'
 import { chromium, ChromiumBrowser } from 'playwright-chromium'
 import { createHead, renderHeadToString, useHead } from '../src'
 
-type Context = {
+type TestContext = {
   browser: ChromiumBrowser
 }
 
-const test = suite<Context>()
+const test = anyTest as TestInterface<TestContext>
 
-test.before(async (context) => {
-  context.browser = await chromium.launch()
+test.before(async (t) => {
+  t.context.browser = await chromium.launch()
 })
 
-test.after(async (context) => {
-  await context.browser.close()
+test.after(async (t) => {
+  await t.context.browser.close()
 })
 
-test('server', async () => {
+test('server', async (t) => {
   const head = createHead()
   const app = createSSRApp({
     setup() {
@@ -56,19 +55,19 @@ test('server', async () => {
   await renderToString(app)
 
   const headResult = renderHeadToString(head)
-  assert.is(
+  t.is(
     headResult.headTags,
     `<title>hello</title><meta name="description" content="desc 2"/><meta property="og:locale:alternate" content="fr"/><meta property="og:locale:alternate" content="zh"/><meta name="head:count" content="3" />`,
   )
-  assert.is(headResult.htmlAttrs, ` lang="zh" data-head-attrs="lang"`)
+  t.is(headResult.htmlAttrs, ` lang="zh" data-head-attrs="lang"`)
 })
 
-test('browser', async (context) => {
-  const page = await context.browser.newPage()
+test('browser', async (t) => {
+  const page = await t.context.browser.newPage()
   await page.goto(`http://localhost:3000`)
   const headHTML = await page.evaluate(() => document.head.innerHTML)
 
-  assert.is(
+  t.is(
     headHTML,
     `
 <script type="module" src="/@vite/client"></script>
@@ -80,10 +79,8 @@ test('browser', async (context) => {
   )
 
   await page.click('button')
-  assert.is(await page.title(), 'count: 1')
+  t.is(await page.title(), 'count: 1')
 
   await page.click('a[href="/about"]')
-  assert.is(await page.title(), 'About')
+  t.is(await page.title(), 'About')
 })
-
-test.run()
