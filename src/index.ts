@@ -296,10 +296,10 @@ export const useHead = (
 const tagToString = (tag: HeadTag) => {
   let attrs = stringifyAttrs(tag.props)
 
-  if (tag.props.children) {
+  if (tag.props.children != null) {
     return `<${tag.tag}${attrs}>${tag.props.children}</${tag.tag}>`
   }
-  return `<${tag.tag}${attrs}/>`
+  return `<${tag.tag}${attrs}>`
 }
 
 export const renderHeadToString = (head: Head): HTMLResult => {
@@ -318,7 +318,7 @@ export const renderHeadToString = (head: Head): HTMLResult => {
       tags.push(tagToString(tag))
     }
   }
-  tags.push(`<meta name="${HEAD_COUNT_KEY}" content="${tags.length}" />`)
+  tags.push(`<meta name="${HEAD_COUNT_KEY}" content="${tags.length}">`)
 
   return {
     get headTags() {
