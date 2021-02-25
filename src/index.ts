@@ -8,7 +8,12 @@ import {
   UnwrapRef,
   watchEffect,
 } from 'vue'
-import { PROVIDE_KEY, HEAD_COUNT_KEY, HEAD_ATTRS_KEY } from './constants'
+import {
+  PROVIDE_KEY,
+  HEAD_COUNT_KEY,
+  HEAD_ATTRS_KEY,
+  SELF_CLOSING_TAGS,
+} from './constants'
 import { createElement } from './create-element'
 import { stringifyAttrs } from './stringify-attrs'
 
@@ -296,10 +301,11 @@ export const useHead = (
 const tagToString = (tag: HeadTag) => {
   let attrs = stringifyAttrs(tag.props)
 
-  if (tag.props.children != null) {
-    return `<${tag.tag}${attrs}>${tag.props.children}</${tag.tag}>`
+  if (SELF_CLOSING_TAGS.includes(tag.tag)) {
+    return `<${tag.tag}${attrs}>`
   }
-  return `<${tag.tag}${attrs}>`
+
+  return `<${tag.tag}${attrs}>${tag.props.children || ''}</${tag.tag}>`
 }
 
 export const renderHeadToString = (head: Head): HTMLResult => {

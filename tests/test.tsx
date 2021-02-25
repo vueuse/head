@@ -47,6 +47,11 @@ test('server', async (t) => {
             key: 'zh',
           },
         ],
+        script: [
+          {
+            src: 'foo.js',
+          },
+        ],
       }))
       return () => <div>hi</div>
     },
@@ -57,7 +62,7 @@ test('server', async (t) => {
   const headResult = renderHeadToString(head)
   t.is(
     headResult.headTags,
-    `<title>hello</title><meta name="description" content="desc 2"><meta property="og:locale:alternate" content="fr"><meta property="og:locale:alternate" content="zh"><meta name="head:count" content="3">`,
+    `<title>hello</title><meta name="description" content="desc 2"><meta property="og:locale:alternate" content="fr"><meta property="og:locale:alternate" content="zh"><script src="foo.js"></script><meta name="head:count" content="4">`,
   )
   t.is(headResult.htmlAttrs, ` lang="zh" data-head-attrs="lang"`)
 })
