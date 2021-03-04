@@ -1,5 +1,3 @@
-dependencies:
-  '@types/cross-spawn': 6.0.2
 devDependencies:
   '@egoist/prettier-config': 0.1.0
   '@types/node-fetch': 2.5.8
@@ -14,7 +12,7 @@ devDependencies:
   node-fetch: 2.6.1
   playwright-core: 1.9.1
   prettier: 2.2.1
-  tsup: 3.12.1_typescript@4.2.2
+  tsup: 4.6.1_typescript@4.2.2
   typescript: 4.2.2
   vite: 2.0.5
   vue: 3.0.7
@@ -336,12 +334,6 @@ packages:
       node: '>=6'
     resolution:
       integrity: sha512-XIB2XbzHTN6ieIjfIMV9hlVcfPU26s2vafYWQcZHWXHOxiaRZYEDKEwdl129Zyg50+foYV2jCgtrqSA6qNuNSA==
-  /@types/cross-spawn/6.0.2:
-    dependencies:
-      '@types/node': 14.14.31
-    dev: false
-    resolution:
-      integrity: sha512-KuwNhp3eza+Rhu8IFI5HUXRP0LIhqH5cAjubUvGXXthh4YYBuP2ntwEX+Cz8GJoZUHlKo247wPWOfA9LYEq4cw==
   /@types/estree/0.0.39:
     dev: true
     resolution:
@@ -354,6 +346,7 @@ packages:
     resolution:
       integrity: sha512-fbjI6ja0N5ZA8TV53RUqzsKNkl9fv8Oj3T7zxW7FGv1GSH7gwJaNF8dzCjrqKaxKeUpTz4yT1DaJFq/omNpGfw==
   /@types/node/14.14.31:
+    dev: true
     resolution:
       integrity: sha512-vFHy/ezP5qI0rFgJ7aQnjDXwAMrG0KqqIH7tQG5PPv3BWBayOPIQNBjVc/P6hhdZfMx51REc6tfDNXHUio893g==
   /@types/normalize-package-data/2.4.0:
@@ -2041,12 +2034,6 @@ packages:
       node: '>=10'
     resolution:
       integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==
-  /magic-string/0.25.7:
-    dependencies:
-      sourcemap-codec: 1.4.8
-    dev: true
-    resolution:
-      integrity: sha512-4CrMT5DOHTDk4HYDlzmwu4FVCcIYI8gauveasrdCu2IKIFOJ3f0v/8MDGJCDL9oD2ppz/Av1b0Nj345H9M+XIA==
   /make-dir/3.1.0:
     dependencies:
       semver: 6.3.0
@@ -2722,19 +2709,6 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==
-  /rollup-plugin-dts/2.0.1_rollup@2.40.0+typescript@4.2.2:
-    dependencies:
-      magic-string: 0.25.7
-      rollup: 2.40.0
-      typescript: 4.2.2
-    dev: true
-    optionalDependencies:
-      '@babel/code-frame': 7.12.13
-    peerDependencies:
-      rollup: ^2.34.2
-      typescript: ^4.1.2
-    resolution:
-      integrity: sha512-y38NSXIY37YExCumbGBTL5dXg7pL7XD+Kbe98iEHWFN9yiKJf7t4kKBOkml5ylUDjQIXBnNClGDeRktc1T5dmA==
   /rollup/2.40.0:
     dev: true
     engines:
@@ -2874,10 +2848,6 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
-  /sourcemap-codec/1.4.8:
-    dev: true
-    resolution:
-      integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==
   /spdx-correct/3.1.1:
     dependencies:
       spdx-expression-parse: 3.0.1
@@ -3098,7 +3068,7 @@ packages:
     dev: true
     resolution:
       integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
-  /tsup/3.12.1_typescript@4.2.2:
+  /tsup/4.6.1_typescript@4.2.2:
     dependencies:
       '@rollup/plugin-node-resolve': 11.2.0_rollup@2.40.0
       cac: 6.7.2
@@ -3110,14 +3080,17 @@ packages:
       postcss-load-config: 3.0.1
       resolve-from: 5.0.0
       rollup: 2.40.0
-      rollup-plugin-dts: 2.0.1_rollup@2.40.0+typescript@4.2.2
       sucrase: 3.17.1
+      typescript: 4.2.2
     dev: true
     hasBin: true
     peerDependencies:
-      typescript: '*'
+      typescript: ^4.2.2
+    peerDependenciesMeta:
+      typescript:
+        optional: true
     resolution:
-      integrity: sha512-W9/XQ7JTEt1iuybQLVk0eNKYBfuIbQ7uvVVyBg6xSEL0XrIdi8sWKj9W2wC8e9KRpXwtQtSZ1a4wnqQMQiIH3w==
+      integrity: sha512-I6WBrNqEdX2cUhr4Aj8TjAC6WKqMdtCyKDuiKgp4U09xnpjlbUbbaS7Y/AF5YNOX6BsISuF4J4hS0gM1qQieVQ==
   /type-fest/0.11.0:
     dev: true
     engines:
@@ -3389,7 +3362,6 @@ packages:
       integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 specifiers:
   '@egoist/prettier-config': ^0.1.0
-  '@types/cross-spawn': ^6.0.2
   '@types/node-fetch': ^2.5.8
   '@vitejs/plugin-vue-jsx': ^1.0.2
   '@vue/server-renderer': ^3.0.5
@@ -3402,8 +3374,8 @@ specifiers:
   node-fetch: ^2.6.1
   playwright-core: ^1.9.1
   prettier: ^2.2.1
-  tsup: ^3.11.0
-  typescript: ^4.1.3
+  tsup: ^4.6.1
+  typescript: ^4.2.2
   vite: ^2.0.5
   vue: ^3.0.5
   vue-router: ^4.0.3
