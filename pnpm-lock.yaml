@@ -5,6 +5,7 @@ devDependencies:
   '@vue/server-renderer': 3.0.7_vue@3.0.7
   ava: 3.15.0
   chrome-location: 1.2.1
+  dtsup: 1.0.1_typescript@4.2.2
   esbuild-register: 2.1.0
   execa: 5.0.0
   husky: 4.3.8
@@ -1148,6 +1149,19 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q==
+  /dtsup/1.0.1_typescript@4.2.2:
+    dependencies:
+      '@rollup/plugin-node-resolve': 11.2.0_rollup@2.40.0
+      cac: 6.7.2
+      rollup: 2.40.0
+      rollup-plugin-dts: 2.0.1_rollup@2.40.0+typescript@4.2.2
+      typescript: 4.2.2
+    dev: true
+    hasBin: true
+    peerDependencies:
+      typescript: ^4.1.5
+    resolution:
+      integrity: sha512-kq/yFqWCJgFYocNJlxszjSjYd1CsQ8A/Lm0pEO8J1ZgrCBsdcJECtYun6znHS6oO1cc52fGk5OJ3VXKuQSI1tA==
   /duplexer3/0.1.4:
     dev: true
     resolution:
@@ -2034,6 +2048,12 @@ packages:
       node: '>=10'
     resolution:
       integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==
+  /magic-string/0.25.7:
+    dependencies:
+      sourcemap-codec: 1.4.8
+    dev: true
+    resolution:
+      integrity: sha512-4CrMT5DOHTDk4HYDlzmwu4FVCcIYI8gauveasrdCu2IKIFOJ3f0v/8MDGJCDL9oD2ppz/Av1b0Nj345H9M+XIA==
   /make-dir/3.1.0:
     dependencies:
       semver: 6.3.0
@@ -2709,6 +2729,19 @@ packages:
     hasBin: true
     resolution:
       integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==
+  /rollup-plugin-dts/2.0.1_rollup@2.40.0+typescript@4.2.2:
+    dependencies:
+      magic-string: 0.25.7
+      rollup: 2.40.0
+      typescript: 4.2.2
+    dev: true
+    optionalDependencies:
+      '@babel/code-frame': 7.12.13
+    peerDependencies:
+      rollup: ^2.34.2
+      typescript: ^4.1.2
+    resolution:
+      integrity: sha512-y38NSXIY37YExCumbGBTL5dXg7pL7XD+Kbe98iEHWFN9yiKJf7t4kKBOkml5ylUDjQIXBnNClGDeRktc1T5dmA==
   /rollup/2.40.0:
     dev: true
     engines:
@@ -2848,6 +2881,10 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
+  /sourcemap-codec/1.4.8:
+    dev: true
+    resolution:
+      integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==
   /spdx-correct/3.1.1:
     dependencies:
       spdx-expression-parse: 3.0.1
@@ -3367,6 +3404,7 @@ specifiers:
   '@vue/server-renderer': ^3.0.5
   ava: ^3.15.0
   chrome-location: ^1.2.1
+  dtsup: ^1.0.1
   esbuild-register: ^2.1.0
   execa: ^5.0.0
   husky: ^4.3.8

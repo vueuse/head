@@ -64,7 +64,7 @@ export interface HTMLResult {
   readonly bodyAttrs: string
 }
 
-const getTagKey = (props: any) => {
+const getTagKey = (props: any): { name: string; value: any } | void => {
   if (props.key !== undefined) {
     return { name: 'key', value: props.key }
   }
