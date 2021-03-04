@@ -1,7 +1,7 @@
 import anyTest, { TestInterface } from 'ava'
 import { createSSRApp, h } from 'vue'
 import { renderToString } from '@vue/server-renderer'
-import { chromium, ChromiumBrowser } from 'playwright-chromium'
+import { chromium, ChromiumBrowser } from 'playwright-core'
 import { createHead, renderHeadToString, useHead } from '../src'
 
 type TestContext = {
@@ -11,7 +11,9 @@ type TestContext = {
 const test = anyTest as TestInterface<TestContext>
 
 test.before(async (t) => {
-  t.context.browser = await chromium.launch()
+  t.context.browser = await chromium.launch({
+    executablePath: require('chrome-location'),
+  })
 })
 
 test.after(async (t) => {
