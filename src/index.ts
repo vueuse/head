@@ -50,6 +50,8 @@ export type Head = {
 
   removeHeadTags: (tags: HeadTag[]) => void
 
+  updateHeadTags: (oldTags: HeadTag[], newTags: HeadTag[]) => void
+
   updateDOM: (document?: Document) => void
 }
 
@@ -211,7 +213,7 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
 }
 
 export const createHead = () => {
-  const headTags: HeadTag[] = []
+  let allHeadTags: HeadTag[][] = []
 
   const head: Head = {
     install(app) {
@@ -219,47 +221,64 @@ export const createHead = () => {
       app.provide(PROVIDE_KEY, head)
     },
 
-    headTags,
+    /**
+     * Get deduped tags
+     */
+    get headTags() {
+      const deduped: HeadTag[] = []
 
-    addHeadTags(tags) {
-      tags.forEach((tag) => {
-        if (tag.tag === 'meta' || tag.tag === 'base') {
-          // Remove tags with the same key
-          const key = getTagKey(tag.props)
-          if (key) {
-            let index = -1
+      allHeadTags.forEach((tags) => {
+        tags.forEach((tag) => {
+          if (tag.tag === 'meta' || tag.tag === 'base') {
+            // Remove tags with the same key
+            const key = getTagKey(tag.props)
+            if (key) {
+              let index = -1
 
-            for (let i = 0; i < headTags.length; i++) {
-              const prev = headTags[i]
-              const prevValue = prev.props[key.name]
-              const nextValue = tag.props[key.name]
-              if (prev.tag === tag.tag && prevValue === nextValue) {
-                index = i
-                break
+              for (let i = 0; i < deduped.length; i++) {
+                const prev = deduped[i]
+                const prevValue = prev.props[key.name]
+                const nextValue = tag.props[key.name]
+                if (prev.tag === tag.tag && prevValue === nextValue) {
+                  index = i
+                  break
+                }
+              }
+
+              if (index !== -1) {
+                deduped.splice(index, 1)
               }
             }
-
-            if (index !== -1) {
-              headTags.splice(index, 1)
-            }
           }
-        }
 
-        headTags.push(tag)
+          deduped.push(tag)
+        })
+      })
+
+      return deduped
+    },
+
+    addHeadTags(tags) {
+      allHeadTags.push(tags)
+    },
+
+    updateHeadTags(oldTags, newTags) {
+      allHeadTags = allHeadTags.map((v) => {
+        if (v === oldTags) {
+          return newTags
+        }
+        return v
       })
     },
 
     removeHeadTags(tags) {
-      tags.forEach((tag) => {
-        const index = headTags.indexOf(tag)
-        if (index !== -1) {
-          headTags.splice(index, 1)
-        }
+      allHeadTags = allHeadTags.filter((v) => {
+        return tags !== v
       })
     },
 
     updateDOM(document) {
-      insertTags(headTags, document)
+      insertTags(head.headTags, document)
     },
   }
   return head
@@ -277,19 +296,24 @@ export const useHead = (
 
   if (IS_BROWSER) {
     let tags: HeadTag[] | undefined
+    let oldTags: HeadTag[] | undefined
 
     watchEffect(() => {
-      if (tags) {
-        head.removeHeadTags(tags)
-      }
       tags = headObjToTags(headObj.value)
-      head.addHeadTags(tags)
+
+      if (oldTags) {
+        head.updateHeadTags(oldTags, tags)
+      } else {
+        head.addHeadTags(tags)
+      }
+
+      oldTags = tags
       head.updateDOM()
     })
 
     onBeforeUnmount(() => {
-      if (tags) {
-        head.removeHeadTags(tags)
+      if (oldTags) {
+        head.removeHeadTags(oldTags)
         head.updateDOM()
       }
     })

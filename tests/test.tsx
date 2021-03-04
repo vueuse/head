@@ -83,7 +83,10 @@ test('browser', async (t) => {
   <base href="/"><style>body {background: red}</style><meta name="description" content="desc 2"><meta property="og:locale:alternate" content="fr"><meta property="og:locale:alternate" content="zh"><meta name="head:count" content="5">`,
   )
 
-  await page.click('button')
+  await page.click('button.counter')
+  t.is(await page.title(), 'count: 1')
+
+  await page.click('button.change-home-title')
   t.is(await page.title(), 'count: 1')
 
   await page.click('a[href="/about"]')

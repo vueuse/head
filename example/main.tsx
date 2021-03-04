@@ -7,11 +7,30 @@ import {
 } from 'vue-router'
 import { createHead, useHead } from '../src'
 
-const Home = defineComponent({
+const Counter = defineComponent({
   setup() {
     const count = ref(0)
     useHead({
       title: computed(() => `count: ${count.value}`),
+    })
+    return () => (
+      <button
+        class="counter"
+        onClick={() => {
+          count.value++
+        }}
+      >
+        {count.value}
+      </button>
+    )
+  },
+})
+
+const Home = defineComponent({
+  setup() {
+    const title = ref('Home')
+    useHead({
+      title,
       base: { href: '/' },
       style: [{ children: `body {background: red}` }],
       htmlAttrs: {
@@ -44,12 +63,12 @@ const Home = defineComponent({
         <RouterLink to="/about">About</RouterLink>
         <hr />
         <button
-          onClick={() => {
-            count.value++
-          }}
+          class="change-home-title"
+          onClick={() => (title.value = 'new title')}
         >
-          {count.value}
+          Change home title (not really)
         </button>
+        <Counter />
       </div>
     )
   },
