@@ -22,7 +22,7 @@ test('server', async (t) => {
   const head = createHead()
   const app = createSSRApp({
     setup() {
-      useHead(() => ({
+      useHead({
         title: `hello`,
         htmlAttrs: {
           lang: 'zh',
@@ -52,7 +52,7 @@ test('server', async (t) => {
             src: 'foo.js',
           },
         ],
-      }))
+      })
       return () => <div>hi</div>
     },
   })
