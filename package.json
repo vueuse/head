@@ -23,7 +23,7 @@
     "test": "node -r esbuild-register scripts/run-test.ts",
     "example": "vite example",
     "release": "shipjs prepare",
-    "build": "tsup src/index.ts --format esm,cjs && tsc && dtsup types/index.d.ts",
+    "build": "tsup src/index.ts --format esm,cjs --dts",
     "prepublishOnly": "npm run build",
     "test:e2e": "ava"
   },
@@ -64,7 +64,6 @@
     "@vue/server-renderer": "^3.0.5",
     "ava": "^3.15.0",
     "chrome-location": "^1.2.1",
-    "dtsup": "^1.0.1",
     "esbuild-register": "^2.1.0",
     "execa": "^5.0.0",
     "husky": "^4.3.8",
