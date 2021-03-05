@@ -76,9 +76,9 @@ const Home = defineComponent({
 
 const About = defineComponent({
   setup() {
-    useHead(() => ({
+    useHead({
       title: 'About',
-    }))
+    })
     return () => (
       <div>
         <h1>About</h1>

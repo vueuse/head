@@ -1,6 +1,5 @@
 import {
   App,
-  computed,
   inject,
   onBeforeUnmount,
   ref,
@@ -46,11 +45,9 @@ export type Head = {
 
   headTags: HeadTag[]
 
-  addHeadTags: (tags: HeadTag[]) => void
+  addHeadObjs: (objs: Ref<HeadObjectPlain>) => void
 
-  removeHeadTags: (tags: HeadTag[]) => void
-
-  updateHeadTags: (oldTags: HeadTag[], newTags: HeadTag[]) => void
+  removeHeadObjs: (objs: Ref<HeadObjectPlain>) => void
 
   updateDOM: (document?: Document) => void
 }
@@ -213,7 +210,7 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
 }
 
 export const createHead = () => {
-  let allHeadTags: HeadTag[][] = []
+  let allHeadObjs: Ref<HeadObjectPlain>[] = []
 
   const head: Head = {
     install(app) {
@@ -227,7 +224,8 @@ export const createHead = () => {
     get headTags() {
       const deduped: HeadTag[] = []
 
-      allHeadTags.forEach((tags) => {
+      allHeadObjs.forEach((objs) => {
+        const tags = headObjToTags(objs.value)
         tags.forEach((tag) => {
           if (tag.tag === 'meta' || tag.tag === 'base') {
             // Remove tags with the same key
@@ -258,23 +256,12 @@ export const createHead = () => {
       return deduped
     },
 
-    addHeadTags(tags) {
-      allHeadTags.push(tags)
+    addHeadObjs(objs) {
+      allHeadObjs.push(objs)
     },
 
-    updateHeadTags(oldTags, newTags) {
-      allHeadTags = allHeadTags.map((v) => {
-        if (v === oldTags) {
-          return newTags
-        }
-        return v
-      })
-    },
-
-    removeHeadTags(tags) {
-      allHeadTags = allHeadTags.filter((v) => {
-        return tags !== v
-      })
+    removeHeadObjs(objs) {
+      allHeadObjs = allHeadObjs.filter((_objs) => _objs !== objs)
     },
 
     updateDOM(document) {
@@ -286,39 +273,21 @@ export const createHead = () => {
 
 const IS_BROWSER = typeof window !== 'undefined'
 
-export const useHead = (
-  obj: HeadObject | Ref<HeadObject> | (() => HeadObject),
-) => {
-  const headObj = (typeof obj === 'function'
-    ? computed(obj)
-    : ref(obj)) as Ref<HeadObjectPlain>
+export const useHead = (obj: HeadObject | Ref<HeadObject>) => {
+  const headObj = ref(obj) as Ref<HeadObjectPlain>
   const head = injectHead()
 
+  head.addHeadObjs(headObj)
+
   if (IS_BROWSER) {
-    let tags: HeadTag[] | undefined
-    let oldTags: HeadTag[] | undefined
-
     watchEffect(() => {
-      tags = headObjToTags(headObj.value)
-
-      if (oldTags) {
-        head.updateHeadTags(oldTags, tags)
-      } else {
-        head.addHeadTags(tags)
-      }
-
-      oldTags = tags
       head.updateDOM()
     })
 
     onBeforeUnmount(() => {
-      if (oldTags) {
-        head.removeHeadTags(oldTags)
-        head.updateDOM()
-      }
+      head.removeHeadObjs(headObj)
+      head.updateDOM()
     })
-  } else {
-    head.addHeadTags(headObjToTags(headObj.value))
   }
 }
 

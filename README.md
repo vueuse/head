@@ -2,7 +2,7 @@
 
 Document head manager for Vue 3.
 
-`@vueuse/head` is a [Vue composition API](https://v3.vuejs.org/guide/composition-api-introduction.html) that helps you manage `<title>`, `<meta>` and other elements inside document head, it has no dependencies and we always try to keep it as slim as possible. 
+`@vueuse/head` is a [Vue composition API](https://v3.vuejs.org/guide/composition-api-introduction.html) that helps you manage `<title>`, `<meta>` and other elements inside document head, it has no dependencies and we always try to keep it as slim as possible.
 
 [![NPM version](https://img.shields.io/npm/v/@vueuse/head?color=a1b858)](https://www.npmjs.com/package/@vueuse/head)
 
@@ -93,7 +93,7 @@ const finalHTML = `
 
 Create the head manager instance.
 
-### `useHead(head: HeadObject | Ref<HeadObject> | (() => HeadObject))`
+### `useHead(head: HeadObject | Ref<HeadObject>)`
 
 ```ts
 interface HeadObject {

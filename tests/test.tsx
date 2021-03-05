@@ -1,5 +1,5 @@
 import anyTest, { TestInterface } from 'ava'
-import { createSSRApp, h } from 'vue'
+import { createSSRApp, h, ref } from 'vue'
 import { renderToString } from '@vue/server-renderer'
 import { chromium, ChromiumBrowser } from 'playwright-core'
 import { createHead, renderHeadToString, useHead } from '../src'
@@ -93,4 +93,22 @@ test('browser', async (t) => {
 
   await page.click('a[href="/about"]')
   t.is(await page.title(), 'About')
+})
+
+test('server async setup', async (t) => {
+  const head = createHead()
+  const app = createSSRApp({
+    async setup() {
+      const title = ref(`initial title`)
+      useHead({ title })
+      await new Promise((resolve) => setTimeout(resolve, 200))
+      title.value = 'new title'
+      return () => <div>hi</div>
+    },
+  })
+  app.use(head)
+  await renderToString(app)
+
+  const { headTags } = renderHeadToString(head)
+  t.regex(headTags, /new title/)
 })
