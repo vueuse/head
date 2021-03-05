@@ -54,7 +54,7 @@ export type HeadClient = {
   updateDOM: (document?: Document) => void
 }
 
-export interface HTMLobj {
+export interface HTMLResult {
   // Tags in `<head>`
   readonly headTags: string
   // Attributes for `<html>`
@@ -310,7 +310,7 @@ const tagToString = (tag: HeadTag) => {
   return `<${tag.tag}${attrs}>${tag.props.children || ''}</${tag.tag}>`
 }
 
-export const renderHeadToString = (head: HeadClient): HTMLobj => {
+export const renderHeadToString = (head: HeadClient): HTMLResult => {
   const tags: string[] = []
   let titleTag = ''
   let htmlAttrs: HeadAttrs = {}
