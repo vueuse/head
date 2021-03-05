@@ -40,7 +40,7 @@ export type HeadTag = {
   }
 }
 
-export type Head = {
+export type HeadClient = {
   install: (app: App) => void
 
   headTags: HeadTag[]
@@ -81,7 +81,7 @@ const getTagKey = (props: any): { name: string; value: any } | void => {
  * Exported for advanced usage or library integration, you probably don't need this
  */
 export const injectHead = () => {
-  const head = inject<Head>(PROVIDE_KEY)
+  const head = inject<HeadClient>(PROVIDE_KEY)
 
   if (!head) {
     throw new Error(`You may forget to apply app.use(head)`)
@@ -212,7 +212,7 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
 export const createHead = () => {
   let allHeadObjs: Ref<HeadObjectPlain>[] = []
 
-  const head: Head = {
+  const head: HeadClient = {
     install(app) {
       app.config.globalProperties.$head = head
       app.provide(PROVIDE_KEY, head)
@@ -301,7 +301,7 @@ const tagToString = (tag: HeadTag) => {
   return `<${tag.tag}${attrs}>${tag.props.children || ''}</${tag.tag}>`
 }
 
-export const renderHeadToString = (head: Head): HTMLResult => {
+export const renderHeadToString = (head: HeadClient): HTMLResult => {
   const tags: string[] = []
   let titleTag = ''
   let htmlAttrs: HeadAttrs = {}
