@@ -273,7 +273,7 @@ export const createHead = () => {
 
 const IS_BROWSER = typeof window !== 'undefined'
 
-export const useHead = (obj: HeadObject | Ref<HeadObject>) => {
+export const useHead = (obj: MaybeRef<HeadObject>) => {
   const headObj = ref(obj) as Ref<HeadObjectPlain>
   const head = injectHead()
 
