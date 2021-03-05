@@ -6,6 +6,7 @@ import {
   RouterView,
 } from 'vue-router'
 import { createHead, useHead } from '../src'
+import Contact from './Contact.vue'
 
 const Counter = defineComponent({
   setup() {
@@ -60,7 +61,8 @@ const Home = defineComponent({
     return () => (
       <div>
         <h1>Home</h1>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/about">About</RouterLink>{' '}
+        <RouterLink to="/contact">Contact</RouterLink>
         <hr />
         <button
           class="change-home-title"
@@ -99,6 +101,10 @@ const router = createRouter({
       path: '/about',
       component: About,
     },
+    {
+      path: '/contact',
+      component: Contact,
+    },
   ],
 })
 
@@ -113,3 +119,6 @@ app.use(head)
 app.use(router)
 
 app.mount('#app')
+
+// @ts-expect-error
+window.head = head

@@ -155,6 +155,26 @@ const title = ref('Website Title')
 useHead({ title })
 ```
 
+### `<Head>`
+
+Besides `useHead`, you can also manipulate head tags using the `<Head>` component:
+
+```vue
+<script setup lang="ts">
+import { Head } from '@vueuse/head'
+</script>
+
+<template>
+  <Head>
+    <title>Hello World</title>
+    <base href="/base" />
+    <html lang="en-US" class="theme-dark" />
+  </Head>
+</template>
+```
+
+Note that you need to use `<html>` and `<body>` to set `htmlAttrs` and `bodyAttrs` respectively, children for these two tags and self-closing tags like `<meta>`, `<link>` and `<base>` are also ignored.
+
 ### `renderHeadToString(head: Head)`
 
 - Returns: `HTMLResult`

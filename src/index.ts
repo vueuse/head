@@ -1,11 +1,13 @@
 import {
   App,
+  defineComponent,
   inject,
   onBeforeUnmount,
   ref,
   Ref,
   UnwrapRef,
   watchEffect,
+  VNode,
 } from 'vue'
 import {
   PROVIDE_KEY,
@@ -52,7 +54,7 @@ export type HeadClient = {
   updateDOM: (document?: Document) => void
 }
 
-export interface HTMLResult {
+export interface HTMLobj {
   // Tags in `<head>`
   readonly headTags: string
   // Attributes for `<html>`
@@ -105,6 +107,8 @@ const headObjToTags = (obj: HeadObjectPlain) => {
   const tags: HeadTag[] = []
 
   for (const key of Object.keys(obj) as Array<keyof HeadObjectPlain>) {
+    if (obj[key] == null) continue
+
     if (key === 'title') {
       tags.push({ tag: key, props: { children: obj[key] } })
     } else if (key === 'base') {
@@ -131,15 +135,20 @@ const setAttrs = (el: Element, attrs: HeadAttrs) => {
       el.removeAttribute(key)
     }
   }
-  const keys = Object.keys(attrs)
 
-  for (const key of keys) {
+  const keys: string[] = []
+
+  for (const key in attrs) {
     const value = attrs[key]
+    if (value == null) continue
+
     if (value === false) {
       el.removeAttribute(key)
     } else {
       el.setAttribute(key, value)
     }
+
+    keys.push(key)
   }
 
   if (keys.length) {
@@ -301,7 +310,7 @@ const tagToString = (tag: HeadTag) => {
   return `<${tag.tag}${attrs}>${tag.props.children || ''}</${tag.tag}>`
 }
 
-export const renderHeadToString = (head: HeadClient): HTMLResult => {
+export const renderHeadToString = (head: HeadClient): HTMLobj => {
   const tags: string[] = []
   let titleTag = ''
   let htmlAttrs: HeadAttrs = {}
@@ -337,3 +346,76 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
     },
   }
 }
+
+const vnodesToHeadObj = (nodes: VNode[]) => {
+  const obj: HeadObjectPlain = {
+    title: undefined,
+    htmlAttrs: undefined,
+    bodyAttrs: undefined,
+    base: undefined,
+    meta: [],
+    link: [],
+    style: [],
+    script: [],
+  }
+
+  for (const node of nodes) {
+    const type =
+      node.type === 'html'
+        ? 'htmlAttrs'
+        : node.type === 'body'
+        ? 'bodyAttrs'
+        : (node.type as keyof HeadObjectPlain)
+
+    if (typeof type !== 'string' || !(type in obj)) continue
+
+    const props = {
+      ...node.props,
+      children: Array.isArray(node.children)
+        ? // @ts-expect-error
+          node.children[0]!.children
+        : node.children,
+    } as HeadAttrs
+    if (Array.isArray(obj[type])) {
+      ;(obj[type] as HeadAttrs[]).push(props)
+    } else if (type === 'title') {
+      obj.title = props.children
+    } else {
+      ;(obj[type] as HeadAttrs) = props
+    }
+  }
+
+  return obj
+}
+
+export const Head = defineComponent({
+  name: 'Head',
+
+  setup(_, { slots }) {
+    const head = injectHead()
+
+    let obj: Ref<HeadObjectPlain> | undefined
+
+    onBeforeUnmount(() => {
+      if (obj) {
+        head.removeHeadObjs(obj)
+        head.updateDOM()
+      }
+    })
+
+    return () => {
+      watchEffect(() => {
+        if (!slots.default) return
+        if (obj) {
+          head.removeHeadObjs(obj)
+        }
+        obj = ref(vnodesToHeadObj(slots.default()))
+        head.addHeadObjs(obj)
+        if (IS_BROWSER) {
+          head.updateDOM()
+        }
+      })
+      return null
+    }
+  },
+})

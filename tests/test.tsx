@@ -1,8 +1,14 @@
 import anyTest, { TestInterface } from 'ava'
-import { createSSRApp, h, ref } from 'vue'
+import { createSSRApp, ref, h } from 'vue'
 import { renderToString } from '@vue/server-renderer'
 import { chromium, ChromiumBrowser } from 'playwright-core'
-import { createHead, renderHeadToString, useHead } from '../src'
+import {
+  createHead,
+  HeadClient,
+  renderHeadToString,
+  useHead,
+  Head,
+} from '../src'
 
 type TestContext = {
   browser: ChromiumBrowser
@@ -95,7 +101,7 @@ test('browser', async (t) => {
   t.is(await page.title(), 'About')
 })
 
-test('server async setup', async (t) => {
+test('useHead: server async setup', async (t) => {
   const head = createHead()
   const app = createSSRApp({
     async setup() {
@@ -104,6 +110,38 @@ test('server async setup', async (t) => {
       await new Promise((resolve) => setTimeout(resolve, 200))
       title.value = 'new title'
       return () => <div>hi</div>
+    },
+  })
+  app.use(head)
+  await renderToString(app)
+
+  const { headTags } = renderHeadToString(head)
+  t.regex(headTags, /new title/)
+})
+
+test('<Head>: basic', async (t) => {
+  const page = await t.context.browser.newPage()
+  await page.goto(`http://localhost:3000/contact`)
+  const getHeadTags = async () => {
+    const head: HeadClient = await page.evaluate(() => {
+      // @ts-expect-error
+      return window.head
+    })
+    return head.headTags
+  }
+  t.snapshot(await getHeadTags())
+  await page.click('button')
+  t.snapshot(await getHeadTags())
+})
+
+test('<Head>: server async setup', async (t) => {
+  const head = createHead()
+  const app = createSSRApp({
+    async setup() {
+      const title = ref(`initial title`)
+      await new Promise((resolve) => setTimeout(resolve, 200))
+      title.value = 'new title'
+      return () => <Head>{() => <title>{title.value}</title>}</Head>
     },
   })
   app.use(head)

@@ -15,7 +15,7 @@ export const stringifyAttrs = (attributes: any) => {
       continue
     }
 
-    if (value === false) {
+    if (value === false || value == null) {
       continue
     }
 
