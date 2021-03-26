@@ -388,7 +388,7 @@ const vnodesToHeadObj = (nodes: VNode[]) => {
   return obj
 }
 
-export const Head = defineComponent({
+export const Head = /*@__PURE__*/ defineComponent({
   name: 'Head',
 
   setup(_, { slots }) {
