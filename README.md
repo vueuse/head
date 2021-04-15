@@ -42,7 +42,7 @@ import { useHead } from '@vueuse/head'
 export default defineComponent({
   setup() {
     const siteData = reactive({
-      title: `My website`
+      title: `My website`,
       description: `My beautiful website`,
     })
 
