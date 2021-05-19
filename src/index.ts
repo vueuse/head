@@ -200,6 +200,28 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
       Object.assign(bodyAttrs, tag.props)
       continue
     }
+
+    // Remove tags with the same key
+    if (tag.tag === 'meta') {
+      let elementList: Element[] = []
+
+      if (tag.props.name) {
+        elementList = [
+          ...head.querySelectorAll(`meta[name="${tag.props.name}"]`),
+        ]
+      } else if (tag.props.property) {
+        elementList = [
+          ...head.querySelectorAll(`meta[property="${tag.props.property}"]`),
+        ]
+      }
+
+      for (const el of elementList) {
+        if (!oldElements.includes(el)) {
+          oldElements.push(el)
+        }
+      }
+    }
+
     newElements.push(createElement(tag.tag, tag.props, document))
   }
 
