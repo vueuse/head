@@ -200,10 +200,31 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
       Object.assign(bodyAttrs, tag.props)
       continue
     }
+
+    // Remove uncontrolled meta tags with the same key
+    if (tag.tag === 'meta') {
+      const key = getTagKey(tag.props)
+
+      if (key) {
+        const elementList = [
+          ...head.querySelectorAll(`meta[${key.name}="${key.value}"]`),
+        ]
+        for (const el of elementList) {
+          if (!oldElements.includes(el)) {
+            oldElements.push(el)
+          }
+        }
+      }
+    }
+
     newElements.push(createElement(tag.tag, tag.props, document))
   }
 
   oldElements.forEach((el) => {
+    // Remove the next text node first, almost certainly a line break
+    if (el.nextSibling && el.nextSibling.nodeType === Node.TEXT_NODE) {
+      el.nextSibling.remove()
+    }
     el.remove()
   })
   if (title !== undefined) {
