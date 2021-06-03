@@ -201,23 +201,18 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
       continue
     }
 
-    // Remove tags with the same key
+    // Remove uncontrolled meta tags with the same key
     if (tag.tag === 'meta') {
-      let elementList: Element[] = []
+      const key = getTagKey(tag.props)
 
-      if (tag.props.name) {
-        elementList = [
-          ...head.querySelectorAll(`meta[name="${tag.props.name}"]`),
+      if (key) {
+        const elementList = [
+          ...head.querySelectorAll(`meta[${key.name}="${key.value}"]`),
         ]
-      } else if (tag.props.property) {
-        elementList = [
-          ...head.querySelectorAll(`meta[property="${tag.props.property}"]`),
-        ]
-      }
-
-      for (const el of elementList) {
-        if (!oldElements.includes(el)) {
-          oldElements.push(el)
+        for (const el of elementList) {
+          if (!oldElements.includes(el)) {
+            oldElements.push(el)
+          }
         }
       }
     }
