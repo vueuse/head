@@ -164,7 +164,7 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
   const headCount = headCountEl
     ? Number(headCountEl.getAttribute('content'))
     : 0
-  const oldElements: Element[] = []
+  const oldElements: (ChildNode | Element)[] = []
   if (headCountEl) {
     for (
       let i = 0, j = headCountEl.previousElementSibling;
@@ -221,6 +221,10 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
   }
 
   oldElements.forEach((el) => {
+    // Remove the next text node first, almost certainly a line break
+    if (el.nextSibling && el.nextSibling.nodeType === Node.TEXT_NODE) {
+      el.nextSibling.remove()
+    }
     el.remove()
   })
   if (title !== undefined) {

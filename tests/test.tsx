@@ -88,7 +88,7 @@ test('browser', async (t) => {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>count: 0</title>
-  <base href="/"><style>body {background: red}</style><meta name="description" content="desc 2"><meta property="og:locale:alternate" content="fr"><meta property="og:locale:alternate" content="zh"><meta name="head:count" content="5">`,
+    <base href="/"><style>body {background: red}</style><meta name="description" content="desc 2"><meta property="og:locale:alternate" content="fr"><meta property="og:locale:alternate" content="zh"><meta name="head:count" content="5">`,
   )
 
   await page.click('button.counter')
