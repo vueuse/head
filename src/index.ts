@@ -164,7 +164,7 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
   const headCount = headCountEl
     ? Number(headCountEl.getAttribute('content'))
     : 0
-  const oldElements: (ChildNode | Element)[] = []
+  const oldElements: Element[] = []
   if (headCountEl) {
     for (
       let i = 0, j = headCountEl.previousElementSibling;
