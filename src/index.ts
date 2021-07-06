@@ -201,13 +201,13 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
       continue
     }
 
-    // Remove uncontrolled meta tags with the same key
-    if (tag.tag === 'meta') {
+    // Remove uncontrolled meta and script tags with the same key
+    if (tag.tag === 'meta' || tag.tag === 'script') {
       const key = getTagKey(tag.props)
 
       if (key) {
         const elementList = [
-          ...head.querySelectorAll(`meta[${key.name}="${key.value}"]`),
+          ...head.querySelectorAll(`${tag.tag}[${key.name}="${key.value}"]`),
         ]
         for (const el of elementList) {
           if (!oldElements.includes(el)) {
@@ -257,7 +257,11 @@ export const createHead = () => {
       allHeadObjs.forEach((objs) => {
         const tags = headObjToTags(objs.value)
         tags.forEach((tag) => {
-          if (tag.tag === 'meta' || tag.tag === 'base') {
+          if (
+            tag.tag === 'meta' ||
+            tag.tag === 'base' ||
+            tag.tag === 'script'
+          ) {
             // Remove tags with the same key
             const key = getTagKey(tag.props)
             if (key) {
