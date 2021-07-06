@@ -150,3 +150,27 @@ test('<Head>: server async setup', async (t) => {
   const { headTags } = renderHeadToString(head)
   t.regex(headTags, /new title/)
 })
+
+test('children', async (t) => {
+  const head = createHead()
+  const app = createSSRApp({
+    setup() {
+      useHead({
+        script: [
+          {
+            children: `console.log('hi')`,
+          },
+        ],
+      })
+      return () => <div>hi</div>
+    },
+  })
+  app.use(head)
+  await renderToString(app)
+
+  const headResult = renderHeadToString(head)
+  t.is(
+    headResult.headTags,
+    `<script>console.log('hi')</script><meta name="head:count" content="1">`,
+  )
+})
