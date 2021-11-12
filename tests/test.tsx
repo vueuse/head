@@ -83,7 +83,8 @@ test('browser', async (t) => {
   t.is(
     headHTML,
     `
-<script type="module" src="/@vite/client"></script>
+    <script type="module" src="/@vite/client"></script>
+
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
