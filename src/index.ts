@@ -239,7 +239,11 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
 
   oldElements.forEach((el) => {
     // Remove the next text node first, almost certainly a line break
-    if (el.nextSibling && el.nextSibling.nodeType === Node.TEXT_NODE) {
+    if (
+      typeof Node !== 'undefined' &&
+      el.nextSibling &&
+      el.nextSibling.nodeType === Node.TEXT_NODE
+    ) {
       el.nextSibling.remove()
     }
     el.remove()
