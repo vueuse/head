@@ -68,10 +68,7 @@ test('server', async (t) => {
   await renderToString(app)
 
   const headResult = renderHeadToString(head)
-  t.is(
-    headResult.headTags,
-    `<title>hello</title><meta name="description" content="desc 2"><meta property="og:locale:alternate" content="fr"><meta property="og:locale:alternate" content="zh"><script src="foo.js"></script><meta name="head:count" content="4">`,
-  )
+  t.snapshot(headResult.headTags)
   t.is(headResult.htmlAttrs, ` lang="zh" data-head-attrs="lang"`)
 })
 
@@ -80,17 +77,7 @@ test('browser', async (t) => {
   await page.goto(`http://localhost:3000`)
   const headHTML = await page.evaluate(() => document.head.innerHTML)
 
-  t.is(
-    headHTML,
-    `
-    <script type="module" src="/@vite/client"></script>
-
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>count: 0</title>
-    <base href="/"><style>body {background: red}</style><meta name="description" content="desc 2"><meta property="og:locale:alternate" content="fr"><meta property="og:locale:alternate" content="zh"><meta name="head:count" content="5">`,
-  )
+  t.snapshot(headHTML)
 
   await page.click('button.counter')
   t.is(await page.title(), 'count: 1')

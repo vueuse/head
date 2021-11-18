@@ -17,6 +17,7 @@ import {
 } from './constants'
 import { createElement } from './create-element'
 import { stringifyAttrs } from './stringify-attrs'
+import { isEqualNode } from './utils'
 
 type MaybeRef<T> = T | Ref<T>
 
@@ -164,6 +165,7 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
   const headCount = headCountEl
     ? Number(headCountEl.getAttribute('content'))
     : 0
+  const uncontrolledElements: Element[] = []
   const oldElements: Element[] = []
   if (headCountEl) {
     for (
@@ -182,7 +184,7 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
     head.append(headCountEl)
   }
 
-  const newElements: Element[] = []
+  let newElements: Element[] = []
   let title: string | undefined
   let htmlAttrs: HeadAttrs = {}
   let bodyAttrs: HeadAttrs = {}
@@ -211,7 +213,7 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
         ]
         for (const el of elementList) {
           if (!oldElements.includes(el)) {
-            oldElements.push(el)
+            uncontrolledElements.push(el)
           }
         }
       }
@@ -220,6 +222,21 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
     newElements.push(createElement(tag.tag, tag.props, document))
   }
 
+  newElements = newElements.filter((newEl) => {
+    for (let k = 0, len = oldElements.length; k < len; k++) {
+      const oldEl = oldElements[k]
+      if (isEqualNode(oldEl, newEl)) {
+        oldElements.splice(k, 1)
+        return false
+      }
+    }
+    return true
+  })
+
+  uncontrolledElements.forEach((el) => {
+    el.remove()
+  })
+
   oldElements.forEach((el) => {
     // Remove the next text node first, almost certainly a line break
     if (el.nextSibling && el.nextSibling.nodeType === Node.TEXT_NODE) {
@@ -227,16 +244,21 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
     }
     el.remove()
   })
+
+  newElements.forEach((el) => {
+    head.insertBefore(el, headCountEl)
+  })
+
   if (title !== undefined) {
     document.title = title
   }
   setAttrs(document.documentElement, htmlAttrs)
   setAttrs(document.body, bodyAttrs)
 
-  newElements.forEach((el) => {
-    head.insertBefore(el, headCountEl)
-  })
-  headCountEl.setAttribute('content', '' + newElements.length)
+  headCountEl.setAttribute(
+    'content',
+    '' + (headCount - oldElements.length + newElements.length),
+  )
 }
 
 export const createHead = () => {
