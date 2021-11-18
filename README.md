@@ -192,6 +192,10 @@ interface HTMLResult {
 
 Render the head manager instance to HTML tags in string form.
 
+## Sponsors
+
+[![sponsors](https://sponsors-images.egoist.sh/sponsors.svg)](https://github.com/sponsors/egoist)
+
 ## License
 
 MIT &copy; [EGOIST](https://egoist.sh)
