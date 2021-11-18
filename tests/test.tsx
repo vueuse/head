@@ -175,3 +175,32 @@ test('children', async (t) => {
     `<script>console.log('hi')</script><meta name="head:count" content="1">`,
   )
 })
+
+test('script key', async (t) => {
+  const head = createHead()
+  const app = createSSRApp({
+    setup() {
+      useHead({
+        script: [
+          {
+            key: 'my-script',
+            children: `console.log('A')`,
+          },
+          {
+            key: 'my-script',
+            children: `console.log('B')`,
+          },
+        ],
+      })
+      return () => <div>hi</div>
+    },
+  })
+  app.use(head)
+  await renderToString(app)
+
+  const headResult = renderHeadToString(head)
+  t.is(
+    headResult.headTags,
+    `<script>console.log('B')</script><meta name="head:count" content="1">`,
+  )
+})
