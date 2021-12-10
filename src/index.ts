@@ -64,17 +64,18 @@ export interface HTMLResult {
   readonly bodyAttrs: string
 }
 
-const getTagKey = (props: any): { name: string; value: any } | void => {
-  if (props.key !== undefined) {
-    return { name: 'key', value: props.key }
-  }
-  if (props.name !== undefined) {
-    return { name: 'name', value: props.name }
-  }
-  if (props.property !== undefined) {
-    return {
-      name: 'property',
-      value: props.property,
+const getTagKey = (
+  props: Record<string, any>,
+): { name: string; value: any } | void => {
+  const names = ['key', 'id', 'name', 'property']
+  for (const n of names) {
+    const value =
+      // Probably an HTML Element
+      typeof props.getAttribute === 'function'
+        ? props.getAttribute(n)
+        : props[n]
+    if (value !== undefined) {
+      return { name: n, value: value }
     }
   }
 }
@@ -159,21 +160,25 @@ const setAttrs = (el: Element, attrs: HeadAttrs) => {
   }
 }
 
-const insertTags = (tags: HeadTag[], document = window.document) => {
+const updateElements = (
+  document = window.document,
+  type: string,
+  tags: HeadTag[],
+) => {
   const head = document.head
   let headCountEl = head.querySelector(`meta[name="${HEAD_COUNT_KEY}"]`)
   const headCount = headCountEl
     ? Number(headCountEl.getAttribute('content'))
     : 0
-  const uncontrolledElements: Element[] = []
   const oldElements: Element[] = []
+
   if (headCountEl) {
     for (
       let i = 0, j = headCountEl.previousElementSibling;
       i < headCount;
       i++, j = j!.previousElementSibling
     ) {
-      if (j) {
+      if (j?.tagName?.toLowerCase() === type) {
         oldElements.push(j)
       }
     }
@@ -183,82 +188,36 @@ const insertTags = (tags: HeadTag[], document = window.document) => {
     headCountEl.setAttribute('content', '0')
     head.append(headCountEl)
   }
-
-  let newElements: Element[] = []
-  let title: string | undefined
-  let htmlAttrs: HeadAttrs = {}
-  let bodyAttrs: HeadAttrs = {}
-
-  for (const tag of tags) {
-    if (tag.tag === 'title') {
-      title = tag.props.children
-      continue
-    }
-    if (tag.tag === 'htmlAttrs') {
-      Object.assign(htmlAttrs, tag.props)
-      continue
-    }
-    if (tag.tag === 'bodyAttrs') {
-      Object.assign(bodyAttrs, tag.props)
-      continue
-    }
-
-    // Remove uncontrolled meta and script tags with the same key
-    if (tag.tag === 'meta' || tag.tag === 'script') {
-      const key = getTagKey(tag.props)
-
-      if (key) {
-        const elementList = [
-          ...head.querySelectorAll(`${tag.tag}[${key.name}="${key.value}"]`),
-        ]
-        for (const el of elementList) {
-          if (!oldElements.includes(el)) {
-            uncontrolledElements.push(el)
-          }
-        }
-      }
-    }
-
-    newElements.push(createElement(tag.tag, tag.props, document))
-  }
+  let newElements = tags.map((tag) =>
+    createElement(tag.tag, tag.props, document),
+  )
 
   newElements = newElements.filter((newEl) => {
-    for (let k = 0, len = oldElements.length; k < len; k++) {
-      const oldEl = oldElements[k]
+    for (let i = 0; i < oldElements.length; i++) {
+      const oldEl = oldElements[i]
       if (isEqualNode(oldEl, newEl)) {
-        oldElements.splice(k, 1)
+        oldElements.splice(i, 1)
         return false
       }
     }
     return true
   })
 
-  uncontrolledElements.forEach((el) => {
-    el.remove()
-  })
-
-  oldElements.forEach((el) => {
-    // Remove the next text node first, almost certainly a line break
-    if (
-      typeof Node !== 'undefined' &&
-      el.nextSibling &&
-      el.nextSibling.nodeType === Node.TEXT_NODE
-    ) {
-      el.nextSibling.remove()
+  oldElements.forEach((t) => t.parentNode?.removeChild(t))
+  newElements.forEach((t) => {
+    // Remove uncontrolled elements with the same key
+    const key = getTagKey(t)
+    if (key) {
+      const uncontrolled = head.querySelector(
+        `${t.tagName.toLowerCase()}[${key.name}="${key.value}"]`,
+      )
+      if (uncontrolled) {
+        uncontrolled.parentNode?.removeChild(uncontrolled)
+      }
     }
-    el.remove()
+
+    head.insertBefore(t, headCountEl)
   })
-
-  newElements.forEach((el) => {
-    head.insertBefore(el, headCountEl)
-  })
-
-  if (title !== undefined) {
-    document.title = title
-  }
-  setAttrs(document.documentElement, htmlAttrs)
-  setAttrs(document.body, bodyAttrs)
-
   headCountEl.setAttribute(
     'content',
     '' + (headCount - oldElements.length + newElements.length),
@@ -324,8 +283,39 @@ export const createHead = () => {
       allHeadObjs = allHeadObjs.filter((_objs) => _objs !== objs)
     },
 
-    updateDOM(document) {
-      insertTags(head.headTags, document)
+    updateDOM(document = window.document) {
+      let title: string | undefined
+      let htmlAttrs: HeadAttrs = {}
+      let bodyAttrs: HeadAttrs = {}
+
+      const actualTags: Record<string, HeadTag[]> = {}
+
+      for (const tag of head.headTags) {
+        if (tag.tag === 'title') {
+          title = tag.props.children
+          continue
+        }
+        if (tag.tag === 'htmlAttrs') {
+          Object.assign(htmlAttrs, tag.props)
+          continue
+        }
+        if (tag.tag === 'bodyAttrs') {
+          Object.assign(bodyAttrs, tag.props)
+          continue
+        }
+
+        actualTags[tag.tag] = actualTags[tag.tag] || []
+        actualTags[tag.tag].push(tag)
+      }
+
+      if (title !== undefined) {
+        document.title = title
+      }
+      setAttrs(document.documentElement, htmlAttrs)
+      setAttrs(document.body, bodyAttrs)
+      for (const name of Object.keys(actualTags)) {
+        updateElements(document, name, actualTags[name])
+      }
     },
   }
   return head

@@ -57,6 +57,7 @@
   "sideEffects": false,
   "devDependencies": {
     "@egoist/prettier-config": "^0.1.0",
+    "@happy-dom/global-registrator": "^2.24.5",
     "@types/node-fetch": "^2.5.8",
     "@vitejs/plugin-vue": "^1.1.5",
     "@vitejs/plugin-vue-jsx": "^1.0.2",
@@ -66,6 +67,7 @@
     "chrome-location": "^1.2.1",
     "esbuild-register": "^3.1.2",
     "execa": "^5.0.0",
+    "happy-dom": "^2.24.5",
     "husky": "^4.3.8",
     "lint-staged": "^10.5.3",
     "node-fetch": "^2.6.1",
