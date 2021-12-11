@@ -14,6 +14,9 @@ export const createElement = (
 
     if (key === 'children') {
       el.textContent = value
+    } else if (/^on/.test(key)) {
+      const eventName = key.slice(2).toLowerCase();
+      el.addEventListener(eventName, value);
     } else {
       el.setAttribute(key, value)
     }

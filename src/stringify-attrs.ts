@@ -11,7 +11,7 @@ export const stringifyAttrs = (attributes: any) => {
   const handledAttributes = []
 
   for (let [key, value] of Object.entries(attributes)) {
-    if (key === 'children' || key === 'key') {
+    if (key === 'children' || key === 'key' || /^on/.test(key)) {
       continue
     }
 
