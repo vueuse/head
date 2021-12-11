@@ -134,7 +134,9 @@ const setAttrs = (el: Element, attrs: HeadAttrs) => {
   const existingAttrs = el.getAttribute(HEAD_ATTRS_KEY)
   if (existingAttrs) {
     for (const key of existingAttrs.split(',')) {
-      el.removeAttribute(key)
+      if (!(key in attrs)) {
+        el.removeAttribute(key)
+      }
     }
   }
 
