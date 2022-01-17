@@ -26,9 +26,7 @@ jobs:
           version: 6.24.0
           run_install: true
       - name: Release
-        run: |
-          pnpm run build
-          npx kanpai release
+        run: npx kanpai release
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
