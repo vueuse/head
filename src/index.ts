@@ -72,7 +72,7 @@ const getTagKey = (
     const value =
       // Probably an HTML Element
       typeof props.getAttribute === 'function'
-        ? props.getAttribute(n)
+        ? (props.hasAttribute(n) ? props.getAttribute(n) : undefined)
         : props[n]
     if (value !== undefined) {
       return { name: n, value: value }
