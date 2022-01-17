@@ -72,7 +72,9 @@ const getTagKey = (
     const value =
       // Probably an HTML Element
       typeof props.getAttribute === 'function'
-        ? (props.hasAttribute(n) ? props.getAttribute(n) : undefined)
+        ? props.hasAttribute(n)
+          ? props.getAttribute(n)
+          : undefined
         : props[n]
     if (value !== undefined) {
       return { name: n, value: value }
@@ -178,7 +180,7 @@ const updateElements = (
     for (
       let i = 0, j = headCountEl.previousElementSibling;
       i < headCount;
-      i++, j = j!.previousElementSibling
+      i++, j = j?.previousElementSibling || null
     ) {
       if (j?.tagName?.toLowerCase() === type) {
         oldElements.push(j)
