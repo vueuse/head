@@ -209,17 +209,6 @@ const updateElements = (
 
   oldElements.forEach((t) => t.parentNode?.removeChild(t))
   newElements.forEach((t) => {
-    // Remove uncontrolled elements with the same key
-    const key = getTagKey(t)
-    if (key) {
-      const uncontrolled = head.querySelector(
-        `${t.tagName.toLowerCase()}[${key.name}="${key.value}"]`,
-      )
-      if (uncontrolled) {
-        uncontrolled.parentNode?.removeChild(uncontrolled)
-      }
-    }
-
     head.insertBefore(t, headCountEl)
   })
   headCountEl.setAttribute(
