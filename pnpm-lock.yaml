@@ -14,6 +14,7 @@ specifiers:
   execa: ^5.0.0
   happy-dom: ^2.24.5
   husky: ^4.3.8
+  kanpai: ^0.10.1
   lint-staged: ^10.5.3
   node-fetch: ^2.6.1
   playwright-core: ^1.9.1
@@ -38,6 +39,7 @@ devDependencies:
   execa: 5.1.1
   happy-dom: 2.24.5
   husky: 4.3.8
+  kanpai: 0.10.1
   lint-staged: 10.5.4
   node-fetch: 2.6.6
   playwright-core: 1.16.3
@@ -2141,6 +2143,12 @@ packages:
 
   /jsonc-parser/3.0.0:
     resolution: {integrity: sha512-fQzRfAbIBnR0IQvftw9FJveWiHp72Fg20giDrHz6TdfB12UH/uue0D3hm57UB5KgAVuniLMCaS8P1IMj9NR7cA==}
+    dev: true
+
+  /kanpai/0.10.1:
+    resolution: {integrity: sha512-EUmZoO4FxphrH0blToWScMEUWyqHUg6x31WgW8ruUhj6EPy4FpI2j+z0LJ3qnUiIeGObrkx/xToH2hFcxLwtuA==}
+    engines: {node: '>=14.0.0'}
+    hasBin: true
     dev: true
 
   /keyv/3.1.0:

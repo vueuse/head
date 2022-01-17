@@ -22,7 +22,6 @@
   "scripts": {
     "test": "node -r esbuild-register scripts/run-test.ts",
     "example": "vite example",
-    "release": "shipjs prepare",
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "prepublishOnly": "npm run build",
     "test:e2e": "ava"
@@ -69,6 +68,7 @@
     "execa": "^5.0.0",
     "happy-dom": "^2.24.5",
     "husky": "^4.3.8",
+    "kanpai": "^0.10.1",
     "lint-staged": "^10.5.3",
     "node-fetch": "^2.6.1",
     "playwright-core": "^1.9.1",
