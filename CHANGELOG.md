@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 0.7.6
+
+No unreleased changes.
+
 ## 0.7.5
 
 - Properly get `key` from HTML element.
