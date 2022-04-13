@@ -219,6 +219,7 @@ const updateElements = (
 
 export const createHead = () => {
   let allHeadObjs: Ref<HeadObjectPlain>[] = []
+  let previousTags = new Set<string>()
 
   const head: HeadClient = {
     install(app) {
@@ -306,9 +307,12 @@ export const createHead = () => {
       }
       setAttrs(document.documentElement, htmlAttrs)
       setAttrs(document.body, bodyAttrs)
-      for (const name of Object.keys(actualTags)) {
-        updateElements(document, name, actualTags[name])
+      const tags = new Set([...Object.keys(actualTags), ...previousTags])
+      for (const tag of tags) {
+        updateElements(document, tag, actualTags[tag] || [])
       }
+      previousTags.clear()
+      Object.keys(actualTags).forEach((i) => previousTags.add(i))
     },
   }
   return head
