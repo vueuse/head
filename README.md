@@ -70,7 +70,7 @@ import { renderHeadToString } from '@vueuse/head'
 const appHTML = await renderToString(yourVueApp)
 
 // `head` is created from `createHead()`
-const { headTags, htmlAttrs, bodyAttrs } = renderHeadToString(head)
+const { headTags, htmlAttrs, bodyAttrs, bodyTags } = renderHeadToString(head)
 
 const finalHTML = `
 <html${htmlAttrs}>
@@ -81,6 +81,7 @@ const finalHTML = `
 
   <body${bodyAttrs}>
     <div id="app">${appHTML}</div>
+    ${bodyTags}
   </body>
 
 </html>
@@ -126,6 +127,19 @@ useHead({
       property: 'og:locale:alternate',
       content: 'en',
       key: 'en',
+    },
+  ],
+})
+```
+
+To render tags at the end of the `<body>`, set `body: true` in a HeadAttrs Object.
+
+```ts
+useHead({
+  script: [
+    {
+      children: `console.log('Hello world!')`,
+      body: true
     },
   ],
 })
@@ -180,13 +194,15 @@ Note that you need to use `<html>` and `<body>` to set `htmlAttrs` and `bodyAttr
 - Returns: `HTMLResult`
 
 ```ts
-interface HTMLResult {
+export interface HTMLResult {
   // Tags in `<head>`
   readonly headTags: string
   // Attributes for `<html>`
   readonly htmlAttrs: string
   // Attributes for `<body>`
   readonly bodyAttrs: string
+  // Tags in `<body>`
+  readonly bodyTags: string
 }
 ```
 
