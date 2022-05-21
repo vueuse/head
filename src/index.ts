@@ -64,6 +64,8 @@ export interface HTMLResult {
   readonly htmlAttrs: string
   // Attributes for `<body>`
   readonly bodyAttrs: string
+  // Tags in `<body>`
+  readonly bodyTags: string
 }
 
 const getTagKey = (
@@ -358,13 +360,18 @@ export const useHead = (obj: MaybeRef<HeadObject>) => {
 }
 
 const tagToString = (tag: HeadTag) => {
+  let isBodyTag = false;
+  if(tag.props.body){
+    isBodyTag = true;
+    // avoid rendering body attr
+    delete tag.props.body
+  }
   let attrs = stringifyAttrs(tag.props)
-
   if (SELF_CLOSING_TAGS.includes(tag.tag)) {
-    return `<${tag.tag}${attrs}>`
+    return `<${tag.tag}${attrs}${isBodyTag ? ' ' + BODY_TAG_ATTR_NAME: ''}>`
   }
 
-  return `<${tag.tag}${attrs}>${tag.props.children || ''}</${tag.tag}>`
+  return `<${tag.tag}${attrs}${isBodyTag ? ' ' + BODY_TAG_ATTR_NAME: ''}>${tag.props.children || ''}</${tag.tag}>`
 }
 
 export const renderHeadToString = (head: HeadClient): HTMLResult => {
@@ -372,6 +379,7 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
   let titleTag = ''
   let htmlAttrs: HeadAttrs = {}
   let bodyAttrs: HeadAttrs = {}
+  let bodyTags: string[] = []
   for (const tag of head.headTags) {
     if (tag.tag === 'title') {
       titleTag = tagToString(tag)
@@ -379,6 +387,8 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
       Object.assign(htmlAttrs, tag.props)
     } else if (tag.tag === 'bodyAttrs') {
       Object.assign(bodyAttrs, tag.props)
+    } else if (tag.props.body) {
+      bodyTags.push(tagToString(tag))
     } else {
       tags.push(tagToString(tag))
     }
@@ -401,6 +411,9 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
         [HEAD_ATTRS_KEY]: Object.keys(bodyAttrs).join(','),
       })
     },
+    get bodyTags() {
+      return bodyTags.join('')
+    }
   }
 }
 
