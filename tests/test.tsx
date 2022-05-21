@@ -191,3 +191,12 @@ test('script key', async (t) => {
     `<script>console.log('B')</script><meta name="head:count" content="1">`,
   )
 })
+
+test('body script', async (t) => {
+  const page = await t.context.browser.newPage()
+  await page.goto(`http://localhost:3000`)
+
+  const script = await page.$('[data-meta-body]')
+  const scriptHtml = await script.innerHTML()
+  t.is(scriptHtml, `console.log('hi')`)
+})
