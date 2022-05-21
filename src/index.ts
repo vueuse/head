@@ -14,6 +14,7 @@ import {
   HEAD_COUNT_KEY,
   HEAD_ATTRS_KEY,
   SELF_CLOSING_TAGS,
+  BODY_TAG_ATTR_NAME,
 } from './constants'
 import { createElement } from './create-element'
 import { stringifyAttrs } from './stringify-attrs'
@@ -39,6 +40,7 @@ export type HeadObjectPlain = UnwrapRef<HeadObject>
 export type HeadTag = {
   tag: string
   props: {
+    body?: boolean
     [k: string]: any
   }
 }
@@ -129,6 +131,7 @@ const headObjToTags = (obj: HeadObjectPlain) => {
     }
   }
 
+
   return tags
 }
 
@@ -170,12 +173,22 @@ const updateElements = (
   tags: HeadTag[],
 ) => {
   const head = document.head
+  const body = document.body
   let headCountEl = head.querySelector(`meta[name="${HEAD_COUNT_KEY}"]`)
+  let bodyMetaElements = body.querySelectorAll(`[${BODY_TAG_ATTR_NAME}]`);
   const headCount = headCountEl
     ? Number(headCountEl.getAttribute('content'))
     : 0
-  const oldElements: Element[] = []
+  const oldHeadElements: Element[] = []
+  const oldBodyElements: Element[] = [];
 
+  if(bodyMetaElements){
+    for(let i = 0; i < bodyMetaElements.length; i++ ){
+      if(bodyMetaElements[i] && bodyMetaElements[i].tagName?.toLowerCase() === type){
+        oldBodyElements.push(bodyMetaElements[i])
+      }
+    }
+  }
   if (headCountEl) {
     for (
       let i = 0, j = headCountEl.previousElementSibling;
@@ -183,7 +196,7 @@ const updateElements = (
       i++, j = j?.previousElementSibling || null
     ) {
       if (j?.tagName?.toLowerCase() === type) {
-        oldElements.push(j)
+        oldHeadElements.push(j)
       }
     }
   } else {
@@ -192,28 +205,34 @@ const updateElements = (
     headCountEl.setAttribute('content', '0')
     head.append(headCountEl)
   }
-  let newElements = tags.map((tag) =>
-    createElement(tag.tag, tag.props, document),
-  )
+  let newElements = tags.map((tag) => ({
+    element: createElement(tag.tag, tag.props, document),
+    body: tag.props.body ?? false
+  }))
 
   newElements = newElements.filter((newEl) => {
-    for (let i = 0; i < oldElements.length; i++) {
-      const oldEl = oldElements[i]
-      if (isEqualNode(oldEl, newEl)) {
-        oldElements.splice(i, 1)
+    for (let i = 0; i < oldHeadElements.length; i++) {
+      const oldEl = oldHeadElements[i]
+      if (isEqualNode(oldEl, newEl.element)) {
+        oldHeadElements.splice(i, 1)
         return false
       }
     }
     return true
   })
 
-  oldElements.forEach((t) => t.parentNode?.removeChild(t))
+  oldBodyElements.forEach((t) => t.parentNode?.removeChild(t))
+  oldHeadElements.forEach((t) => t.parentNode?.removeChild(t))
   newElements.forEach((t) => {
-    head.insertBefore(t, headCountEl)
+    if(t.body === true) {
+      body.insertAdjacentElement('beforeend', t.element)
+    }else {
+      head.insertBefore(t.element, headCountEl)
+    }
   })
   headCountEl.setAttribute(
     'content',
-    '' + (headCount - oldElements.length + newElements.length),
+    '' + (headCount - oldHeadElements.length + newElements.filter(t => !t.body).length),
   )
 }
 
