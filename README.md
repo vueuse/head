@@ -103,6 +103,7 @@ interface HeadObject {
   base?: MaybeRef<HeadAttrs>
   style?: MaybeRef<HeadAttrs[]>
   script?: MaybeRef<HeadAttrs[]>
+  noscript?: MaybeRef<HeadAttrs[]>
   htmlAttrs?: MaybeRef<HeadAttrs>
   bodyAttrs?: MaybeRef<HeadAttrs>
 }
@@ -138,6 +139,11 @@ useHead({
   style: [
     {
       children: `body {color: red}`,
+    },
+  ],
+  noscript: [
+    {
+      children: `Javascript is required`,
     },
   ],
 })
