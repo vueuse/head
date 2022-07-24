@@ -25,7 +25,8 @@
     "example": "vite example",
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "prepublishOnly": "npm run build",
-    "test:e2e": "ava"
+    "test:e2e": "ava",
+    "release": "kanpai"
   },
   "repository": {
     "type": "git",
