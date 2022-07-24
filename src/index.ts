@@ -30,6 +30,7 @@ export type HeadObject = {
   base?: MaybeRef<HeadAttrs>
   style?: MaybeRef<HeadAttrs[]>
   script?: MaybeRef<HeadAttrs[]>
+  noscript?: MaybeRef<HeadAttrs[]>
   htmlAttrs?: MaybeRef<HeadAttrs>
   bodyAttrs?: MaybeRef<HeadAttrs>
 }
@@ -103,6 +104,7 @@ const acceptFields: Array<keyof HeadObject> = [
   'base',
   'style',
   'script',
+  'noscript',
   'htmlAttrs',
   'bodyAttrs',
 ]
@@ -395,6 +397,7 @@ const vnodesToHeadObj = (nodes: VNode[]) => {
     link: [],
     style: [],
     script: [],
+    noscript: [],
   }
 
   for (const node of nodes) {
