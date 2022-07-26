@@ -25,7 +25,9 @@ import { createApp } from 'vue'
 import { createHead } from '@vueuse/head'
 
 const app = createApp()
-const head = createHead()
+const head = createHead({
+  titleCallback: (title) => `${title} - My App` // optional
+})
 
 app.use(head)
 
@@ -89,9 +91,15 @@ const finalHTML = `
 
 ## API
 
-### `createHead()`
+### `createHead(options?: CreateHeadOptions)`
 
 Create the head manager instance.
+
+```ts
+interface CreateHeadOptions {
+  titleCallback?: (title?: string) => string
+}
+```
 
 ### `useHead(head: HeadObject | Ref<HeadObject>)`
 

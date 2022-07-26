@@ -130,7 +130,9 @@ export const createApp = () => {
       return () => <RouterView />
     },
   })
-  const head = createHead()
+  const head = createHead({
+    titleCallback: title => `${title} - Test App`
+  })
 
   app.use(head)
   app.use(router)

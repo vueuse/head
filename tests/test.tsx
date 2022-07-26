@@ -80,13 +80,13 @@ test('browser', async (t) => {
   t.snapshot(headHTML)
 
   await page.click('button.counter')
-  t.is(await page.title(), 'count: 1')
+  t.is(await page.title(), 'count: 1 - Test App')
 
   await page.click('button.change-home-title')
-  t.is(await page.title(), 'count: 1')
+  t.is(await page.title(), 'count: 1 - Test App')
 
   await page.click('a[href="/about"]')
-  t.is(await page.title(), 'About')
+  t.is(await page.title(), 'About - Test App')
 })
 
 test('useHead: server async setup', async (t) => {
@@ -210,4 +210,24 @@ test('script key', async (t) => {
     headResult.headTags,
     `<script>console.log('B')</script><meta name="head:count" content="1">`,
   )
+})
+
+
+test('createHead: server titleCallback', async (t) => {
+  const head = createHead({
+    titleCallback: (title) => `${title} - My App`
+  })
+  const app = createSSRApp({
+    setup() {
+      useHead({
+        title: `hello`
+      })
+      return () => <div>hi</div>
+    },
+  })
+  app.use(head)
+  await renderToString(app)
+
+  const headResult = renderHeadToString(head)
+  t.is(headResult.headTags, `<title>hello - My App</title><meta name="head:count" content="0">`)
 })

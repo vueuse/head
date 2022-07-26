@@ -23,6 +23,10 @@ type MaybeRef<T> = T | Ref<T>
 
 export type HeadAttrs = { [k: string]: any }
 
+export interface CreateHeadOptions {
+  titleCallback?: (title?: string) => string
+}
+
 export type HeadObject = {
   title?: MaybeRef<string>
   meta?: MaybeRef<HeadAttrs[]>
@@ -109,14 +113,15 @@ const acceptFields: Array<keyof HeadObject> = [
   'bodyAttrs',
 ]
 
-const headObjToTags = (obj: HeadObjectPlain) => {
+const headObjToTags = (obj: HeadObjectPlain, opts: CreateHeadOptions = {}) => {
   const tags: HeadTag[] = []
 
   for (const key of Object.keys(obj) as Array<keyof HeadObjectPlain>) {
     if (obj[key] == null) continue
 
     if (key === 'title') {
-      tags.push({ tag: key, props: { children: obj[key] } })
+      const title = opts?.titleCallback?.(obj[key]) || obj[key]
+      tags.push({ tag: key, props: { children: title } })
     } else if (key === 'base') {
       tags.push({ tag: key, props: { key: 'default', ...obj[key] } })
     } else if (acceptFields.includes(key)) {
@@ -219,7 +224,7 @@ const updateElements = (
   )
 }
 
-export const createHead = () => {
+export const createHead = (opts: CreateHeadOptions = {}) => {
   let allHeadObjs: Ref<HeadObjectPlain>[] = []
   let previousTags = new Set<string>()
 
@@ -236,7 +241,7 @@ export const createHead = () => {
       const deduped: HeadTag[] = []
 
       allHeadObjs.forEach((objs) => {
-        const tags = headObjToTags(objs.value)
+        const tags = headObjToTags(objs.value, opts)
         tags.forEach((tag) => {
           if (
             tag.tag === 'meta' ||
