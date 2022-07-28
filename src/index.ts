@@ -184,7 +184,7 @@ const updateElements = (
   const oldBodyElements: Element[] = []
 
   if (bodyMetaElements) {
-    for (let i = 0; i < bodyMetaElements.length; i++ ) {
+    for (let i = 0; i < bodyMetaElements.length; i++) {
       if (bodyMetaElements[i] && bodyMetaElements[i].tagName?.toLowerCase() === type) {
         oldBodyElements.push(bodyMetaElements[i])
       }

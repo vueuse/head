@@ -17,7 +17,7 @@ export const createElement = (
       if (key === 'key' || value === false) {
         continue
       }
-  
+
       if (key === 'children') {
         el.textContent = value
       } else {
