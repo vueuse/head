@@ -8,9 +8,9 @@ export const createElement = (
   const el = document.createElement(tag)
 
   for (const key of Object.keys(attrs)) {
-    if(key === "body" && attrs.body === true){
+    if (key === 'body' && attrs.body === true) {
       // set meta-body attribute to add the tag before </body>
-      el.setAttribute(BODY_TAG_ATTR_NAME, "true")
+      el.setAttribute(BODY_TAG_ATTR_NAME, 'true')
     } else {
       let value = attrs[key]
 

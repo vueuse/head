@@ -133,7 +133,6 @@ const headObjToTags = (obj: HeadObjectPlain) => {
     }
   }
 
-
   return tags
 }
 
@@ -182,11 +181,11 @@ const updateElements = (
     ? Number(headCountEl.getAttribute('content'))
     : 0
   const oldHeadElements: Element[] = []
-  const oldBodyElements: Element[] = [];
+  const oldBodyElements: Element[] = []
 
-  if(bodyMetaElements){
-    for(let i = 0; i < bodyMetaElements.length; i++ ){
-      if(bodyMetaElements[i] && bodyMetaElements[i].tagName?.toLowerCase() === type){
+  if (bodyMetaElements) {
+    for (let i = 0; i < bodyMetaElements.length; i++ ) {
+      if (bodyMetaElements[i] && bodyMetaElements[i].tagName?.toLowerCase() === type) {
         oldBodyElements.push(bodyMetaElements[i])
       }
     }
@@ -226,9 +225,9 @@ const updateElements = (
   oldBodyElements.forEach((t) => t.parentNode?.removeChild(t))
   oldHeadElements.forEach((t) => t.parentNode?.removeChild(t))
   newElements.forEach((t) => {
-    if(t.body === true) {
+    if (t.body === true) {
       body.insertAdjacentElement('beforeend', t.element)
-    }else {
+    } else {
       head.insertBefore(t.element, headCountEl)
     }
   })
@@ -360,18 +359,18 @@ export const useHead = (obj: MaybeRef<HeadObject>) => {
 }
 
 const tagToString = (tag: HeadTag) => {
-  let isBodyTag = false;
-  if(tag.props.body){
-    isBodyTag = true;
+  let isBodyTag = false
+  if (tag.props.body) {
+    isBodyTag = true
     // avoid rendering body attr
     delete tag.props.body
   }
   let attrs = stringifyAttrs(tag.props)
   if (SELF_CLOSING_TAGS.includes(tag.tag)) {
-    return `<${tag.tag}${attrs}${isBodyTag ? ' ' + BODY_TAG_ATTR_NAME: ''}>`
+    return `<${tag.tag}${attrs}${isBodyTag ? ' ' + BODY_TAG_ATTR_NAME : ''}>`
   }
 
-  return `<${tag.tag}${attrs}${isBodyTag ? ' ' + BODY_TAG_ATTR_NAME: ''}>${tag.props.children || ''}</${tag.tag}>`
+  return `<${tag.tag}${attrs}${isBodyTag ? ' ' + BODY_TAG_ATTR_NAME : ''}>${tag.props.children || ''}</${tag.tag}>`
 }
 
 export const renderHeadToString = (head: HeadClient): HTMLResult => {
