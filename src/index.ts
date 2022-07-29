@@ -14,6 +14,7 @@ import {
   HEAD_COUNT_KEY,
   HEAD_ATTRS_KEY,
   SELF_CLOSING_TAGS,
+  BODY_TAG_ATTR_NAME,
 } from './constants'
 import { createElement } from './create-element'
 import { stringifyAttrs } from './stringify-attrs'
@@ -40,6 +41,7 @@ export type HeadObjectPlain = UnwrapRef<HeadObject>
 export type HeadTag = {
   tag: string
   props: {
+    body?: boolean
     [k: string]: any
   }
 }
@@ -63,6 +65,8 @@ export interface HTMLResult {
   readonly htmlAttrs: string
   // Attributes for `<body>`
   readonly bodyAttrs: string
+  // Tags in `<body>`
+  readonly bodyTags: string
 }
 
 const getTagKey = (
@@ -172,12 +176,22 @@ const updateElements = (
   tags: HeadTag[],
 ) => {
   const head = document.head
+  const body = document.body
   let headCountEl = head.querySelector(`meta[name="${HEAD_COUNT_KEY}"]`)
+  let bodyMetaElements = body.querySelectorAll(`[${BODY_TAG_ATTR_NAME}]`);
   const headCount = headCountEl
     ? Number(headCountEl.getAttribute('content'))
     : 0
-  const oldElements: Element[] = []
+  const oldHeadElements: Element[] = []
+  const oldBodyElements: Element[] = []
 
+  if (bodyMetaElements) {
+    for (let i = 0; i < bodyMetaElements.length; i++) {
+      if (bodyMetaElements[i] && bodyMetaElements[i].tagName?.toLowerCase() === type) {
+        oldBodyElements.push(bodyMetaElements[i])
+      }
+    }
+  }
   if (headCountEl) {
     for (
       let i = 0, j = headCountEl.previousElementSibling;
@@ -185,7 +199,7 @@ const updateElements = (
       i++, j = j?.previousElementSibling || null
     ) {
       if (j?.tagName?.toLowerCase() === type) {
-        oldElements.push(j)
+        oldHeadElements.push(j)
       }
     }
   } else {
@@ -194,28 +208,34 @@ const updateElements = (
     headCountEl.setAttribute('content', '0')
     head.append(headCountEl)
   }
-  let newElements = tags.map((tag) =>
-    createElement(tag.tag, tag.props, document),
-  )
+  let newElements = tags.map((tag) => ({
+    element: createElement(tag.tag, tag.props, document),
+    body: tag.props.body ?? false
+  }))
 
   newElements = newElements.filter((newEl) => {
-    for (let i = 0; i < oldElements.length; i++) {
-      const oldEl = oldElements[i]
-      if (isEqualNode(oldEl, newEl)) {
-        oldElements.splice(i, 1)
+    for (let i = 0; i < oldHeadElements.length; i++) {
+      const oldEl = oldHeadElements[i]
+      if (isEqualNode(oldEl, newEl.element)) {
+        oldHeadElements.splice(i, 1)
         return false
       }
     }
     return true
   })
 
-  oldElements.forEach((t) => t.parentNode?.removeChild(t))
+  oldBodyElements.forEach((t) => t.parentNode?.removeChild(t))
+  oldHeadElements.forEach((t) => t.parentNode?.removeChild(t))
   newElements.forEach((t) => {
-    head.insertBefore(t, headCountEl)
+    if (t.body === true) {
+      body.insertAdjacentElement('beforeend', t.element)
+    } else {
+      head.insertBefore(t.element, headCountEl)
+    }
   })
   headCountEl.setAttribute(
     'content',
-    '' + (headCount - oldElements.length + newElements.length),
+    '' + (headCount - oldHeadElements.length + newElements.filter(t => !t.body).length),
   )
 }
 
@@ -341,13 +361,18 @@ export const useHead = (obj: MaybeRef<HeadObject>) => {
 }
 
 const tagToString = (tag: HeadTag) => {
+  let isBodyTag = false
+  if (tag.props.body) {
+    isBodyTag = true
+    // avoid rendering body attr
+    delete tag.props.body
+  }
   let attrs = stringifyAttrs(tag.props)
-
   if (SELF_CLOSING_TAGS.includes(tag.tag)) {
-    return `<${tag.tag}${attrs}>`
+    return `<${tag.tag}${attrs}${isBodyTag ? ' ' + BODY_TAG_ATTR_NAME : ''}>`
   }
 
-  return `<${tag.tag}${attrs}>${tag.props.children || ''}</${tag.tag}>`
+  return `<${tag.tag}${attrs}${isBodyTag ? ' ' + BODY_TAG_ATTR_NAME : ''}>${tag.props.children || ''}</${tag.tag}>`
 }
 
 export const renderHeadToString = (head: HeadClient): HTMLResult => {
@@ -355,6 +380,7 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
   let titleTag = ''
   let htmlAttrs: HeadAttrs = {}
   let bodyAttrs: HeadAttrs = {}
+  let bodyTags: string[] = []
   for (const tag of head.headTags) {
     if (tag.tag === 'title') {
       titleTag = tagToString(tag)
@@ -362,6 +388,8 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
       Object.assign(htmlAttrs, tag.props)
     } else if (tag.tag === 'bodyAttrs') {
       Object.assign(bodyAttrs, tag.props)
+    } else if (tag.props.body) {
+      bodyTags.push(tagToString(tag))
     } else {
       tags.push(tagToString(tag))
     }
@@ -384,6 +412,9 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
         [HEAD_ATTRS_KEY]: Object.keys(bodyAttrs).join(','),
       })
     },
+    get bodyTags() {
+      return bodyTags.join('')
+    }
   }
 }
 

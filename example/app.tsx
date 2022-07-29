@@ -62,6 +62,12 @@ export const createApp = () => {
             key: 'zh',
           },
         ],
+        script: [
+          {
+            children: `console.log('hi')`,
+            body: true
+          },
+        ],
       })
       return () => (
         <div>
