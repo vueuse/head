@@ -283,6 +283,7 @@ export const createHead = () => {
       let title: string | undefined
       let htmlAttrs: HeadAttrs = {}
       let bodyAttrs: HeadAttrs = {}
+      let setHeadAttrs = false
 
       const actualTags: Record<string, HeadTag[]> = {}
 
@@ -293,6 +294,7 @@ export const createHead = () => {
         }
         if (tag.tag === 'htmlAttrs') {
           Object.assign(htmlAttrs, tag.props)
+          setHeadAttrs = true
           continue
         }
         if (tag.tag === 'bodyAttrs') {
@@ -307,7 +309,11 @@ export const createHead = () => {
       if (title !== undefined) {
         document.title = title
       }
-      setAttrs(document.documentElement, htmlAttrs)
+
+      if (setHeadAttrs) {
+        setAttrs(document.documentElement, htmlAttrs)
+      }
+
       setAttrs(document.body, bodyAttrs)
       const tags = new Set([...Object.keys(actualTags), ...previousTags])
       for (const tag of tags) {
