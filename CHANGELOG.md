@@ -2,6 +2,14 @@
 
 No unreleased changes.
 
+## 0.7.8
+
+No unreleased changes.
+
+## 0.7.7
+
+No unreleased changes.
+
 ## 0.7.6
 
 No unreleased changes.

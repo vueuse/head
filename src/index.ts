@@ -31,6 +31,7 @@ export type HeadObject = {
   base?: MaybeRef<HeadAttrs>
   style?: MaybeRef<HeadAttrs[]>
   script?: MaybeRef<HeadAttrs[]>
+  noscript?: MaybeRef<HeadAttrs[]>
   htmlAttrs?: MaybeRef<HeadAttrs>
   bodyAttrs?: MaybeRef<HeadAttrs>
 }
@@ -107,6 +108,7 @@ const acceptFields: Array<keyof HeadObject> = [
   'base',
   'style',
   'script',
+  'noscript',
   'htmlAttrs',
   'bodyAttrs',
 ]
@@ -216,6 +218,7 @@ const updateElements = (
       const oldEl = oldHeadElements[i]
       if (isEqualNode(oldEl, newEl.element)) {
         oldHeadElements.splice(i, 1)
+
         return false
       }
     }
@@ -223,6 +226,7 @@ const updateElements = (
       const oldEl = oldBodyElements[i]
       if (isEqualNode(oldEl, newEl.element)) {
         oldBodyElements.splice(i, 1)
+        
         return false
       }
     }
@@ -423,27 +427,15 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
   }
 }
 
-const vnodesToHeadObj = (nodes: VNode[]) => {
-  const obj: HeadObjectPlain = {
-    title: undefined,
-    htmlAttrs: undefined,
-    bodyAttrs: undefined,
-    base: undefined,
-    meta: [],
-    link: [],
-    style: [],
-    script: [],
-  }
-
-  for (const node of nodes) {
-    const type =
+const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
+  const type =
       node.type === 'html'
         ? 'htmlAttrs'
         : node.type === 'body'
         ? 'bodyAttrs'
         : (node.type as keyof HeadObjectPlain)
 
-    if (typeof type !== 'string' || !(type in obj)) continue
+    if (typeof type !== 'string' || !(type in obj)) return
 
     const props = {
       ...node.props,
@@ -458,6 +450,29 @@ const vnodesToHeadObj = (nodes: VNode[]) => {
       obj.title = props.children
     } else {
       ;(obj[type] as HeadAttrs) = props
+    }
+  }
+
+const vnodesToHeadObj = (nodes: VNode[]) => {
+  const obj: HeadObjectPlain = {
+    title: undefined,
+    htmlAttrs: undefined,
+    bodyAttrs: undefined,
+    base: undefined,
+    meta: [],
+    link: [],
+    style: [],
+    script: [],
+    noscript: [],
+  }
+
+  for (const node of nodes) {
+    if (typeof node.type === 'symbol' && Array.isArray(node.children)) {
+      for (const childNode of node.children) {
+        addVNodeToHeadObj(childNode as VNode, obj);
+      }
+    } else {
+      addVNodeToHeadObj(node, obj);
     }
   }
 

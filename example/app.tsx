@@ -41,6 +41,7 @@ export const createApp = () => {
         htmlAttrs: {
           lang: 'en',
         },
+        noscript: [{ children: 'This app requires javascript to work' }],
         meta: [
           {
             name: 'description',
