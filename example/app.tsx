@@ -41,6 +41,7 @@ export const createApp = () => {
         htmlAttrs: {
           lang: 'en',
         },
+        noscript: [{ children: 'This app requires javascript to work' }],
         meta: [
           {
             name: 'description',
@@ -59,6 +60,12 @@ export const createApp = () => {
             property: 'og:locale:alternate',
             content: 'zh',
             key: 'zh',
+          },
+        ],
+        script: [
+          {
+            children: `console.log('hi')`,
+            body: true
           },
         ],
       })

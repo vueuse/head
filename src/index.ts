@@ -15,6 +15,7 @@ import {
   HEAD_COUNT_KEY,
   HEAD_ATTRS_KEY,
   SELF_CLOSING_TAGS,
+  BODY_TAG_ATTR_NAME,
 } from './constants'
 import { createElement } from './create-element'
 import { stringifyAttrs } from './stringify-attrs'
@@ -32,6 +33,7 @@ export type HeadObject = {
   base?: MaybeRef<HeadAttrs>
   style?: MaybeRef<HeadAttrs[]>
   script?: MaybeRef<HeadAttrs[]>
+  noscript?: MaybeRef<HeadAttrs[]>
   htmlAttrs?: MaybeRef<HeadAttrs>
   bodyAttrs?: MaybeRef<HeadAttrs>
 }
@@ -41,6 +43,7 @@ export type HeadObjectPlain = UnwrapRef<HeadObject>
 export type HeadTag = {
   tag: string
   props: {
+    body?: boolean
     [k: string]: any
   }
 }
@@ -70,6 +73,8 @@ export interface HTMLResult {
   readonly htmlAttrs: string
   // Attributes for `<body>`
   readonly bodyAttrs: string
+  // Tags in `<body>`
+  readonly bodyTags: string
 }
 
 const getTagKey = (
@@ -80,7 +85,9 @@ const getTagKey = (
     const value =
       // Probably an HTML Element
       typeof props.getAttribute === 'function'
-        ? props.getAttribute(n)
+        ? props.hasAttribute(n)
+          ? props.getAttribute(n)
+          : undefined
         : props[n]
     if (value !== undefined) {
       return { name: n, value: value }
@@ -109,6 +116,7 @@ const acceptFields: Array<keyof Omit<HeadObject, 'titleTemplate'>> = [
   'base',
   'style',
   'script',
+  'noscript',
   'htmlAttrs',
   'bodyAttrs',
 ]
@@ -204,20 +212,30 @@ const updateElements = (
   tags: HeadTag[],
 ) => {
   const head = document.head
+  const body = document.body
   let headCountEl = head.querySelector(`meta[name="${HEAD_COUNT_KEY}"]`)
+  let bodyMetaElements = body.querySelectorAll(`[${BODY_TAG_ATTR_NAME}]`);
   const headCount = headCountEl
     ? Number(headCountEl.getAttribute('content'))
     : 0
-  const oldElements: Element[] = []
+  const oldHeadElements: Element[] = []
+  const oldBodyElements: Element[] = []
 
+  if (bodyMetaElements) {
+    for (let i = 0; i < bodyMetaElements.length; i++) {
+      if (bodyMetaElements[i] && bodyMetaElements[i].tagName?.toLowerCase() === type) {
+        oldBodyElements.push(bodyMetaElements[i])
+      }
+    }
+  }
   if (headCountEl) {
     for (
       let i = 0, j = headCountEl.previousElementSibling;
       i < headCount;
-      i++, j = j!.previousElementSibling
+      i++, j = j?.previousElementSibling || null
     ) {
       if (j?.tagName?.toLowerCase() === type) {
-        oldElements.push(j)
+        oldHeadElements.push(j)
       }
     }
   } else {
@@ -226,44 +244,47 @@ const updateElements = (
     headCountEl.setAttribute('content', '0')
     head.append(headCountEl)
   }
-  let newElements = tags.map((tag) =>
-    createElement(tag.tag, tag.props, document),
-  )
+  let newElements = tags.map((tag) => ({
+    element: createElement(tag.tag, tag.props, document),
+    body: tag.props.body ?? false
+  }))
 
   newElements = newElements.filter((newEl) => {
-    for (let i = 0; i < oldElements.length; i++) {
-      const oldEl = oldElements[i]
-      if (isEqualNode(oldEl, newEl)) {
-        oldElements.splice(i, 1)
+    for (let i = 0; i < oldHeadElements.length; i++) {
+      const oldEl = oldHeadElements[i]
+      if (isEqualNode(oldEl, newEl.element)) {
+        oldHeadElements.splice(i, 1)
+        return false
+      }
+    }
+    for(let i = 0; i < oldBodyElements.length; i++) {
+      const oldEl = oldBodyElements[i]
+      if (isEqualNode(oldEl, newEl.element)) {
+        oldBodyElements.splice(i, 1)
         return false
       }
     }
     return true
   })
 
-  oldElements.forEach((t) => t.parentNode?.removeChild(t))
+  oldBodyElements.forEach((t) => t.parentNode?.removeChild(t))
+  oldHeadElements.forEach((t) => t.parentNode?.removeChild(t))
   newElements.forEach((t) => {
-    // Remove uncontrolled elements with the same key
-    const key = getTagKey(t)
-    if (key) {
-      const uncontrolled = head.querySelector(
-        `${t.tagName.toLowerCase()}[${key.name}="${key.value}"]`,
-      )
-      if (uncontrolled) {
-        uncontrolled.parentNode?.removeChild(uncontrolled)
-      }
+    if (t.body === true) {
+      body.insertAdjacentElement('beforeend', t.element)
+    } else {
+      head.insertBefore(t.element, headCountEl)
     }
-
-    head.insertBefore(t, headCountEl)
   })
   headCountEl.setAttribute(
     'content',
-    '' + (headCount - oldElements.length + newElements.length),
+    '' + (headCount - oldHeadElements.length + newElements.filter(t => !t.body).length),
   )
 }
 
 export const createHead = (options: HeadOptions = {}) => {
   let allHeadObjs: Ref<HeadObjectPlain>[] = []
+  let previousTags = new Set<string>()
 
   const head: HeadClient = {
     options,
@@ -352,9 +373,12 @@ export const createHead = (options: HeadOptions = {}) => {
       }
       setAttrs(document.documentElement, htmlAttrs)
       setAttrs(document.body, bodyAttrs)
-      for (const name of Object.keys(actualTags)) {
-        updateElements(document, name, actualTags[name])
+      const tags = new Set([...Object.keys(actualTags), ...previousTags])
+      for (const tag of tags) {
+        updateElements(document, tag, actualTags[tag] || [])
       }
+      previousTags.clear()
+      Object.keys(actualTags).forEach((i) => previousTags.add(i))
     },
   }
   return head
@@ -387,13 +411,18 @@ export const useHead = (obj: MaybeRef<HeadObject>) => {
 }
 
 const tagToString = (tag: HeadTag) => {
+  let isBodyTag = false
+  if (tag.props.body) {
+    isBodyTag = true
+    // avoid rendering body attr
+    delete tag.props.body
+  }
   let attrs = stringifyAttrs(tag.props)
-
   if (SELF_CLOSING_TAGS.includes(tag.tag)) {
-    return `<${tag.tag}${attrs}>`
+    return `<${tag.tag}${attrs}${isBodyTag ? ' ' + ` ${BODY_TAG_ATTR_NAME}="true"` : ''}>`
   }
 
-  return `<${tag.tag}${attrs}>${tag.props.children || ''}</${tag.tag}>`
+  return `<${tag.tag}${attrs}${isBodyTag ? ` ${BODY_TAG_ATTR_NAME}="true"` : ''}>${tag.props.children || ''}</${tag.tag}>`
 }
 
 export const renderHeadToString = (head: HeadClient): HTMLResult => {
@@ -401,6 +430,7 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
   let titleTag = ''
   let htmlAttrs: HeadAttrs = {}
   let bodyAttrs: HeadAttrs = {}
+  let bodyTags: string[] = []
   for (const tag of head.headTags) {
     if (tag.tag === 'title') {
       titleTag = tagToString(tag)
@@ -408,6 +438,8 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
       Object.assign(htmlAttrs, tag.props)
     } else if (tag.tag === 'bodyAttrs') {
       Object.assign(bodyAttrs, tag.props)
+    } else if (tag.props.body) {
+      bodyTags.push(tagToString(tag))
     } else {
       tags.push(tagToString(tag))
     }
@@ -430,30 +462,21 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
         [HEAD_ATTRS_KEY]: Object.keys(bodyAttrs).join(','),
       })
     },
+    get bodyTags() {
+      return bodyTags.join('')
+    }
   }
 }
 
-const vnodesToHeadObj = (nodes: VNode[]) => {
-  const obj: HeadObjectPlain = {
-    title: undefined,
-    htmlAttrs: undefined,
-    bodyAttrs: undefined,
-    base: undefined,
-    meta: [],
-    link: [],
-    style: [],
-    script: [],
-  }
-
-  for (const node of nodes) {
-    const type =
+const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
+  const type =
       node.type === 'html'
         ? 'htmlAttrs'
         : node.type === 'body'
         ? 'bodyAttrs'
         : (node.type as keyof HeadObjectPlain)
 
-    if (typeof type !== 'string' || !(type in obj)) continue
+    if (typeof type !== 'string' || !(type in obj)) return
 
     const props = {
       ...node.props,
@@ -468,6 +491,29 @@ const vnodesToHeadObj = (nodes: VNode[]) => {
       obj.title = props.children
     } else {
       ;(obj[type] as HeadAttrs) = props
+    }
+  }
+
+const vnodesToHeadObj = (nodes: VNode[]) => {
+  const obj: HeadObjectPlain = {
+    title: undefined,
+    htmlAttrs: undefined,
+    bodyAttrs: undefined,
+    base: undefined,
+    meta: [],
+    link: [],
+    style: [],
+    script: [],
+    noscript: [],
+  }
+
+  for (const node of nodes) {
+    if (typeof node.type === 'symbol' && Array.isArray(node.children)) {
+      for (const childNode of node.children) {
+        addVNodeToHeadObj(childNode as VNode, obj);
+      }
+    } else {
+      addVNodeToHeadObj(node, obj);
     }
   }
 

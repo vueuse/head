@@ -122,6 +122,26 @@ test('<Head>: basic', async (t) => {
   t.snapshot(await getHeadTags())
 })
 
+test('<Head>: link & meta with v-for', async (t) => {
+  const head = createHead()
+  const app = createSSRApp({
+    template: `<Head>
+      <meta v-for="meta in metaList" :key="meta.property" :property="meta.property" :content="meta.content" />
+    </Head>`,
+    components: { Head },
+    data() {
+      return {
+        metaList: [{ property: "test1", content: "test1" }, { property: "test2", content: "test2" }],
+      };
+    },
+  })
+  app.use(head)
+  await renderToString(app)
+
+  const { headTags } = renderHeadToString(head)
+  t.snapshot(headTags);
+})
+
 test('<Head>: server async setup', async (t) => {
   const head = createHead()
   const app = createSSRApp({
@@ -190,4 +210,13 @@ test('script key', async (t) => {
     headResult.headTags,
     `<script>console.log('B')</script><meta name="head:count" content="1">`,
   )
+})
+
+test('body script', async (t) => {
+  const page = await t.context.browser.newPage()
+  await page.goto(`http://localhost:3000`)
+
+  const script = await page.$('[data-meta-body]')
+  const scriptHtml = await script.innerHTML()
+  t.is(scriptHtml, `console.log('hi')`)
 })
