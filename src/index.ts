@@ -221,6 +221,13 @@ const updateElements = (
         return false
       }
     }
+    for(let i = 0; i < oldBodyElements.length; i++) {
+      const oldEl = oldBodyElements[i]
+      if (isEqualNode(oldEl, newEl.element)) {
+        oldBodyElements.splice(i, 1)
+        return false
+      }
+    }
     return true
   })
 
@@ -369,10 +376,10 @@ const tagToString = (tag: HeadTag) => {
   }
   let attrs = stringifyAttrs(tag.props)
   if (SELF_CLOSING_TAGS.includes(tag.tag)) {
-    return `<${tag.tag}${attrs}${isBodyTag ? ' ' + BODY_TAG_ATTR_NAME : ''}>`
+    return `<${tag.tag}${attrs}${isBodyTag ? ' ' + ` ${BODY_TAG_ATTR_NAME}="true"` : ''}>`
   }
 
-  return `<${tag.tag}${attrs}${isBodyTag ? ' ' + BODY_TAG_ATTR_NAME : ''}>${tag.props.children || ''}</${tag.tag}>`
+  return `<${tag.tag}${attrs}${isBodyTag ? ` ${BODY_TAG_ATTR_NAME}="true"` : ''}>${tag.props.children || ''}</${tag.tag}>`
 }
 
 export const renderHeadToString = (head: HeadClient): HTMLResult => {
