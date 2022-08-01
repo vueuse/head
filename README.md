@@ -99,7 +99,7 @@ Create the head manager instance.
 ```ts
 interface HeadObject {
   title?: MaybeRef<string>
-  titleTemplate?: MaybeRef<string>
+  titleTemplate?: MaybeRef<string> | ((title?: string) => string)
   meta?: MaybeRef<HeadAttrs[]>
   link?: MaybeRef<HeadAttrs[]>
   base?: MaybeRef<HeadAttrs>

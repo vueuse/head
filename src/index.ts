@@ -28,7 +28,7 @@ export type HeadAttrs = { [k: string]: any }
 
 export type HeadObject = {
   title?: MaybeRef<string>
-  titleTemplate?: MaybeRef<string> | ((chunk?: MaybeRef<string>) => string)
+  titleTemplate?: MaybeRef<string> | ((title?: string) => string)
   meta?: MaybeRef<HeadAttrs[]>
   link?: MaybeRef<HeadAttrs[]>
   base?: MaybeRef<HeadAttrs>
@@ -124,8 +124,7 @@ const renderTemplate = (
   if (typeof template === "string") {
     return template.replace("%s", title ?? "")
   }
-
-  return template(title)
+  return template(unref(title))
 }
 
 const headObjToTags = (obj: HeadObjectPlain) => {
