@@ -1,4 +1,4 @@
-import { BODY_TAG_ATTR_NAME } from "./constants"
+import { BODY_TAG_ATTR_NAME } from './constants'
 
 export const createElement = (
   tag: string,

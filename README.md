@@ -141,7 +141,7 @@ useHead({
   script: [
     {
       children: `console.log('Hello world!')`,
-      body: true
+      body: true,
     },
   ],
 })
