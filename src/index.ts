@@ -8,6 +8,8 @@ import {
   UnwrapRef,
   watchEffect,
   VNode,
+  unref,
+  shallowRef,
 } from "vue"
 import {
   PROVIDE_KEY,
@@ -26,6 +28,7 @@ export type HeadAttrs = { [k: string]: any }
 
 export type HeadObject = {
   title?: MaybeRef<string>
+  titleTemplate?: MaybeRef<string> | ((title?: string) => string)
   meta?: MaybeRef<HeadAttrs[]>
   link?: MaybeRef<HeadAttrs[]>
   base?: MaybeRef<HeadAttrs>
@@ -101,7 +104,7 @@ export const injectHead = () => {
   return head
 }
 
-const acceptFields: Array<keyof HeadObject> = [
+const acceptFields: Array<keyof Omit<HeadObject, "titleTemplate">> = [
   "title",
   "meta",
   "link",
@@ -113,25 +116,45 @@ const acceptFields: Array<keyof HeadObject> = [
   "bodyAttrs",
 ]
 
+const renderTemplate = (
+  template: HeadObjectPlain["titleTemplate"],
+  title?: string,
+): string => {
+  if (template == null) return ""
+  if (typeof template === "string") {
+    return template.replace("%s", title ?? "")
+  }
+  return template(unref(title))
+}
+
 const headObjToTags = (obj: HeadObjectPlain) => {
   const tags: HeadTag[] = []
+  const keys = Object.keys(obj) as Array<keyof HeadObjectPlain>
 
-  for (const key of Object.keys(obj) as Array<keyof HeadObjectPlain>) {
+  for (const key of keys) {
     if (obj[key] == null) continue
 
-    if (key === "title") {
-      tags.push({ tag: key, props: { children: obj[key] } })
-    } else if (key === "base") {
-      tags.push({ tag: key, props: { key: "default", ...obj[key] } })
-    } else if (acceptFields.includes(key)) {
-      const value = obj[key]
-      if (Array.isArray(value)) {
-        value.forEach((item) => {
-          tags.push({ tag: key, props: item })
-        })
-      } else if (value) {
-        tags.push({ tag: key, props: value })
-      }
+    switch (key) {
+      case "title":
+        tags.push({ tag: key, props: { children: obj[key] } })
+        break
+      case "titleTemplate":
+        break
+      case "base":
+        tags.push({ tag: key, props: { key: "default", ...obj[key] } })
+        break
+      default:
+        if (acceptFields.includes(key)) {
+          const value = obj[key]
+          if (Array.isArray(value)) {
+            value.forEach((item) => {
+              tags.push({ tag: key, props: item })
+            })
+          } else if (value) {
+            tags.push({ tag: key, props: value })
+          }
+        }
+        break
     }
   }
 
@@ -252,9 +275,13 @@ const updateElements = (
   )
 }
 
-export const createHead = () => {
+export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
   let allHeadObjs: Ref<HeadObjectPlain>[] = []
   let previousTags = new Set<string>()
+
+  if (initHeadObject) {
+    allHeadObjs.push(shallowRef(initHeadObject))
+  }
 
   const head: HeadClient = {
     install(app) {
@@ -268,8 +295,13 @@ export const createHead = () => {
     get headTags() {
       const deduped: HeadTag[] = []
 
+      const titleTemplate = allHeadObjs
+        .map((i) => unref(i).titleTemplate)
+        .reverse()
+        .find((i) => i != null)
+
       allHeadObjs.forEach((objs) => {
-        const tags = headObjToTags(objs.value)
+        const tags = headObjToTags(unref(objs))
         tags.forEach((tag) => {
           if (
             tag.tag === "meta" ||
@@ -295,6 +327,13 @@ export const createHead = () => {
                 deduped.splice(index, 1)
               }
             }
+          }
+
+          if (titleTemplate && tag.tag === "title") {
+            tag.props.children = renderTemplate(
+              titleTemplate,
+              tag.props.children,
+            )
           }
 
           deduped.push(tag)
@@ -356,8 +395,8 @@ export const createHead = () => {
 const IS_BROWSER = typeof window !== "undefined"
 
 export const useHead = (obj: MaybeRef<HeadObject>) => {
-  const headObj = ref(obj) as Ref<HeadObjectPlain>
   const head = injectHead()
+  const headObj = ref(obj) as Ref<HeadObjectPlain>
 
   head.addHeadObjs(headObj)
 

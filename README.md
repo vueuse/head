@@ -90,7 +90,7 @@ const finalHTML = `
 
 ## API
 
-### `createHead()`
+### `createHead(head?: HeadObject | Ref<HeadObject>)`
 
 Create the head manager instance.
 
@@ -99,6 +99,7 @@ Create the head manager instance.
 ```ts
 interface HeadObject {
   title?: MaybeRef<string>
+  titleTemplate?: MaybeRef<string> | ((title?: string) => string)
   meta?: MaybeRef<HeadAttrs[]>
   link?: MaybeRef<HeadAttrs[]>
   base?: MaybeRef<HeadAttrs>

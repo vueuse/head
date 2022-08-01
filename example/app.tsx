@@ -91,6 +91,7 @@ export const createApp = () => {
     setup() {
       useHead({
         title: "About",
+        titleTemplate: "%s | About Template",
       })
       return () => (
         <div>
@@ -136,7 +137,10 @@ export const createApp = () => {
       return () => <RouterView />
     },
   })
-  const head = createHead()
+
+  const head = createHead({
+    titleTemplate: "%s | @vueuse/head",
+  })
 
   app.use(head)
   app.use(router)

@@ -80,13 +80,13 @@ test("browser", async (t) => {
   t.snapshot(headHTML)
 
   await page.click("button.counter")
-  t.is(await page.title(), "count: 1")
+  t.is(await page.title(), "count: 1 | @vueuse/head")
 
   await page.click("button.change-home-title")
-  t.is(await page.title(), "count: 1")
+  t.is(await page.title(), "count: 1 | @vueuse/head")
 
   await page.click('a[href="/about"]')
-  t.is(await page.title(), "About")
+  t.is(await page.title(), "About | About Template")
 })
 
 test("useHead: server async setup", async (t) => {
