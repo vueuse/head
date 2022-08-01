@@ -21,23 +21,23 @@ yarn add @vueuse/head
 Register the Vue plugin:
 
 ```ts
-import { createApp } from 'vue'
-import { createHead } from '@vueuse/head'
+import { createApp } from "vue"
+import { createHead } from "@vueuse/head"
 
 const app = createApp()
 const head = createHead()
 
 app.use(head)
 
-app.mount('#app')
+app.mount("#app")
 ```
 
 Manage `head` with the composition API `useHead` in your component:
 
 ```vue
 <script>
-import { defineComponent, computed, reactive } from 'vue'
-import { useHead } from '@vueuse/head'
+import { defineComponent, computed, reactive } from "vue"
+import { useHead } from "@vueuse/head"
 
 export default defineComponent({
   setup() {
@@ -64,8 +64,8 @@ export default defineComponent({
 ### Server-side rendering
 
 ```ts
-import { renderToString } from '@vue/server-renderer'
-import { renderHeadToString } from '@vueuse/head'
+import { renderToString } from "@vue/server-renderer"
+import { renderHeadToString } from "@vueuse/head"
 
 const appHTML = await renderToString(yourVueApp)
 
@@ -120,14 +120,14 @@ For `meta` tags, we use `name` and `property` to prevent duplicated tags, you ca
 useHead({
   meta: [
     {
-      property: 'og:locale:alternate',
-      content: 'zh',
-      key: 'zh',
+      property: "og:locale:alternate",
+      content: "zh",
+      key: "zh",
     },
     {
-      property: 'og:locale:alternate',
-      content: 'en',
-      key: 'en',
+      property: "og:locale:alternate",
+      content: "en",
+      key: "en",
     },
   ],
 })
@@ -140,7 +140,7 @@ useHead({
   script: [
     {
       children: `console.log('Hello world!')`,
-      body: true
+      body: true,
     },
   ],
 })
@@ -166,12 +166,12 @@ useHead({
 `useHead` also takes reactive object or ref as the argument, for example:
 
 ```ts
-const head = reactive({ title: 'Website Title' })
+const head = reactive({ title: "Website Title" })
 useHead(head)
 ```
 
 ```ts
-const title = ref('Website Title')
+const title = ref("Website Title")
 useHead({ title })
 ```
 
@@ -181,7 +181,7 @@ Besides `useHead`, you can also manipulate head tags using the `<Head>` componen
 
 ```vue
 <script setup lang="ts">
-import { Head } from '@vueuse/head'
+import { Head } from "@vueuse/head"
 </script>
 
 <template>

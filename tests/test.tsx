@@ -1,14 +1,14 @@
-import anyTest, { TestInterface } from 'ava'
-import { createSSRApp, ref, h } from 'vue'
-import { renderToString } from '@vue/server-renderer'
-import { chromium, ChromiumBrowser } from 'playwright-core'
+import anyTest, { TestInterface } from "ava"
+import { createSSRApp, ref, h } from "vue"
+import { renderToString } from "@vue/server-renderer"
+import { chromium, ChromiumBrowser } from "playwright-core"
 import {
   createHead,
   HeadClient,
   renderHeadToString,
   useHead,
   Head,
-} from '../src'
+} from "../src"
 
 type TestContext = {
   browser: ChromiumBrowser
@@ -18,7 +18,7 @@ const test = anyTest as TestInterface<TestContext>
 
 test.before(async (t) => {
   t.context.browser = await chromium.launch({
-    executablePath: require('chrome-location'),
+    executablePath: require("chrome-location"),
   })
 })
 
@@ -26,38 +26,38 @@ test.after(async (t) => {
   await t.context.browser.close()
 })
 
-test('server', async (t) => {
+test("server", async (t) => {
   const head = createHead()
   const app = createSSRApp({
     setup() {
       useHead({
         title: `hello`,
         htmlAttrs: {
-          lang: 'zh',
+          lang: "zh",
         },
         meta: [
           {
-            name: 'description',
-            content: 'desc',
+            name: "description",
+            content: "desc",
           },
           {
-            name: 'description',
-            content: 'desc 2',
+            name: "description",
+            content: "desc 2",
           },
           {
-            property: 'og:locale:alternate',
-            content: 'fr',
-            key: 'fr',
+            property: "og:locale:alternate",
+            content: "fr",
+            key: "fr",
           },
           {
-            property: 'og:locale:alternate',
-            content: 'zh',
-            key: 'zh',
+            property: "og:locale:alternate",
+            content: "zh",
+            key: "zh",
           },
         ],
         script: [
           {
-            src: 'foo.js',
+            src: "foo.js",
           },
         ],
       })
@@ -72,31 +72,31 @@ test('server', async (t) => {
   t.is(headResult.htmlAttrs, ` lang="zh" data-head-attrs="lang"`)
 })
 
-test('browser', async (t) => {
+test("browser", async (t) => {
   const page = await t.context.browser.newPage()
   await page.goto(`http://localhost:3000`)
   const headHTML = await page.evaluate(() => document.head.innerHTML)
 
   t.snapshot(headHTML)
 
-  await page.click('button.counter')
-  t.is(await page.title(), 'count: 1')
+  await page.click("button.counter")
+  t.is(await page.title(), "count: 1")
 
-  await page.click('button.change-home-title')
-  t.is(await page.title(), 'count: 1')
+  await page.click("button.change-home-title")
+  t.is(await page.title(), "count: 1")
 
   await page.click('a[href="/about"]')
-  t.is(await page.title(), 'About')
+  t.is(await page.title(), "About")
 })
 
-test('useHead: server async setup', async (t) => {
+test("useHead: server async setup", async (t) => {
   const head = createHead()
   const app = createSSRApp({
     async setup() {
       const title = ref(`initial title`)
       useHead({ title })
       await new Promise((resolve) => setTimeout(resolve, 200))
-      title.value = 'new title'
+      title.value = "new title"
       return () => <div>hi</div>
     },
   })
@@ -107,7 +107,7 @@ test('useHead: server async setup', async (t) => {
   t.regex(headTags, /new title/)
 })
 
-test('<Head>: basic', async (t) => {
+test("<Head>: basic", async (t) => {
   const page = await t.context.browser.newPage()
   await page.goto(`http://localhost:3000/contact`)
   const getHeadTags = async () => {
@@ -118,11 +118,11 @@ test('<Head>: basic', async (t) => {
     return head.headTags
   }
   t.snapshot(await getHeadTags())
-  await page.click('button')
+  await page.click("button")
   t.snapshot(await getHeadTags())
 })
 
-test('<Head>: link & meta with v-for', async (t) => {
+test("<Head>: link & meta with v-for", async (t) => {
   const head = createHead()
   const app = createSSRApp({
     template: `<Head>
@@ -131,24 +131,27 @@ test('<Head>: link & meta with v-for', async (t) => {
     components: { Head },
     data() {
       return {
-        metaList: [{ property: "test1", content: "test1" }, { property: "test2", content: "test2" }],
-      };
+        metaList: [
+          { property: "test1", content: "test1" },
+          { property: "test2", content: "test2" },
+        ],
+      }
     },
   })
   app.use(head)
   await renderToString(app)
 
   const { headTags } = renderHeadToString(head)
-  t.snapshot(headTags);
+  t.snapshot(headTags)
 })
 
-test('<Head>: server async setup', async (t) => {
+test("<Head>: server async setup", async (t) => {
   const head = createHead()
   const app = createSSRApp({
     async setup() {
       const title = ref(`initial title`)
       await new Promise((resolve) => setTimeout(resolve, 200))
-      title.value = 'new title'
+      title.value = "new title"
       return () => <Head>{() => <title>{title.value}</title>}</Head>
     },
   })
@@ -159,7 +162,7 @@ test('<Head>: server async setup', async (t) => {
   t.regex(headTags, /new title/)
 })
 
-test('children', async (t) => {
+test("children", async (t) => {
   const head = createHead()
   const app = createSSRApp({
     setup() {
@@ -183,18 +186,18 @@ test('children', async (t) => {
   )
 })
 
-test('script key', async (t) => {
+test("script key", async (t) => {
   const head = createHead()
   const app = createSSRApp({
     setup() {
       useHead({
         script: [
           {
-            key: 'my-script',
+            key: "my-script",
             children: `console.log('A')`,
           },
           {
-            key: 'my-script',
+            key: "my-script",
             children: `console.log('B')`,
           },
         ],
@@ -212,11 +215,11 @@ test('script key', async (t) => {
   )
 })
 
-test('body script', async (t) => {
+test("body script", async (t) => {
   const page = await t.context.browser.newPage()
   await page.goto(`http://localhost:3000`)
 
-  const script = await page.$('[data-meta-body]')
+  const script = await page.$("[data-meta-body]")
   const scriptHtml = await script.innerHTML()
   t.is(scriptHtml, `console.log('hi')`)
 })
