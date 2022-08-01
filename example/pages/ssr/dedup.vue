@@ -1,11 +1,11 @@
 <script setup>
-import { useHead } from '../../../src'
+import { useHead } from "../../../src"
 
 useHead({
   style: [
     {
-      type: 'text/css',
-      id: 'darkStyle',
+      type: "text/css",
+      id: "darkStyle",
       children: `
         body {
           background-color: #000;
