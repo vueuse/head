@@ -79,6 +79,6 @@
     "vue-router": "^4.1.2"
   },
   "peerDependencies": {
-    "vue": ">=3"
+    "vue": ">=2.7 || >=3"
   }
 }
