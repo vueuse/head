@@ -48,7 +48,6 @@ test("basic", async (t) => {
         ],
         style: [
           {
-            key: 'text-color',
             children: '* { color: red }',
             body: true
           }
