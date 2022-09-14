@@ -156,8 +156,6 @@ test("malformed", async (t) => {
           {
             // @ts-expect-error number is not valid for name
             name: 123,
-            // @ts-expect-error dates not allowed
-            content: new Date(10, 10, 10),
             "data-unknown-attr": "test",
             // @ts-expect-error meta cannot have children
             children: 'test'
