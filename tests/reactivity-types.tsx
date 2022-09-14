@@ -2,7 +2,7 @@ import anyTest, { TestInterface } from "ava"
 import { computed, createSSRApp, h, ref } from "vue"
 import { renderToString } from "@vue/server-renderer"
 import { createHead, renderHeadToString, useHead } from "../src"
-import {HeadObject, HeadObjectPlain} from "../src/types";
+import { HeadObject, HeadObjectPlain } from "../src/types"
 
 const test = anyTest as TestInterface
 
@@ -10,20 +10,20 @@ test("basic", async (t) => {
   const head = createHead()
   const app = createSSRApp({
     setup() {
-      const titleTemplate = ref('%s - My site')
+      const titleTemplate = ref("%s - My site")
       useHead({
         title: `hello`,
         titleTemplate,
         htmlAttrs: {
-          lang: ref('zh'),
+          lang: ref("zh"),
         },
         bodyAttrs: {
-          'data-some-body-attr': 'some-value'
+          "data-some-body-attr": "some-value",
         },
         meta: [
           {
             name: "description",
-            content: ref('test'),
+            content: ref("test"),
           },
           {
             name: "description",
@@ -42,19 +42,19 @@ test("basic", async (t) => {
         ],
         link: [
           {
-            as: 'style',
-            href: '/style.css'
-          }
+            as: "style",
+            href: "/style.css",
+          },
         ],
         style: [
           {
-            children: '* { color: red }',
-            body: true
-          }
+            children: "* { color: red }",
+            body: true,
+          },
         ],
         script: [
           {
-            key: 'foo-script',
+            key: "foo-script",
             src: "foo.js",
           },
         ],
@@ -98,18 +98,20 @@ test("reactive", async (t) => {
   const app = createSSRApp({
     setup() {
       const title = ref("")
-      const scripts = ref<Required<HeadObject>['script']>([])
-      const urlMeta = computed<Required<HeadObjectPlain>['meta'][number]>(() => {
-        return {
-          property: "og:url",
-          content: "test",
-        }
-      })
+      const scripts = ref<Required<HeadObject>["script"]>([])
+      const urlMeta = computed<Required<HeadObjectPlain>["meta"][number]>(
+        () => {
+          return {
+            property: "og:url",
+            content: "test",
+          }
+        },
+      )
       useHead({
         title,
         htmlAttrs: {
-          lang: 'test',
-          dir: 'ltr',
+          lang: "test",
+          dir: "ltr",
         },
         meta: [
           {
@@ -158,7 +160,7 @@ test("malformed", async (t) => {
             name: 123,
             "data-unknown-attr": "test",
             // @ts-expect-error meta cannot have children
-            children: 'test'
+            children: "test",
           },
           {
             name: "some-flag",

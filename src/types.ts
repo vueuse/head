@@ -26,9 +26,9 @@ interface HeadAugmentations {
   base: HandlesDuplicates & { body?: never; children?: never }
   link: RendersToBody & { key?: never; children?: never }
   meta: HandlesDuplicates & { children?: never; body?: never }
-  style: RendersToBody & RendersInnerContent & { key?: never; }
+  style: RendersToBody & RendersInnerContent & { key?: never }
   script: RendersToBody & RendersInnerContent & HandlesDuplicates
-  noscript: RendersToBody & RendersInnerContent & { key?: never; }
+  noscript: RendersToBody & RendersInnerContent & { key?: never }
   htmlAttrs: { key?: never; children?: never; body?: never }
   bodyAttrs: { key?: never; children?: never; body?: never }
 }

@@ -20,7 +20,7 @@ import {
 import { createElement } from "./create-element"
 import { stringifyAttrs } from "./stringify-attrs"
 import { isEqualNode } from "./utils"
-import {HeadObjectPlain, HeadObject, TagKeys} from "./types"
+import type { HeadObjectPlain, HeadObject, TagKeys } from "./types"
 
 type MaybeRef<T> = T | Ref<T>
 
