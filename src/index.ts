@@ -5,7 +5,6 @@ import {
   onBeforeUnmount,
   ref,
   Ref,
-  UnwrapRef,
   watchEffect,
   VNode,
   unref,
@@ -21,28 +20,14 @@ import {
 import { createElement } from "./create-element"
 import { stringifyAttrs } from "./stringify-attrs"
 import { isEqualNode } from "./utils"
+import {HeadObjectPlain, HeadObject, TagKeys} from "./types"
 
 type MaybeRef<T> = T | Ref<T>
 
 export type HeadAttrs = { [k: string]: any }
 
-export type HeadObject = {
-  title?: MaybeRef<string>
-  titleTemplate?: MaybeRef<string> | ((title?: string) => string)
-  meta?: MaybeRef<HeadAttrs[]>
-  link?: MaybeRef<HeadAttrs[]>
-  base?: MaybeRef<HeadAttrs>
-  style?: MaybeRef<HeadAttrs[]>
-  script?: MaybeRef<HeadAttrs[]>
-  noscript?: MaybeRef<HeadAttrs[]>
-  htmlAttrs?: MaybeRef<HeadAttrs>
-  bodyAttrs?: MaybeRef<HeadAttrs>
-}
-
-export type HeadObjectPlain = UnwrapRef<HeadObject>
-
 export type HeadTag = {
-  tag: string
+  tag: TagKeys
   props: {
     body?: boolean
     [k: string]: any
@@ -104,7 +89,7 @@ export const injectHead = () => {
   return head
 }
 
-const acceptFields: Array<keyof Omit<HeadObject, "titleTemplate">> = [
+const acceptFields: Array<TagKeys> = [
   "title",
   "meta",
   "link",
@@ -117,7 +102,7 @@ const acceptFields: Array<keyof Omit<HeadObject, "titleTemplate">> = [
 ]
 
 const renderTemplate = (
-  template: HeadObjectPlain["titleTemplate"],
+  template: Required<HeadObjectPlain>["titleTemplate"],
   title?: string,
 ): string => {
   if (template == null) return ""
@@ -148,7 +133,8 @@ const headObjToTags = (obj: HeadObjectPlain) => {
           const value = obj[key]
           if (Array.isArray(value)) {
             value.forEach((item) => {
-              tags.push({ tag: key, props: item })
+              // unref item to support ref array entries
+              tags.push({ tag: key, props: unref(item) })
             })
           } else if (value) {
             tags.push({ tag: key, props: value })

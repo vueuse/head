@@ -80,5 +80,8 @@
   },
   "peerDependencies": {
     "vue": ">=2.7 || >=3"
+  },
+  "dependencies": {
+    "@zhead/schema-vue": "^0.7.0"
   }
 }
