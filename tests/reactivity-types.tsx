@@ -15,7 +15,7 @@ test("basic", async (t) => {
         title: `hello`,
         titleTemplate,
         htmlAttrs: {
-          lang: "zh",
+          lang: ref('zh'),
         },
         bodyAttrs: {
           'data-some-body-attr': 'some-value'
@@ -23,7 +23,7 @@ test("basic", async (t) => {
         meta: [
           {
             name: "description",
-            content: "desc",
+            content: ref('test'),
           },
           {
             name: "description",

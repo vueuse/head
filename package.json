@@ -82,6 +82,6 @@
     "vue": ">=2.7 || >=3"
   },
   "dependencies": {
-    "@zhead/schema-vue": "^0.7.0"
+    "@zhead/schema-vue": "^0.7.1"
   }
 }

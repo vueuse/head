@@ -7,7 +7,7 @@ specifiers:
   '@vitejs/plugin-vue-jsx': ^2.0.0
   '@vue/compiler-sfc': ^3.2.37
   '@vue/server-renderer': ^3.2.37
-  '@zhead/schema-vue': ^0.7.0
+  '@zhead/schema-vue': ^0.7.1
   ava: ^4.3.1
   chrome-location: ^1.2.1
   esbuild-register: ^3.3.3
@@ -26,7 +26,7 @@ specifiers:
   vue-router: ^4.1.2
 
 dependencies:
-  '@zhead/schema-vue': 0.7.0_vue@3.2.37
+  '@zhead/schema-vue': 0.7.1_vue@3.2.37
 
 devDependencies:
   '@egoist/prettier-config': 1.0.0
@@ -656,17 +656,17 @@ packages:
   /@vue/shared/3.2.37:
     resolution: {integrity: sha512-4rSJemR2NQIo9Klm1vabqWjD8rs/ZaJSzMxkMNeJS6lHiUjjUeYFbooN19NgFjztubEKh3WlZUeOLVdbbUWHsw==}
 
-  /@zhead/schema-vue/0.7.0_vue@3.2.37:
-    resolution: {integrity: sha512-q+2sbdjXO7pFG0xzSzmwX9EBDAjtoWZ1PpcSDf+3/KeTQbfJUriBofd7dxVGJOZDPSk3RBv2GPmhIuI6x3vfkw==}
+  /@zhead/schema-vue/0.7.1_vue@3.2.37:
+    resolution: {integrity: sha512-puEmNJOjfC5IRJqc5p0GEemWP1B25YYRMZ2RM10UrJXGjR+cGOZ+PYQHoBIl9Nf5kJVzhokg1H99HE6Wnyx+qA==}
     peerDependencies:
       vue: '>=2.7 || >=3'
     dependencies:
-      '@zhead/schema': 0.7.0
+      '@zhead/schema': 0.7.1
       vue: 3.2.37
     dev: false
 
-  /@zhead/schema/0.7.0:
-    resolution: {integrity: sha512-xPPwQRTdcS2AYBlpxuT+pxj2usXUU9uS+W35QdLKzvC9/8la4nLvRJ0/dnmiXSjEiuIJcUpjAAWQU/LT1aqhkw==}
+  /@zhead/schema/0.7.1:
+    resolution: {integrity: sha512-3FjTUj8YBN45PCW4YSosV9LjBu6HnKetk0aYtaZ7HffgpSlAIl/eCaem8T34KJZ7/lRsvoGPcDDkaAzyvGqi0g==}
     dev: false
 
   /acorn-walk/8.2.0:
