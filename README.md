@@ -203,19 +203,13 @@ useHead({
 })
 ```
 
-The priority for rendering the tag, without this all tags are rendered as they are registered
-(besides some special tags).
-
-&lt;meta&gt; tags have a priority of 10 by default and will appear before all other tags (besides &lt;title&gt; and &lt;base&gt;).
-
-All other tags have a priority of 20 and will be rendered as they are registered.
-
-The following default priorities exist:
+The following special tags have default priorities:
 
 - -2 &lt;meta charset ...&gt;
 - -1 &lt;base&gt;
 - 0 &lt;meta http-equiv=&quot;content-security-policy&quot; ...&gt;
-- 10 &lt;script&gt;, &lt;link&gt;, &lt;style&gt;, &lt;meta ...&gt;, etc
+
+All other tags have a default priority of 10: <meta>, <script>, <link>, <style>, etc
 
 ### `<Head>`
 

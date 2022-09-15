@@ -27,15 +27,12 @@ export interface HasRenderPriority {
    * The priority for rendering the tag, without this all tags are rendered as they are registered
    * (besides some special tags).
    *
-   * <meta> tags have a priority of 2 by default and will appear before all other tags (besides <title> and <base>).
-   *
-   * All other tags have a priority of 100 and will be rendered as they are registered.
-   *
-   * The following default priorities exist:
+   * The following special tags have default priorities:
    * * -2 <meta charset ...>
    * * -1 <base>
    * * 0 <meta http-equiv="content-security-policy" ...>
-   * * 10 <meta>, <script>, <link>, <style>, etc
+   *
+   * All other tags have a default priority of 10: <meta>, <script>, <link>, <style>, etc
    *
    * @warn Experimental feature. Only available when rendering SSR
    */
