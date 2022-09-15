@@ -22,6 +22,8 @@ import { stringifyAttrs } from "./stringify-attrs"
 import { isEqualNode } from "./utils"
 import type { HeadObjectPlain, HeadObject, TagKeys } from "./types"
 
+export * from './types'
+
 type MaybeRef<T> = T | Ref<T>
 
 export type HeadAttrs = { [k: string]: any }
