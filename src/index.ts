@@ -335,7 +335,7 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
               ) {
                 index = i
               }
-              if (index) {
+              if (index !== -1) {
                 break
               }
             }

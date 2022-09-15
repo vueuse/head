@@ -4,6 +4,41 @@ import { createHead, renderHeadToString } from "../src"
 
 const test = anyTest as TestFn
 
+test("dedupes desc", async (t) => {
+  const head = createHead()
+  head.addHeadObjs(
+      computed(() => ({
+        meta: [
+          {
+            name: "something-else",
+            content: 'test',
+          },
+          {
+            name: "description",
+            content: "desc"
+          },
+        ],
+      })),
+  )
+  head.addHeadObjs(
+      computed(() => ({
+        meta: [
+          {
+            name: "description",
+            content: "desc 2"
+          },
+        ],
+      })),
+  )
+  const { headTags } = renderHeadToString(head)
+  t.true(
+      headTags.includes(
+          '<meta name="description" content="desc 2">',
+      ),
+  )
+  t.true(headTags.split("description").length === 2)
+})
+
 test("dedupes key", async (t) => {
   const head = createHead()
   head.addHeadObjs(
