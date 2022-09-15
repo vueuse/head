@@ -23,7 +23,7 @@ interface RendersInnerContent {
 }
 
 interface HeadAugmentations {
-  base: HandlesDuplicates & { body?: never; children?: never }
+  base: { key?: never; body?: never; children?: never }
   link: RendersToBody & { key?: never; children?: never }
   meta: HandlesDuplicates & { children?: never; body?: never }
   style: RendersToBody & RendersInnerContent & { key?: never }
