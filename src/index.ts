@@ -20,7 +20,12 @@ import {
 import { createElement } from "./create-element"
 import { stringifyAttrs } from "./stringify-attrs"
 import { isEqualNode } from "./utils"
-import type { HeadObjectPlain, HeadObject, TagKeys } from "./types"
+import type {
+  HeadObjectPlain,
+  HeadObject,
+  TagKeys,
+  HasRenderPriority,
+} from "./types"
 
 type MaybeRef<T> = T | Ref<T>
 
@@ -28,9 +33,8 @@ export type HeadAttrs = { [k: string]: any }
 
 export type HeadTag = {
   tag: TagKeys
-  props: {
+  props: HasRenderPriority & {
     body?: boolean
-    renderPriority?: number
     [k: string]: any
   }
 }
@@ -346,8 +350,7 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
       const actualTags: Record<string, HeadTag[]> = {}
 
       // head sorting here is not guaranteed to be honoured
-      const headTags = head.headTags.sort(sortTags)
-      for (const tag of headTags) {
+      for (const tag of head.headTags.sort(sortTags)) {
         if (tag.tag === "title") {
           title = tag.props.children
           continue
@@ -457,8 +460,7 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
   let bodyAttrs: HeadAttrs = {}
   let bodyTags: string[] = []
 
-  const headTags = head.headTags.sort(sortTags)
-  for (const tag of headTags) {
+  for (const tag of head.headTags.sort(sortTags)) {
     if (tag.tag === "title") {
       titleTag = tagToString(tag)
     } else if (tag.tag === "htmlAttrs") {
