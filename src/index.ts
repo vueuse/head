@@ -30,6 +30,7 @@ export type HeadTag = {
   tag: TagKeys
   props: {
     body?: boolean
+    renderPriority?: number
     [k: string]: any
   }
 }
@@ -344,7 +345,9 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
 
       const actualTags: Record<string, HeadTag[]> = {}
 
-      for (const tag of head.headTags) {
+      // head sorting here is not guaranteed to be honoured
+      const headTags = head.headTags.sort(sortTags)
+      for (const tag of headTags) {
         if (tag.tag === "title") {
           title = tag.props.children
           continue
@@ -405,6 +408,9 @@ const tagToString = (tag: HeadTag) => {
     // avoid rendering body attr
     delete tag.props.body
   }
+  if (tag.props.renderPriority) {
+    delete tag.props.renderPriority
+  }
   let attrs = stringifyAttrs(tag.props)
   if (SELF_CLOSING_TAGS.includes(tag.tag)) {
     return `<${tag.tag}${attrs}${
@@ -417,13 +423,42 @@ const tagToString = (tag: HeadTag) => {
   }>${tag.props.children || ""}</${tag.tag}>`
 }
 
+const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
+  const tagWeight = (tag: HeadTag) => {
+    if (tag.props.renderPriority) {
+      return tag.props.renderPriority
+    }
+    switch (tag.tag) {
+      // This element must come before other elements with attribute values of URLs
+      case "base":
+        return -1
+      case "meta":
+        // charset must come early in case there's non-utf8 characters in the HTML document
+        if (tag.props.charset) {
+          return -2
+        }
+        // CSP needs to be as it effects the loading of assets
+        if (tag.props["http-equiv"] === "content-security-policy") {
+          return 0
+        }
+        return 10
+      default:
+        // arbitrary safe number that can go up and down without conflicting with meta
+        return 20
+    }
+  }
+  return tagWeight(aTag) - tagWeight(bTag)
+}
+
 export const renderHeadToString = (head: HeadClient): HTMLResult => {
   const tags: string[] = []
   let titleTag = ""
   let htmlAttrs: HeadAttrs = {}
   let bodyAttrs: HeadAttrs = {}
   let bodyTags: string[] = []
-  for (const tag of head.headTags) {
+
+  const headTags = head.headTags.sort(sortTags)
+  for (const tag of headTags) {
     if (tag.tag === "title") {
       titleTag = tagToString(tag)
     } else if (tag.tag === "htmlAttrs") {
