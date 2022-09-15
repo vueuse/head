@@ -1,7 +1,6 @@
 import anyTest, { TestFn } from "ava"
 import { computed } from "vue"
 import { createHead, renderHeadToString } from "../src"
-import { RENDER_PRIORITY_AFTER_META } from "../src/constants"
 
 const test = anyTest as TestFn
 
@@ -36,7 +35,6 @@ test("charset first", async (t) => {
     })),
   )
   const { headTags } = renderHeadToString(head)
-    console.log(headTags)
   t.true(headTags.startsWith('<meta charset="utf-8">'))
 })
 
@@ -132,13 +130,12 @@ test("manual priority", async (t) => {
       script: [
         {
           src: "/very-important-script.js",
-          renderPriority: RENDER_PRIORITY_AFTER_META,
+          renderPriority: 1,
         },
       ],
     })),
   )
   const { headTags } = renderHeadToString(head)
-  console.log(headTags)
   t.snapshot(headTags)
   t.true(
     headTags.startsWith(

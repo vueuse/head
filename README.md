@@ -184,8 +184,6 @@ useHead({ title })
 To set the render priority of a tag you can use the `renderPriority` attribute:
 
 ```ts
-import { RENDER_PRIORITY_AFTER_META } from "@vueuse/head"
-
 useHead({
   script: [
     {
@@ -199,7 +197,7 @@ useHead({
     // will render first
     {
       src: "/very-important-script.js",
-      renderPriority: RENDER_PRIORITY_AFTER_META, // 11
+      renderPriority: 1 // default is 10, so will be first
     },
   ],
 })
@@ -217,8 +215,7 @@ The following default priorities exist:
 - -2 &lt;meta charset ...&gt;
 - -1 &lt;base&gt;
 - 0 &lt;meta http-equiv=&quot;content-security-policy&quot; ...&gt;
-- 10 &lt;meta ...&gt;
-- 20 &lt;script&gt;, &lt;link&gt;, &lt;style&gt;, etc
+- 10 &lt;script&gt;, &lt;link&gt;, &lt;style&gt;, &lt;meta ...&gt;, etc
 
 ### `<Head>`
 

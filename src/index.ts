@@ -443,8 +443,8 @@ const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
         }
         return 10
       default:
-        // arbitrary safe number that can go up and down without conflicting with meta
-        return 20
+        // arbitrary safe number that can go up and down without conflicting
+        return 10
     }
   }
   return tagWeight(aTag) - tagWeight(bTag)

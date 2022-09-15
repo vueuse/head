@@ -8,7 +8,6 @@ import {
 } from "vue-router"
 import { createHead, useHead } from "../src"
 import Contact from "./Contact.vue"
-import {RENDER_PRIORITY_FIRST} from "../src/constants";
 
 export const createApp = () => {
   const Counter = defineComponent({
@@ -42,13 +41,6 @@ export const createApp = () => {
         htmlAttrs: {
           lang: "en",
         },
-        link: [
-          {
-            as: 'font',
-            rel: 'preload',
-            href: './fonts/my-font-file.ttf'
-          }
-        ],
         noscript: [{ children: "This app requires javascript to work" }],
         meta: [
           {
@@ -72,7 +64,7 @@ export const createApp = () => {
           {
             name: "custom-priority",
             content: "of 1",
-            renderPriority: RENDER_PRIORITY_FIRST
+            renderPriority: 1
           },
         ],
         script: [
@@ -140,12 +132,6 @@ export const createApp = () => {
   const app = createSSRApp({
     setup() {
       useHead({
-        link: [
-          {
-            as: "style",
-            href: "/fonts.css"
-          }
-        ],
         meta: [
           {
             name: "global-meta",

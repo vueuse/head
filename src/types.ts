@@ -35,8 +35,7 @@ export interface HasRenderPriority {
    * * -2 <meta charset ...>
    * * -1 <base>
    * * 0 <meta http-equiv="content-security-policy" ...>
-   * * 10 <meta ...>
-   * * 20 <script>, <link>, <style>, etc
+   * * 10 <meta>, <script>, <link>, <style>, etc
    *
    * @warn Experimental feature. Only available when rendering SSR
    */
