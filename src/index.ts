@@ -26,8 +26,9 @@ import type {
   TagKeys,
   HasRenderPriority,
 } from "./types"
+import { HandlesDuplicates, RendersInnerContent, RendersToBody } from "./types"
 
-export * from './types'
+export * from "./types"
 
 type MaybeRef<T> = T | Ref<T>
 
@@ -35,10 +36,12 @@ export type HeadAttrs = { [k: string]: any }
 
 export type HeadTag = {
   tag: TagKeys
-  props: HasRenderPriority & {
-    body?: boolean
-    [k: string]: any
-  }
+  props: HandlesDuplicates &
+    HasRenderPriority &
+    RendersToBody &
+    RendersInnerContent & {
+      [k: string]: any
+    }
 }
 
 export type HeadClient = {
