@@ -1,10 +1,10 @@
-import anyTest, { TestInterface } from "ava"
+import anyTest, { TestFn } from "ava"
 import { computed, createSSRApp, h, ref } from "vue"
 import { renderToString } from "@vue/server-renderer"
 import { createHead, renderHeadToString, useHead } from "../src"
 import { HeadObject, HeadObjectPlain } from "../src/types"
 
-const test = anyTest as TestInterface
+const test = anyTest as TestFn
 
 test("basic", async (t) => {
   const head = createHead()

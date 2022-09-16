@@ -1,4 +1,4 @@
-import anyTest, { TestInterface } from "ava"
+import anyTest, { TestFn } from "ava"
 import { createSSRApp, ref, h } from "vue"
 import { renderToString } from "@vue/server-renderer"
 import { chromium, ChromiumBrowser } from "playwright-core"
@@ -14,7 +14,7 @@ type TestContext = {
   browser: ChromiumBrowser
 }
 
-const test = anyTest as TestInterface<TestContext>
+const test = anyTest as TestFn<TestContext>
 
 test.before(async (t) => {
   t.context.browser = await chromium.launch({

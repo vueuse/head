@@ -1,6 +1,6 @@
 import type { Head as PlainHead, ReactiveHead } from "@zhead/schema-vue"
 
-interface HandlesDuplicates {
+export interface HandlesDuplicates {
   /**
    * By default, tags which share the same unique key `name, `property` are de-duped. To allow duplicates
    * to be made you can provide a unique key for each entry.
@@ -8,14 +8,14 @@ interface HandlesDuplicates {
   key?: string
 }
 
-interface RendersToBody {
+export interface RendersToBody {
   /**
    * Render tag at the end of the <body>.
    */
   body?: boolean
 }
 
-interface RendersInnerContent {
+export interface RendersInnerContent {
   /**
    * Sets the textContent of an element.
    */
@@ -40,7 +40,8 @@ export interface HasRenderPriority {
 }
 
 interface HeadAugmentations {
-  base: HandlesDuplicates & {
+  base: {
+    key?: never
     renderPriority?: never
     body?: never
     children?: never
