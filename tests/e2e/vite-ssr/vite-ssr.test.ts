@@ -58,97 +58,11 @@ describe("e2e: vite ssr", async () => {
       })
       return head.headTags
     }
-    expect(await getHeadTags()).toMatchInlineSnapshot(`
-      [
-        {
-          "props": {
-            "content": "some global meta tag",
-            "name": "global-meta",
-          },
-          "tag": "meta",
-        },
-        {
-          "props": {
-            "children": "0 | @vueuse/head",
-          },
-          "tag": "title",
-        },
-        {
-          "props": {
-            "children": null,
-            "lang": "en",
-          },
-          "tag": "htmlAttrs",
-        },
-        {
-          "props": {
-            "children": null,
-            "class": "body",
-          },
-          "tag": "bodyAttrs",
-        },
-        {
-          "props": {
-            "children": null,
-            "content": "desc",
-            "name": "description",
-          },
-          "tag": "meta",
-        },
-        {
-          "props": {
-            "children": " body { background: lightgreen; } button {color: red}",
-          },
-          "tag": "style",
-        },
-      ]
-    `)
+    expect((await getHeadTags()).find(t => t.tag === 'title')!.props.children)
+      .toMatchInlineSnapshot('"0 | @vueuse/head"')
     await page.click("button")
-    expect(await getHeadTags()).toMatchInlineSnapshot(`
-      [
-        {
-          "props": {
-            "content": "some global meta tag",
-            "name": "global-meta",
-          },
-          "tag": "meta",
-        },
-        {
-          "props": {
-            "children": "1 | @vueuse/head",
-          },
-          "tag": "title",
-        },
-        {
-          "props": {
-            "children": null,
-            "lang": "en",
-          },
-          "tag": "htmlAttrs",
-        },
-        {
-          "props": {
-            "children": null,
-            "class": "body",
-          },
-          "tag": "bodyAttrs",
-        },
-        {
-          "props": {
-            "children": null,
-            "content": "desc",
-            "name": "description",
-          },
-          "tag": "meta",
-        },
-        {
-          "props": {
-            "children": " body { background: lightgreen; } button {color: red}",
-          },
-          "tag": "style",
-        },
-      ]
-    `)
+    expect((await getHeadTags()).find(t => t.tag === 'title')!.props.children)
+      .toMatchInlineSnapshot('"1 | @vueuse/head"')
   })
 
   test("body script", async () => {

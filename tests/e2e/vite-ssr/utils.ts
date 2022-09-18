@@ -32,17 +32,6 @@ export async function startServer() {
 }
 
 export async function createBrowser() {
-  let playwright: typeof import("playwright")
-  try {
-    // Workround for https://github.com/nuxt/framework/issues/3470
-    // TODO: Remove when upstream issue resolved
-    playwright = await import(String("playwright"))
-  } catch {
-    /* istanbul ignore next */
-    throw new Error(`
-      The dependency 'playwright' not found.
-      Please run 'yarn add --dev playwright' or 'npm install --save-dev playwright'
-    `)
-  }
+  const playwright = await import("playwright")
   return await playwright.chromium.launch()
 }

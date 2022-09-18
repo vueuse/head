@@ -24,7 +24,7 @@
     "play:vite": "vite examples/vite-ssr",
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "prepublishOnly": "npm run build",
-    "test": "vitest",
+    "test": "nuxi prepare examples/nuxt3 && vitest",
     "test:e2e": "vitest tests/e2e",
     "release": "kanpai"
   },
