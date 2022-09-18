@@ -26,6 +26,7 @@ specifiers:
   simple-git-hooks: ^2.8.0
   tsup: ^6.2.3
   typescript: ^4.8.3
+  ufo: ^0.8.5
   vite: ^3.1.2
   vitest: ^0.23.4
   vue: ^3.2.39
@@ -56,6 +57,7 @@ devDependencies:
   simple-git-hooks: 2.8.0
   tsup: 6.2.3_typescript@4.8.3
   typescript: 4.8.3
+  ufo: 0.8.5
   vite: 3.1.2
   vitest: 0.23.4_jsdom@20.0.0
   vue: 3.2.39
