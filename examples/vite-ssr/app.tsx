@@ -64,7 +64,7 @@ export const createApp = () => {
           {
             name: "custom-priority",
             content: "of 1",
-            renderPriority: 1
+            renderPriority: 1,
           },
         ],
         script: [

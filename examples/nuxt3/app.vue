@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useHead } from '#head'
+import { useHead } from "#head"
 
 useHead({
-  title: 'Title',
+  title: "Title",
 })
 </script>
 <template>
