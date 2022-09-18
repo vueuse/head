@@ -37,7 +37,7 @@ export const createApp = () => {
       useHead({
         title,
         base: { href: "/" },
-        style: [{ children: `body {background: red}` }],
+        style: [{ children: `body {background: salmon}` }],
         htmlAttrs: {
           lang: "en",
         },
@@ -60,6 +60,11 @@ export const createApp = () => {
             property: "og:locale:alternate",
             content: "zh",
             key: "zh",
+          },
+          {
+            name: "custom-priority",
+            content: "of 1",
+            renderPriority: 1
           },
         ],
         script: [

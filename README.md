@@ -176,6 +176,41 @@ const title = ref("Website Title")
 useHead({ title })
 ```
 
+#### Render Priority
+
+> :warning: Experimental feature
+> Only available when rendering SSR.
+
+To set the render priority of a tag you can use the `renderPriority` attribute:
+
+```ts
+useHead({
+  script: [
+    {
+      src: "/not-important-script.js",
+    },
+  ],
+})
+
+useHead({
+  script: [
+    // will render first
+    {
+      src: "/very-important-script.js",
+      renderPriority: 1 // default is 10, so will be first
+    },
+  ],
+})
+```
+
+The following special tags have default priorities:
+
+- -2 &lt;meta charset ...&gt;
+- -1 &lt;base&gt;
+- 0 &lt;meta http-equiv=&quot;content-security-policy&quot; ...&gt;
+
+All other tags have a default priority of 10: <meta>, <script>, <link>, <style>, etc
+
 ### `<Head>`
 
 Besides `useHead`, you can also manipulate head tags using the `<Head>` component:

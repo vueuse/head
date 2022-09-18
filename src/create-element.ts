@@ -14,7 +14,7 @@ export const createElement = (
     } else {
       let value = attrs[key]
 
-      if (key === "key" || value === false) {
+      if (key === "renderPriority" || key === "key" || value === false) {
         continue
       }
 
