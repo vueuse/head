@@ -12,7 +12,6 @@ export async function startServer() {
   const port = await getRandomPort()
 
   const vite = resolve(await resolvePath("vite"), "../../../bin/vite.js")
-  console.log("vite process", vite, FixturePath)
   const serverProcess = execa(vite, [".", "--port", port.toString()], {
     cwd: FixturePath,
     stdio: "inherit",
