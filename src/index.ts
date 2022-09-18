@@ -7,8 +7,7 @@ import {
   Ref,
   watchEffect,
   VNode,
-  unref,
-  shallowRef,
+  getCurrentInstance,
 } from "vue"
 import {
   PROVIDE_KEY,
@@ -19,18 +18,17 @@ import {
 } from "./constants"
 import { createElement } from "./create-element"
 import { stringifyAttrs } from "./stringify-attrs"
-import { isEqualNode } from "./utils"
+import { isEqualNode, resolveHeadInput } from "./utils"
 import type {
   HeadObjectPlain,
-  HeadObject,
+
   TagKeys,
   HasRenderPriority,
 } from "./types"
 import { HandlesDuplicates, RendersInnerContent, RendersToBody } from "./types"
+import { RegisteredHeadInput, UseHeadInput } from "./types"
 
 export * from "./types"
-
-type MaybeRef<T> = T | Ref<T>
 
 export type HeadAttrs = { [k: string]: any }
 
@@ -49,9 +47,7 @@ export type HeadClient = {
 
   headTags: HeadTag[]
 
-  addHeadObjs: (objs: Ref<HeadObjectPlain>) => void
-
-  removeHeadObjs: (objs: Ref<HeadObjectPlain>) => void
+  addHeadObjs: (input: UseHeadInput, ctxId?: number) => () => void
 
   updateDOM: (document?: Document) => void
 }
@@ -65,6 +61,16 @@ export interface HTMLResult {
   readonly bodyAttrs: string
   // Tags in `<body>`
   readonly bodyTags: string
+}
+
+let ssrCtxId = -1
+
+const useCtxId = () => {
+  const ctx = getCurrentInstance()
+  if (ctx) {
+    return ctx.uid
+  }
+  return ++ssrCtxId
 }
 
 const getTagDeduper = <T extends HeadTag>(tag: T) => {
@@ -135,7 +141,7 @@ const renderTemplate = (
   if (typeof template === "string") {
     return template.replace("%s", title ?? "")
   }
-  return template(unref(title))
+  return template(title)
 }
 
 const headObjToTags = (obj: HeadObjectPlain) => {
@@ -158,9 +164,8 @@ const headObjToTags = (obj: HeadObjectPlain) => {
         if (acceptFields.includes(key)) {
           const value = obj[key]
           if (Array.isArray(value)) {
-            value.forEach((item) => {
-              // unref item to support ref array entries
-              tags.push({ tag: key, props: unref(item) })
+            value.forEach((props) => {
+              tags.push({ tag: key, props })
             })
           } else if (value) {
             tags.push({ tag: key, props: value })
@@ -287,12 +292,12 @@ const updateElements = (
   )
 }
 
-export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
-  let allHeadObjs: Ref<HeadObjectPlain>[] = []
+export const createHead = (initHeadObject?: UseHeadInput) => {
+  let allHeadObjs: RegisteredHeadInput[] = []
   let previousTags = new Set<string>()
 
   if (initHeadObject) {
-    allHeadObjs.push(shallowRef(initHeadObject))
+    allHeadObjs.push({ input: initHeadObject, ctxId: useCtxId() })
   }
 
   const head: HeadClient = {
@@ -306,15 +311,21 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
     get headTags() {
       const deduped: HeadTag[] = []
 
-      const titleTemplate = allHeadObjs
-        .map((i) => unref(i).titleTemplate)
-        .reverse()
-        .find((i) => i != null)
+      console.log(allHeadObjs)
+      const headTags = allHeadObjs
+        // allow sorting by descending generated or artificial ctx id
+        .sort((a, b) => a.ctxId - b.ctxId)
+        .map((entry) => resolveHeadInput(entry.input))
 
-      allHeadObjs.forEach((objs) => {
-        const tags = headObjToTags(unref(objs))
-        tags.forEach((tag) => {
-          // Remove tags with the same key
+      const { titleTemplate } = headTags
+        .reverse()
+        .find((i) => !!i.titleTemplate) || { titleTemplate: null }
+
+      headTags
+        .map((entry) => headObjToTags(entry))
+        .forEach((tags) => {
+          tags.forEach((tag) => {
+            // Remove tags with the same key
           const dedupe = getTagDeduper(tag)
           if (dedupe) {
             let index = -1
@@ -355,26 +366,26 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
             }
           }
 
-          if (titleTemplate && tag.tag === "title") {
-            tag.props.children = renderTemplate(
-              titleTemplate,
-              tag.props.children,
-            )
-          }
+            if (titleTemplate && tag.tag === "title") {
+              tag.props.children = renderTemplate(
+                titleTemplate,
+                tag.props.children,
+              )
+            }
 
-          deduped.push(tag)
+            deduped.push(tag)
+          })
         })
-      })
 
       return deduped
     },
 
-    addHeadObjs(objs) {
-      allHeadObjs.push(objs)
-    },
-
-    removeHeadObjs(objs) {
-      allHeadObjs = allHeadObjs.filter((_objs) => _objs !== objs)
+    addHeadObjs(input) {
+      const ctx = useCtxId()
+      allHeadObjs.push({ ctxId: ctx, input })
+      return () => {
+        allHeadObjs = allHeadObjs.filter((i) => i.ctxId !== ctx)
+      }
     },
 
     updateDOM(document = window.document) {
@@ -421,11 +432,10 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
 
 const IS_BROWSER = typeof window !== "undefined"
 
-export const useHead = (obj: MaybeRef<HeadObject>) => {
+export const useHead = (headInput: UseHeadInput) => {
   const head = injectHead()
-  const headObj = ref(obj) as Ref<HeadObjectPlain>
 
-  head.addHeadObjs(headObj)
+  const removeHeadObjs = head.addHeadObjs(headInput)
 
   if (IS_BROWSER) {
     watchEffect(() => {
@@ -433,7 +443,7 @@ export const useHead = (obj: MaybeRef<HeadObject>) => {
     })
 
     onBeforeUnmount(() => {
-      head.removeHeadObjs(headObj)
+      removeHeadObjs()
       head.updateDOM()
     })
   }
@@ -591,10 +601,12 @@ export const Head = /*@__PURE__*/ defineComponent({
     const head = injectHead()
 
     let obj: Ref<HeadObjectPlain> | undefined
+    const ctx = useCtxId()
+    let removeHeadObjs: () => void
 
     onBeforeUnmount(() => {
-      if (obj) {
-        head.removeHeadObjs(obj)
+      if (removeHeadObjs) {
+        removeHeadObjs()
         head.updateDOM()
       }
     })
@@ -602,11 +614,13 @@ export const Head = /*@__PURE__*/ defineComponent({
     return () => {
       watchEffect(() => {
         if (!slots.default) return
-        if (obj) {
-          head.removeHeadObjs(obj)
+        if (removeHeadObjs) {
+          removeHeadObjs()
         }
         obj = ref(vnodesToHeadObj(slots.default()))
-        head.addHeadObjs(obj)
+        if (obj) {
+          removeHeadObjs = head.addHeadObjs(obj, ctx)
+        }
         if (IS_BROWSER) {
           head.updateDOM()
         }

@@ -21,6 +21,7 @@
     "dist"
   ],
   "scripts": {
+    "lint": "prettier src/** tests/** --write",
     "test": "node -r esbuild-register scripts/run-test.ts",
     "example": "vite example",
     "build": "tsup src/index.ts --format esm,cjs --dts",
@@ -82,6 +83,7 @@
     "vue": ">=2.7 || >=3"
   },
   "dependencies": {
-    "@zhead/schema-vue": "^0.7.1"
+    "@vueuse/shared": "^9.2.0",
+    "@zhead/schema-vue": "^0.7.3"
   }
 }

@@ -1,8 +1,9 @@
 import anyTest, { TestFn } from "ava"
 import { computed, createSSRApp, h, ref } from "vue"
 import { renderToString } from "@vue/server-renderer"
-import { createHead, renderHeadToString, useHead } from "../src"
+import { createHead, renderHeadToString, useHead, UseHeadInput } from "../src"
 import { HeadObject, HeadObjectPlain } from "../src/types"
+import { resolveRef } from "@vueuse/shared"
 
 const test = anyTest as TestFn
 
@@ -182,4 +183,78 @@ test("malformed", async (t) => {
 
   const headResult = renderHeadToString(head)
   t.snapshot(headResult.headTags)
+})
+
+test.only("computed ref entries", async (t) => {
+  const head = createHead()
+  const app = createSSRApp({
+    setup() {
+      const foo = ref("my title")
+      const pallete = ref({ primary: "red" })
+      useHead({
+        title: () => `${foo.value} | template`,
+        meta: [
+          () => ({
+            name: "description",
+            content: () => `the page of ${foo.value}`,
+          }),
+        ],
+        style: [
+          {
+            children: () => `.primary { color: ${pallete.value.primary} };`,
+          },
+        ],
+        link: () => {
+          return [
+            {
+              as: "style",
+              href: "./my-styles.css",
+            },
+          ]
+        },
+      })
+      return () => <div>hi</div>
+    },
+  })
+  app.use(head)
+  await renderToString(app)
+
+  const headResult = renderHeadToString(head)
+  t.true(headResult.headTags.startsWith("<title>my title | template</title>"))
+  t.snapshot(headResult.headTags)
+})
+
+test("ensure ref is removable", async (t) => {
+  const head = createHead()
+
+  const foo = ref("my title")
+  const pallete = ref({ primary: "red" })
+  const headInput: UseHeadInput = () => ({
+    title: () => `${foo} | template`,
+    meta: [
+      () => ({
+        name: "description",
+        content: () => `the page of ${foo}`,
+      }),
+    ],
+    style: [
+      {
+        children: () => `.primary { color: ${pallete} };`,
+      },
+    ],
+    link: () => {
+      return [
+        {
+          as: "style",
+          href: "./my-styles.css",
+        },
+      ]
+    },
+  })
+
+  const obj = resolveRef(headInput)
+  const removeHeadObjs = head.addHeadObjs(obj)
+  t.true(head.headTags.length === 4)
+  removeHeadObjs()
+  t.true(head.headTags.length === 0)
 })
