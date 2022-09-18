@@ -20,9 +20,15 @@ import {
 import { createElement } from "./create-element"
 import { stringifyAttrs } from "./stringify-attrs"
 import { isEqualNode } from "./utils"
-import type { HeadObjectPlain, HeadObject, TagKeys } from "./types"
+import type {
+  HeadObjectPlain,
+  HeadObject,
+  TagKeys,
+  HasRenderPriority,
+} from "./types"
+import { HandlesDuplicates, RendersInnerContent, RendersToBody } from "./types"
 
-export * from './types'
+export * from "./types"
 
 type MaybeRef<T> = T | Ref<T>
 
@@ -30,10 +36,12 @@ export type HeadAttrs = { [k: string]: any }
 
 export type HeadTag = {
   tag: TagKeys
-  props: {
-    body?: boolean
-    [k: string]: any
-  }
+  props: HandlesDuplicates &
+    HasRenderPriority &
+    RendersToBody &
+    RendersInnerContent & {
+      [k: string]: any
+    }
 }
 
 export type HeadClient = {
@@ -59,22 +67,38 @@ export interface HTMLResult {
   readonly bodyTags: string
 }
 
-const getTagKey = (
-  props: Record<string, any>,
-): { name: string; value: any } | void => {
-  const names = ["key", "id", "name", "property"]
-  for (const n of names) {
-    const value =
-      // Probably an HTML Element
-      typeof props.getAttribute === "function"
-        ? props.hasAttribute(n)
-          ? props.getAttribute(n)
-          : undefined
-        : props[n]
+const getTagDeduper = <T extends HeadTag>(tag: T) => {
+  // only meta, base and script tags will be deduped
+  if (!["meta", "base", "script", "link"].includes(tag.tag)) {
+    return false
+  }
+  const { props, tag: tagName } = tag
+  // must only be a single base so we always dedupe
+  if (tagName === "base") {
+    return true
+  }
+  // support only a single canonical
+  if (tagName === "link" && props.rel === "canonical") {
+    return { propValue: "canonical" }
+  }
+  // must only be a single charset
+  if (props.charset) {
+    return { propKey: "charset" }
+  }
+  const name = ["key", "id", "name", "property", "http-equiv"]
+  for (const n of name) {
+    let value = undefined
+    // Probably an HTML Element
+    if (typeof props.getAttribute === "function" && props.hasAttribute(n)) {
+      value = props.getAttribute(n)
+    } else {
+      value = props[n]
+    }
     if (value !== undefined) {
-      return { name: n, value: value }
+      return { propValue: n }
     }
   }
+  return false
 }
 
 /**
@@ -276,7 +300,6 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
       app.config.globalProperties.$head = head
       app.provide(PROVIDE_KEY, head)
     },
-
     /**
      * Get deduped tags
      */
@@ -291,29 +314,44 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
       allHeadObjs.forEach((objs) => {
         const tags = headObjToTags(unref(objs))
         tags.forEach((tag) => {
-          if (
-            tag.tag === "meta" ||
-            tag.tag === "base" ||
-            tag.tag === "script"
-          ) {
-            // Remove tags with the same key
-            const key = getTagKey(tag.props)
-            if (key) {
-              let index = -1
+          // Remove tags with the same key
+          const dedupe = getTagDeduper(tag)
+          if (dedupe) {
+            let index = -1
 
-              for (let i = 0; i < deduped.length; i++) {
-                const prev = deduped[i]
-                const prevValue = prev.props[key.name]
-                const nextValue = tag.props[key.name]
-                if (prev.tag === tag.tag && prevValue === nextValue) {
-                  index = i
-                  break
-                }
+            for (let i = 0; i < deduped.length; i++) {
+              const prev = deduped[i]
+              // only if the tags match
+              if (prev.tag !== tag.tag) {
+                continue
               }
-
+              // dedupe based on tag, for example <base>
+              if (dedupe === true) {
+                index = i
+              }
+              // dedupe based on property key value, for example <meta name="description">
+              else if (
+                dedupe.propValue &&
+                unref(prev.props[dedupe.propValue]) ===
+                  unref(tag.props[dedupe.propValue])
+              ) {
+                index = i
+              }
+              // dedupe based on property keys, for example <meta charset="utf-8">
+              else if (
+                dedupe.propKey &&
+                prev.props[dedupe.propKey] &&
+                tag.props[dedupe.propKey]
+              ) {
+                index = i
+              }
               if (index !== -1) {
-                deduped.splice(index, 1)
+                break
               }
+            }
+
+            if (index !== -1) {
+              deduped.splice(index, 1)
             }
           }
 
@@ -346,7 +384,8 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
 
       const actualTags: Record<string, HeadTag[]> = {}
 
-      for (const tag of head.headTags) {
+      // head sorting here is not guaranteed to be honoured
+      for (const tag of head.headTags.sort(sortTags)) {
         if (tag.tag === "title") {
           title = tag.props.children
           continue
@@ -407,6 +446,9 @@ const tagToString = (tag: HeadTag) => {
     // avoid rendering body attr
     delete tag.props.body
   }
+  if (tag.props.renderPriority) {
+    delete tag.props.renderPriority
+  }
   let attrs = stringifyAttrs(tag.props)
   if (SELF_CLOSING_TAGS.includes(tag.tag)) {
     return `<${tag.tag}${attrs}${
@@ -419,13 +461,41 @@ const tagToString = (tag: HeadTag) => {
   }>${tag.props.children || ""}</${tag.tag}>`
 }
 
+const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
+  const tagWeight = (tag: HeadTag) => {
+    if (tag.props.renderPriority) {
+      return tag.props.renderPriority
+    }
+    switch (tag.tag) {
+      // This element must come before other elements with attribute values of URLs
+      case "base":
+        return -1
+      case "meta":
+        // charset must come early in case there's non-utf8 characters in the HTML document
+        if (tag.props.charset) {
+          return -2
+        }
+        // CSP needs to be as it effects the loading of assets
+        if (tag.props["http-equiv"] === "content-security-policy") {
+          return 0
+        }
+        return 10
+      default:
+        // arbitrary safe number that can go up and down without conflicting
+        return 10
+    }
+  }
+  return tagWeight(aTag) - tagWeight(bTag)
+}
+
 export const renderHeadToString = (head: HeadClient): HTMLResult => {
   const tags: string[] = []
   let titleTag = ""
   let htmlAttrs: HeadAttrs = {}
   let bodyAttrs: HeadAttrs = {}
   let bodyTags: string[] = []
-  for (const tag of head.headTags) {
+
+  for (const tag of head.headTags.sort(sortTags)) {
     if (tag.tag === "title") {
       titleTag = tagToString(tag)
     } else if (tag.tag === "htmlAttrs") {

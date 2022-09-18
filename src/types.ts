@@ -22,15 +22,55 @@ export interface RendersInnerContent {
   children?: string
 }
 
-export interface HeadAugmentations {
-  base: HandlesDuplicates & { body?: never; children?: never }
-  link: RendersToBody & { key?: never; children?: never }
-  meta: HandlesDuplicates & { children?: never; body?: never }
-  style: RendersToBody & RendersInnerContent & { key?: never }
-  script: RendersToBody & RendersInnerContent & HandlesDuplicates
-  noscript: RendersToBody & RendersInnerContent & { key?: never }
-  htmlAttrs: { key?: never; children?: never; body?: never }
-  bodyAttrs: { key?: never; children?: never; body?: never }
+export interface HasRenderPriority {
+  /**
+   * The priority for rendering the tag, without this all tags are rendered as they are registered
+   * (besides some special tags).
+   *
+   * The following special tags have default priorities:
+   * * -2 <meta charset ...>
+   * * -1 <base>
+   * * 0 <meta http-equiv="content-security-policy" ...>
+   *
+   * All other tags have a default priority of 10: <meta>, <script>, <link>, <style>, etc
+   *
+   * @warn Experimental feature. Only available when rendering SSR
+   */
+  renderPriority?: number
+}
+
+interface HeadAugmentations {
+  base: {
+    key?: never
+    renderPriority?: never
+    body?: never
+    children?: never
+  }
+  link: HasRenderPriority & RendersToBody & { key?: never; children?: never }
+  meta: HasRenderPriority &
+    HandlesDuplicates & { children?: never; body?: never }
+  style: HasRenderPriority &
+    RendersToBody &
+    RendersInnerContent & { key?: never }
+  script: HasRenderPriority &
+    RendersToBody &
+    RendersInnerContent &
+    HandlesDuplicates
+  noscript: HasRenderPriority &
+    RendersToBody &
+    RendersInnerContent & { key?: never }
+  htmlAttrs: {
+    renderPriority?: never
+    key?: never
+    children?: never
+    body?: never
+  }
+  bodyAttrs: {
+    renderPriority?: never
+    key?: never
+    children?: never
+    body?: never
+  }
 }
 
 export type HeadObjectPlain = PlainHead<HeadAugmentations>
