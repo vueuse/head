@@ -21,11 +21,11 @@
     "dist"
   ],
   "scripts": {
-    "test": "node -r esbuild-register scripts/run-test.ts",
-    "example": "vite example",
+    "play:vite": "vite examples/vite-ssr",
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "prepublishOnly": "npm run build",
-    "test:e2e": "ava",
+    "test": "nuxi prepare examples/nuxt3 && vitest",
+    "test:e2e": "vitest tests/e2e",
     "release": "kanpai"
   },
   "repository": {
@@ -35,15 +35,6 @@
   "author": {
     "name": "EGOIST",
     "url": "https://egoist.sh"
-  },
-  "ava": {
-    "extensions": [
-      "ts",
-      "tsx"
-    ],
-    "require": [
-      "esbuild-register"
-    ]
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
@@ -56,25 +47,27 @@
   "sideEffects": false,
   "devDependencies": {
     "@egoist/prettier-config": "^1.0.0",
-    "@happy-dom/global-registrator": "^6.0.4",
+    "@nuxt/test-utils": "3.0.0-rc.10",
     "@vitejs/plugin-vue": "^3.1.0",
     "@vitejs/plugin-vue-jsx": "^2.0.1",
     "@vue/compiler-sfc": "^3.2.39",
     "@vue/server-renderer": "^3.2.39",
-    "ava": "^4.3.3",
-    "chrome-location": "^1.2.1",
-    "esbuild-register": "^3.3.3",
-    "execa": "^5.1.1",
-    "happy-dom": "^6.0.4",
+    "cheerio": "1.0.0-rc.12",
+    "execa": "^6.1.0",
+    "get-port-please": "^2.6.1",
+    "jsdom": "^20.0.0",
     "kanpai": "^0.11.0",
     "lint-staged": "^13.0.3",
-    "node-fetch": "^3.2.10",
-    "playwright-core": "^1.25.2",
+    "mlly": "^0.5.14",
+    "nuxt": "3.0.0-rc.10",
+    "pathe": "^0.3.7",
+    "playwright": "^1.25.2",
     "prettier": "^2.7.1",
     "simple-git-hooks": "^2.8.0",
     "tsup": "^6.2.3",
     "typescript": "^4.8.3",
     "vite": "^3.1.2",
+    "vitest": "^0.23.4",
     "vue": "^3.2.39",
     "vue-router": "^4.1.5"
   },
@@ -83,5 +76,8 @@
   },
   "dependencies": {
     "@zhead/schema-vue": "^0.7.3"
+  },
+  "resolutions": {
+    "@vueuse/head": "link:."
   }
 }

@@ -3,7 +3,7 @@ import { defineConfig } from "vite"
 import vueJsx from "@vitejs/plugin-vue-jsx"
 import vue from "@vitejs/plugin-vue"
 import { renderToString } from "@vue/server-renderer"
-import { renderHeadToString } from "../src"
+import { renderHeadToString } from "../../src"
 
 export default defineConfig({
   plugins: [
@@ -45,7 +45,4 @@ export default defineConfig({
       },
     },
   ],
-  server: {
-    port: 3000,
-  },
 })

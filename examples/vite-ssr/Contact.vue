@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue"
-import { Head } from "../src"
+import { Head } from "../../src"
 
 const count = ref(0)
 
