@@ -8,6 +8,7 @@ export default defineNuxtConfig({
   alias: {
     "@vueuse/head": fileURLToPath(new URL("../../", import.meta.url)),
   },
+  workspaceDir: fileURLToPath(new URL("../../", import.meta.url)),
   hooks: {
     "modules:done"({ nuxt }) {
       // Replace #head alias
