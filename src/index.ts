@@ -9,6 +9,8 @@ import {
   VNode,
   unref,
   shallowRef,
+  getCurrentInstance,
+  watch,
 } from "vue"
 import {
   PROVIDE_KEY,
@@ -48,6 +50,19 @@ export type HeadClient = {
   install: (app: App) => void
 
   headTags: HeadTag[]
+
+  /**
+   * Internal property used to keep track of the hydration node.
+   *
+   * For server this id will be updated for each render.
+   *
+   * For client this will be read from the DOM and not updated.
+   *
+   * When the value is `false` we are not hydrating from any specific node and can ignore this property.
+   *
+   * Otherwise, when a number is provided we need to wait for that node id to render before we can update the DOM.
+   */
+  _ssrHydrateFromNodeId: number | false
 
   addHeadObjs: (objs: Ref<HeadObjectPlain>) => void
 
@@ -289,6 +304,16 @@ const updateElements = (
 
 export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
   let allHeadObjs: Ref<HeadObjectPlain>[] = []
+
+  let ssrHydrateFromNodeId: number | false = false
+  if (IS_BROWSER) {
+    // ssr may have written the last node id that was used rendering head data
+    ssrHydrateFromNodeId =
+      Number.parseInt(
+        document.children[0]?.getAttribute("data-head-ssr") || "0",
+      ) || false
+  }
+
   let previousTags = new Set<string>()
 
   if (initHeadObject) {
@@ -300,6 +325,9 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
       app.config.globalProperties.$head = head
       app.provide(PROVIDE_KEY, head)
     },
+
+    _ssrHydrateFromNodeId: ssrHydrateFromNodeId,
+
     /**
      * Get deduped tags
      */
@@ -427,16 +455,41 @@ export const useHead = (obj: MaybeRef<HeadObject>) => {
 
   head.addHeadObjs(headObj)
 
-  if (IS_BROWSER) {
-    watchEffect(() => {
-      head.updateDOM()
-    })
+  const vm = getCurrentInstance()
 
-    onBeforeUnmount(() => {
-      head.removeHeadObjs(headObj)
-      head.updateDOM()
-    })
+  if (!IS_BROWSER) {
+    if (vm) {
+      // for SSR we keep track of the last node to update the head
+      head._ssrHydrateFromNodeId = vm.uid - vm.root.uid
+    }
+    return
   }
+
+  if (vm) {
+    // for client we hydrate the DOM when we hit the last node to update on the SSR
+    if (
+      head._ssrHydrateFromNodeId === false ||
+      head._ssrHydrateFromNodeId === vm.uid - vm.root.uid
+    ) {
+      head.updateDOM()
+    }
+  }
+
+  // any new reactive changes we push straight away
+  watch(
+    obj,
+    () => {
+      head.updateDOM()
+    },
+    {
+      deep: true,
+    },
+  )
+
+  onBeforeUnmount(() => {
+    head.removeHeadObjs(headObj)
+    head.updateDOM()
+  })
 }
 
 const tagToString = (tag: HeadTag) => {
@@ -494,6 +547,12 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
   let htmlAttrs: HeadAttrs = {}
   let bodyAttrs: HeadAttrs = {}
   let bodyTags: string[] = []
+
+  // by virtue of using this function, we are server-side rendering
+  // we need to tell the client that we've server rendered at this final node so hydration can happen in reverse
+  if (head._ssrHydrateFromNodeId >= 0) {
+    htmlAttrs["data-head-ssr"] = head._ssrHydrateFromNodeId
+  }
 
   for (const tag of head.headTags.sort(sortTags)) {
     if (tag.tag === "title") {
