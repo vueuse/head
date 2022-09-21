@@ -12,6 +12,8 @@ import type { MetaObject } from "."
 import { defineNuxtPlugin } from "#app"
 import { watch } from "#imports"
 
+// Note: This is just a copy of Nuxt's internal head plugin with modifications made for this issue
+
 export default defineNuxtPlugin((nuxtApp) => {
   const head = createHead()
 

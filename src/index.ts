@@ -548,8 +548,7 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
   let bodyAttrs: HeadAttrs = {}
   let bodyTags: string[] = []
 
-  // by virtue of using this function, we are server-side rendering
-  // we need to tell the client that we've server rendered at this final node so hydration can happen in reverse
+  // tell the client that we've server rendered at this final node so that the DOM update can be done at the right time
   if (head._ssrHydrateFromNodeId >= 0) {
     htmlAttrs["data-head-ssr"] = head._ssrHydrateFromNodeId
   }
