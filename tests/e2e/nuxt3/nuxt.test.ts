@@ -14,7 +14,7 @@ describe("e2e: nuxt 3", () => {
     const html = await $fetch("/")
     const $ = load(html as string)
     expect($("title").text()).equals("Home | Nuxt")
-    expect($('meta[name="head:count"]').attr("content")).toMatch("4")
+    expect($('meta[name="head:count"]').attr("content")).toMatch("5")
     await expectNoClientErrors("/")
   })
 })

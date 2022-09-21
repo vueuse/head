@@ -384,9 +384,7 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
     },
 
     addHeadObjs(objs) {
-      if (!isRef(objs)) {
-        objs = resolveRefDeeply(objs)
-      }
+      objs = resolveRefDeeply(objs)
       const idx = allHeadObjs.value.push(objs)
 
       let stopWatcher: WatchStopHandle | null = null

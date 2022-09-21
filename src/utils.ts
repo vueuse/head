@@ -1,5 +1,6 @@
 import { MaybeComputedRef, resolveRef, resolveUnref } from "@vueuse/shared"
 import { HeadObjectPlain, UseHeadInput } from "./types"
+import { isRef } from "vue"
 
 // Shamelessly taken from Next.js
 export function isEqualNode(oldTag: Element, newTag: Element) {
@@ -19,6 +20,9 @@ export function isEqualNode(oldTag: Element, newTag: Element) {
 }
 
 export function resolveRefDeeply<T>(ref: MaybeComputedRef<T>): any {
+  if (isRef(ref)) {
+    return ref
+  }
   if (typeof ref === "function") {
     ref = resolveRef(ref)
     return ref
