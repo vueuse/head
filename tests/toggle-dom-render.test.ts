@@ -1,8 +1,7 @@
 import { computed, createSSRApp, ref } from "vue"
-import { createHead, useHead } from "../src"
+import { createHead, useHead, injectHead } from "../src"
 import { JSDOM } from "jsdom"
 import { renderToString } from "@vue/server-renderer"
-import { injectHead } from "@vueuse/head"
 
 describe("toggle dom render", () => {
   test("basic", async () => {
