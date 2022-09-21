@@ -15,7 +15,6 @@ describe("e2e: nuxt 3", () => {
     const $ = load(html as string)
     expect($("title").text()).equals("Home | Nuxt | Title Site")
     expect($('meta[name="head:count"]').attr("content")).toMatch("2")
-    expect($("html").attr("data-head-ssr")).toMatch("7")
     await expectNoClientErrors("/")
   })
 })

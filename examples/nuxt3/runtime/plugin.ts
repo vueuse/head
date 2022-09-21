@@ -28,7 +28,9 @@ export default defineNuxtPlugin((nuxtApp) => {
   })
 
   if (process.client) {
+    head._pauseDOMUpdates.value = true
     nuxtApp.hooks.hookOnce("page:finish", () => {
+      head._pauseDOMUpdates.value = false
       // start pausing DOM updates when route changes (trigger immediately)
       useRouter().beforeEach(() => {
         head._pauseDOMUpdates.value = true
@@ -55,31 +57,14 @@ export default defineNuxtPlugin((nuxtApp) => {
     })
     head.addHeadObjs(headObj as any)
 
+    if (process.server) { return }
+
+    if (headReady) {
+      watchEffect(() => { head.updateDOM() })
+    }
+
     const vm = getCurrentInstance()
-    // need to offset the root uid for HMR
-    const vmUid = vm ? vm?.uid - vm.root.uid : false
-
-    if (process.server) {
-      if (vmUid) {
-        head._ssrHydrateFromNodeId.value = vmUid
-      }
-      return
-    }
-
-    if (
-      head._pauseDOMUpdates.value &&
-      head._ssrHydrateFromNodeId.value === vmUid
-    ) {
-      head._pauseDOMUpdates.value = false
-    }
-
-    watchEffect(() => {
-      head.updateDOM()
-    })
-
-    if (!vm) {
-      return
-    }
+    if (!vm) { return }
 
     onBeforeUnmount(() => {
       head.removeHeadObjs(headObj as any)
