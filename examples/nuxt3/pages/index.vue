@@ -8,15 +8,15 @@ const page = ref({
 })
 
 useHead({
-  title: computed(() => `${page.value.title} | Nuxt`),
+  title: (() => `${page.value.title} | Nuxt`),
   meta: [
     {
       name: "description",
-      content: computed(() => page.value.description),
+      content: (() => page.value.description),
     },
     {
       property: "og:image",
-      content: computed(() => page.value.image),
+      content: (() => page.value.image),
     },
   ],
 })

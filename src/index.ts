@@ -11,6 +11,7 @@ import {
   watch,
   nextTick,
   WatchStopHandle,
+  isRef,
 } from "vue"
 import {
   PROVIDE_KEY,
@@ -21,7 +22,7 @@ import {
 } from "./constants"
 import { createElement } from "./create-element"
 import { stringifyAttrs } from "./stringify-attrs"
-import { isEqualNode, resolveHeadInput } from "./utils"
+import { isEqualNode, resolveHeadInput, resolveRefDeeply } from "./utils"
 import type { HeadObjectPlain, TagKeys, HasRenderPriority } from "./types"
 import { HandlesDuplicates, RendersInnerContent, RendersToBody } from "./types"
 import { UseHeadInput } from "./types"
@@ -49,9 +50,7 @@ export type HeadClient = {
 
   headTags: Ref<HeadTag[]>
 
-  addHeadObjs: (objs: UseHeadInput) => void
-
-  removeHeadObjs: (objs: UseHeadInput) => void
+  addHeadObjs: (objs: UseHeadInput) => () => void
 
   updateDOM: (document?: Document) => void
 }
@@ -288,7 +287,6 @@ const updateElements = (
 
 export const createHead = (initHeadObject?: UseHeadInput) => {
   let allHeadObjs: Ref<UseHeadInput[]> = shallowRef([])
-  let watcherMap: Record<number, WatchStopHandle> = {}
   let previousTags = new Set<string>()
 
   if (initHeadObject) {
@@ -386,11 +384,15 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
     },
 
     addHeadObjs(objs) {
+      if (!isRef(objs)) {
+        objs = resolveRefDeeply(objs)
+      }
       const idx = allHeadObjs.value.push(objs)
 
+      let stopWatcher: WatchStopHandle | null = null
       if (IS_BROWSER) {
         // watch objects deeply for changes
-        watcherMap[idx] = watch(
+        stopWatcher = watch(
           () => objs,
           () => {
             updateDomOnTick()
@@ -399,19 +401,17 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
         )
         updateDomOnTick()
       }
-    },
 
-    removeHeadObjs(objs) {
-      const idx = allHeadObjs.value.indexOf(objs)
-      allHeadObjs.value = allHeadObjs.value.splice(idx, 1)
+      return () => {
+        allHeadObjs.value = allHeadObjs.value.splice(idx, 1)
 
-      if (IS_BROWSER) {
-        // clean up watchers when done
-        if (watcherMap[idx]) {
-          watcherMap[idx]()
-          delete watcherMap[idx]
+        if (IS_BROWSER) {
+          // clean up watchers when done
+          if (stopWatcher) {
+            stopWatcher()
+          }
+          updateDomOnTick()
         }
-        updateDomOnTick()
       }
     },
 
@@ -460,11 +460,11 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
 export const useHead = (headObj: UseHeadInput) => {
   const head = injectHead()
 
-  head.addHeadObjs(headObj)
+  const removeHeadObjs = head.addHeadObjs(headObj)
 
   if (IS_BROWSER) {
     onBeforeUnmount(() => {
-      head.removeHeadObjs(headObj)
+      removeHeadObjs()
     })
   }
 }
@@ -622,13 +622,14 @@ export const Head = /*@__PURE__*/ defineComponent({
 
     let obj: Ref<HeadObjectPlain> = ref({})
 
+    const removeHeadObjs = head.addHeadObjs(obj)
+
     onBeforeUnmount(() => {
       if (obj) {
-        head.removeHeadObjs(obj)
+        removeHeadObjs()
       }
     })
 
-    head.addHeadObjs(obj)
     return () => {
       if (!slots.default) return
       obj.value = vnodesToHeadObj(slots.default())

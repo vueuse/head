@@ -18,26 +18,24 @@ export function isEqualNode(oldTag: Element, newTag: Element) {
   return oldTag.isEqualNode(newTag)
 }
 
-function resolveRefDeeply<T>(ref: MaybeComputedRef<T>) {
-  const root = resolveRef(ref)
-  if (!ref || !root) {
-    return root
+export function resolveRefDeeply<T>(ref: MaybeComputedRef<T>): any {
+  if (typeof ref === "function") {
+    ref = resolveRef(ref)
+    return ref
   }
-  if (Array.isArray(root)) {
-    return root.map(resolveRefDeeply)
+  if (Array.isArray(ref)) {
+    return ref.map(resolveRefDeeply)
   }
-  if (typeof root === "object") {
+  if (typeof ref === "object") {
     return Object.fromEntries(
-      Object.entries(root).map(([key, value]) => [
-        key,
-        resolveRefDeeply(value),
-      ]),
+      // @ts-expect-error untyped
+      Object.entries(ref).map(([key, value]) => [key, resolveRefDeeply(value)]),
     )
   }
-  return root
+  return ref
 }
 
-function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>) {
+function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>): any {
   const root = resolveUnref(ref)
   if (!ref || !root) {
     return root
