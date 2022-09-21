@@ -23,7 +23,6 @@
   "scripts": {
     "play:vite": "vite examples/vite-ssr",
     "lint": "prettier src/** tests/** --write",
-    "example": "vite example",
     "build": "tsup src/index.ts --format esm,cjs --dts",
     "prepublishOnly": "npm run build",
     "test": "nuxi prepare examples/nuxt3 && vitest",

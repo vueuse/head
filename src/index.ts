@@ -7,7 +7,6 @@ import {
   Ref,
   watchEffect,
   VNode,
-  getCurrentInstance,
 } from "vue"
 import {
   PROVIDE_KEY,
@@ -19,14 +18,9 @@ import {
 import { createElement } from "./create-element"
 import { stringifyAttrs } from "./stringify-attrs"
 import { isEqualNode, resolveHeadInput } from "./utils"
-import type {
-  HeadObjectPlain,
-
-  TagKeys,
-  HasRenderPriority,
-} from "./types"
+import type { HeadObjectPlain, TagKeys, HasRenderPriority } from "./types"
 import { HandlesDuplicates, RendersInnerContent, RendersToBody } from "./types"
-import { RegisteredHeadInput, UseHeadInput } from "./types"
+import { UseHeadInput } from "./types"
 
 export * from "./types"
 
@@ -47,7 +41,9 @@ export type HeadClient = {
 
   headTags: HeadTag[]
 
-  addHeadObjs: (input: UseHeadInput, ctxId?: number) => () => void
+  addHeadObjs: (objs: UseHeadInput) => void
+
+  removeHeadObjs: (objs: UseHeadInput) => void
 
   updateDOM: (document?: Document) => void
 }
@@ -61,16 +57,6 @@ export interface HTMLResult {
   readonly bodyAttrs: string
   // Tags in `<body>`
   readonly bodyTags: string
-}
-
-let ssrCtxId = -1
-
-const useCtxId = () => {
-  const ctx = getCurrentInstance()
-  if (ctx) {
-    return ctx.uid
-  }
-  return ++ssrCtxId
 }
 
 const getTagDeduper = <T extends HeadTag>(tag: T) => {
@@ -293,11 +279,11 @@ const updateElements = (
 }
 
 export const createHead = (initHeadObject?: UseHeadInput) => {
-  let allHeadObjs: RegisteredHeadInput[] = []
+  let allHeadObjs: UseHeadInput[] = []
   let previousTags = new Set<string>()
 
   if (initHeadObject) {
-    allHeadObjs.push({ input: initHeadObject, ctxId: useCtxId() })
+    allHeadObjs.push(initHeadObject)
   }
 
   const head: HeadClient = {
@@ -311,21 +297,17 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
     get headTags() {
       const deduped: HeadTag[] = []
 
-      console.log(allHeadObjs)
-      const headTags = allHeadObjs
-        // allow sorting by descending generated or artificial ctx id
-        .sort((a, b) => a.ctxId - b.ctxId)
-        .map((entry) => resolveHeadInput(entry.input))
+      const resolvedHeadObjs = allHeadObjs.map(resolveHeadInput)
 
-      const { titleTemplate } = headTags
+      const titleTemplate = resolvedHeadObjs
+        .map((i) => i.titleTemplate)
         .reverse()
-        .find((i) => !!i.titleTemplate) || { titleTemplate: null }
+        .find((i) => i != null)
 
-      headTags
-        .map((entry) => headObjToTags(entry))
-        .forEach((tags) => {
-          tags.forEach((tag) => {
-            // Remove tags with the same key
+      resolvedHeadObjs.forEach((objs) => {
+        const tags = headObjToTags(objs)
+        tags.forEach((tag) => {
+          // Remove tags with the same key
           const dedupe = getTagDeduper(tag)
           if (dedupe) {
             let index = -1
@@ -343,8 +325,7 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
               // dedupe based on property key value, for example <meta name="description">
               else if (
                 dedupe.propValue &&
-                unref(prev.props[dedupe.propValue]) ===
-                  unref(tag.props[dedupe.propValue])
+                prev.props[dedupe.propValue] === tag.props[dedupe.propValue]
               ) {
                 index = i
               }
@@ -366,26 +347,26 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
             }
           }
 
-            if (titleTemplate && tag.tag === "title") {
-              tag.props.children = renderTemplate(
-                titleTemplate,
-                tag.props.children,
-              )
-            }
+          if (titleTemplate && tag.tag === "title") {
+            tag.props.children = renderTemplate(
+              titleTemplate,
+              tag.props.children,
+            )
+          }
 
-            deduped.push(tag)
-          })
+          deduped.push(tag)
         })
+      })
 
       return deduped
     },
 
     addHeadObjs(input) {
-      const ctx = useCtxId()
-      allHeadObjs.push({ ctxId: ctx, input })
-      return () => {
-        allHeadObjs = allHeadObjs.filter((i) => i.ctxId !== ctx)
-      }
+      allHeadObjs.push(input)
+    },
+
+    removeHeadObjs(objs) {
+      allHeadObjs = allHeadObjs.filter((_objs) => _objs !== objs)
     },
 
     updateDOM(document = window.document) {
@@ -435,7 +416,7 @@ const IS_BROWSER = typeof window !== "undefined"
 export const useHead = (headInput: UseHeadInput) => {
   const head = injectHead()
 
-  const removeHeadObjs = head.addHeadObjs(headInput)
+  head.addHeadObjs(headInput)
 
   if (IS_BROWSER) {
     watchEffect(() => {
@@ -443,7 +424,7 @@ export const useHead = (headInput: UseHeadInput) => {
     })
 
     onBeforeUnmount(() => {
-      removeHeadObjs()
+      head.removeHeadObjs(headInput)
       head.updateDOM()
     })
   }
@@ -601,12 +582,10 @@ export const Head = /*@__PURE__*/ defineComponent({
     const head = injectHead()
 
     let obj: Ref<HeadObjectPlain> | undefined
-    const ctx = useCtxId()
-    let removeHeadObjs: () => void
 
     onBeforeUnmount(() => {
-      if (removeHeadObjs) {
-        removeHeadObjs()
+      if (obj) {
+        head.removeHeadObjs(obj)
         head.updateDOM()
       }
     })
@@ -614,13 +593,11 @@ export const Head = /*@__PURE__*/ defineComponent({
     return () => {
       watchEffect(() => {
         if (!slots.default) return
-        if (removeHeadObjs) {
-          removeHeadObjs()
+        if (obj) {
+          head.removeHeadObjs(obj)
         }
         obj = ref(vnodesToHeadObj(slots.default()))
-        if (obj) {
-          removeHeadObjs = head.addHeadObjs(obj, ctx)
-        }
+        head.addHeadObjs(obj)
         if (IS_BROWSER) {
           head.updateDOM()
         }
