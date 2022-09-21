@@ -98,7 +98,7 @@ describe("reactivity", () => {
     const app = createSSRApp({
       setup() {
         const title = ref("")
-        const scripts = ref<Required<HeadObject>["script"]>([])
+        const scripts = ref<Required<HeadObjectPlain>["script"]>([])
         const urlMeta = computed<Required<HeadObjectPlain>["meta"][number]>(
           () => {
             return {
@@ -147,11 +147,55 @@ describe("reactivity", () => {
     )
   })
 
+  test("computed getter entry", async () => {
+    const headResult = await ssrRenderHeadToString(() => ({
+      title: "test",
+    }))
+    expect(headResult.headTags).toMatchInlineSnapshot(
+      '"<title>test</title><meta name=\\"head:count\\" content=\\"0\\">"',
+    )
+  })
+
+  test("computed getter entries", async () => {
+    const test = ref("test")
+    const input = {
+      title: () => "my title",
+      script: () => {
+        return [
+          {
+            src: "foo.js",
+          },
+        ]
+      },
+      meta: [
+        () => ({
+          name: test.value,
+          content: test.value,
+        }),
+        {
+          name: () => `some-flag-${test.value}`,
+          content: "test",
+        },
+        {
+          property: "og:fake-prop",
+          content: () => test.value,
+        },
+      ],
+    }
+    const headResult = await ssrRenderHeadToString(input)
+    expect(headResult.headTags).toMatchInlineSnapshot(
+      '"<title>my title</title><script src=\\"foo.js\\"></script><meta name=\\"test\\" content=\\"test\\"><meta name=\\"some-flag-test\\" content=\\"test\\"><meta property=\\"og:fake-prop\\" content=\\"test\\"><meta name=\\"head:count\\" content=\\"4\\">"',
+    )
+    test.value = "test2"
+    const headResult2 = await ssrRenderHeadToString(input)
+    expect(headResult2.headTags).toMatchInlineSnapshot(
+      '"<title>my title</title><script src=\\"foo.js\\"></script><meta name=\\"test2\\" content=\\"test2\\"><meta name=\\"some-flag-test2\\" content=\\"test\\"><meta property=\\"og:fake-prop\\" content=\\"test2\\"><meta name=\\"head:count\\" content=\\"4\\">"',
+    )
+  })
+
   test("malformed", async () => {
     const headResult = await ssrRenderHeadToString({
-      title: function () {
-        return "my title"
-      },
+      title: () => "my title",
       meta: [
         {
           // @ts-expect-error number is not valid for name
@@ -172,6 +216,8 @@ describe("reactivity", () => {
         },
       ],
     })
-    expect(headResult.headTags).toMatchInlineSnapshot('"<title>my title</title><meta name=\\"123\\" data-unknown-attr=\\"test\\"><meta name=\\"some-flag\\" content><meta property=\\"og:fake-prop\\" content=\\"test1,test2\\"><meta name=\\"head:count\\" content=\\"3\\">"')
+    expect(headResult.headTags).toMatchInlineSnapshot(
+      '"<title>my title</title><meta name=\\"123\\" data-unknown-attr=\\"test\\"><meta name=\\"some-flag\\" content><meta property=\\"og:fake-prop\\" content=\\"test1,test2\\"><meta name=\\"head:count\\" content=\\"3\\">"',
+    )
   })
 })
