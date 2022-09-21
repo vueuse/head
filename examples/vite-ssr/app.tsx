@@ -14,7 +14,7 @@ export const createApp = () => {
     setup() {
       const count = ref(0)
       useHead({
-        title: computed(() => `count: ${count.value}`),
+        title: (() => `count: ${count.value}`),
         script: [{ children: 'console.log("a")', key: "a" }],
         link: [{ href: "/foo", rel: "stylesheet" }],
       })
