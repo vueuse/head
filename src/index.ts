@@ -5,8 +5,12 @@ import {
   onBeforeUnmount,
   ref,
   Ref,
-  watchEffect,
   VNode,
+  computed,
+  shallowRef,
+  watch,
+  nextTick,
+  WatchStopHandle,
 } from "vue"
 import {
   PROVIDE_KEY,
@@ -26,6 +30,8 @@ export * from "./types"
 
 export type HeadAttrs = { [k: string]: any }
 
+const IS_BROWSER = typeof window !== "undefined"
+
 export type HeadTag = {
   tag: TagKeys
   props: HandlesDuplicates &
@@ -39,7 +45,9 @@ export type HeadTag = {
 export type HeadClient = {
   install: (app: App) => void
 
-  headTags: HeadTag[]
+  allHeadObjs: Ref<UseHeadInput[]>
+
+  headTags: Ref<HeadTag[]>
 
   addHeadObjs: (objs: UseHeadInput) => void
 
@@ -279,11 +287,23 @@ const updateElements = (
 }
 
 export const createHead = (initHeadObject?: UseHeadInput) => {
-  let allHeadObjs: UseHeadInput[] = []
+  let allHeadObjs: Ref<UseHeadInput[]> = shallowRef([])
+  let watcherMap: Record<number, WatchStopHandle> = {}
   let previousTags = new Set<string>()
 
   if (initHeadObject) {
-    allHeadObjs.push(initHeadObject)
+    allHeadObjs.value.push(initHeadObject)
+  }
+
+  // patch the dom once when a node is inserted or deleted
+  let domUpdateTick: Promise<void> | null = null
+
+  const updateDomOnTick = () => {
+    if (domUpdateTick) return
+    domUpdateTick = nextTick(() => {
+      head.updateDOM()
+      domUpdateTick = null
+    })
   }
 
   const head: HeadClient = {
@@ -291,82 +311,108 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
       app.config.globalProperties.$head = head
       app.provide(PROVIDE_KEY, head)
     },
+
+    allHeadObjs,
     /**
      * Get deduped tags
      */
     get headTags() {
-      const deduped: HeadTag[] = []
+      return computed(() => {
+        const deduped: HeadTag[] = []
 
-      const resolvedHeadObjs = allHeadObjs.map(resolveHeadInput)
+        const resolvedHeadObjs = allHeadObjs.value.map(resolveHeadInput)
 
-      const titleTemplate = resolvedHeadObjs
-        .map((i) => i.titleTemplate)
-        .reverse()
-        .find((i) => i != null)
+        const titleTemplate = resolvedHeadObjs
+          .map((i) => i.titleTemplate)
+          .reverse()
+          .find((i) => i != null)
 
-      resolvedHeadObjs.forEach((objs) => {
-        const tags = headObjToTags(objs)
-        tags.forEach((tag) => {
-          // Remove tags with the same key
-          const dedupe = getTagDeduper(tag)
-          if (dedupe) {
-            let index = -1
+        resolvedHeadObjs.forEach((objs) => {
+          const tags = headObjToTags(objs)
+          tags.forEach((tag) => {
+            // Remove tags with the same key
+            const dedupe = getTagDeduper(tag)
+            if (dedupe) {
+              let index = -1
 
-            for (let i = 0; i < deduped.length; i++) {
-              const prev = deduped[i]
-              // only if the tags match
-              if (prev.tag !== tag.tag) {
-                continue
+              for (let i = 0; i < deduped.length; i++) {
+                const prev = deduped[i]
+                // only if the tags match
+                if (prev.tag !== tag.tag) {
+                  continue
+                }
+                // dedupe based on tag, for example <base>
+                if (dedupe === true) {
+                  index = i
+                }
+                // dedupe based on property key value, for example <meta name="description">
+                else if (
+                  dedupe.propValue &&
+                  prev.props[dedupe.propValue] === tag.props[dedupe.propValue]
+                ) {
+                  index = i
+                }
+                // dedupe based on property keys, for example <meta charset="utf-8">
+                else if (
+                  dedupe.propKey &&
+                  prev.props[dedupe.propKey] &&
+                  tag.props[dedupe.propKey]
+                ) {
+                  index = i
+                }
+                if (index !== -1) {
+                  break
+                }
               }
-              // dedupe based on tag, for example <base>
-              if (dedupe === true) {
-                index = i
-              }
-              // dedupe based on property key value, for example <meta name="description">
-              else if (
-                dedupe.propValue &&
-                prev.props[dedupe.propValue] === tag.props[dedupe.propValue]
-              ) {
-                index = i
-              }
-              // dedupe based on property keys, for example <meta charset="utf-8">
-              else if (
-                dedupe.propKey &&
-                prev.props[dedupe.propKey] &&
-                tag.props[dedupe.propKey]
-              ) {
-                index = i
-              }
+
               if (index !== -1) {
-                break
+                deduped.splice(index, 1)
               }
             }
 
-            if (index !== -1) {
-              deduped.splice(index, 1)
+            if (titleTemplate && tag.tag === "title") {
+              tag.props.children = renderTemplate(
+                titleTemplate,
+                tag.props.children,
+              )
             }
-          }
 
-          if (titleTemplate && tag.tag === "title") {
-            tag.props.children = renderTemplate(
-              titleTemplate,
-              tag.props.children,
-            )
-          }
-
-          deduped.push(tag)
+            deduped.push(tag)
+          })
         })
-      })
 
-      return deduped
+        return deduped.sort(sortTags)
+      })
     },
 
     addHeadObjs(objs) {
-      allHeadObjs.push(objs)
+      const idx = allHeadObjs.value.push(objs)
+
+      if (IS_BROWSER) {
+        // watch objects deeply for changes
+        watcherMap[idx] = watch(
+          () => objs,
+          () => {
+            updateDomOnTick()
+          },
+          { deep: true },
+        )
+        updateDomOnTick()
+      }
     },
 
     removeHeadObjs(objs) {
-      allHeadObjs = allHeadObjs.filter((_objs) => _objs !== objs)
+      const idx = allHeadObjs.value.indexOf(objs)
+      allHeadObjs.value = allHeadObjs.value.splice(idx, 1)
+
+      if (IS_BROWSER) {
+        // clean up watchers when done
+        if (watcherMap[idx]) {
+          watcherMap[idx]()
+          delete watcherMap[idx]
+        }
+        updateDomOnTick()
+      }
     },
 
     updateDOM(document = window.document) {
@@ -377,7 +423,7 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
       const actualTags: Record<string, HeadTag[]> = {}
 
       // head sorting here is not guaranteed to be honoured
-      for (const tag of head.headTags.sort(sortTags)) {
+      for (const tag of head.headTags.value) {
         if (tag.tag === "title") {
           title = tag.props.children
           continue
@@ -411,21 +457,14 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
   return head
 }
 
-const IS_BROWSER = typeof window !== "undefined"
-
 export const useHead = (headObj: UseHeadInput) => {
   const head = injectHead()
 
   head.addHeadObjs(headObj)
 
   if (IS_BROWSER) {
-    watchEffect(() => {
-      head.updateDOM()
-    })
-
     onBeforeUnmount(() => {
       head.removeHeadObjs(headObj)
-      head.updateDOM()
     })
   }
 }
@@ -486,7 +525,7 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
   let bodyAttrs: HeadAttrs = {}
   let bodyTags: string[] = []
 
-  for (const tag of head.headTags.sort(sortTags)) {
+  for (const tag of head.headTags.value) {
     if (tag.tag === "title") {
       titleTag = tagToString(tag)
     } else if (tag.tag === "htmlAttrs") {
@@ -581,27 +620,18 @@ export const Head = /*@__PURE__*/ defineComponent({
   setup(_, { slots }) {
     const head = injectHead()
 
-    let obj: Ref<HeadObjectPlain> | undefined
+    let obj: Ref<HeadObjectPlain> = ref({})
 
     onBeforeUnmount(() => {
       if (obj) {
         head.removeHeadObjs(obj)
-        head.updateDOM()
       }
     })
 
+    head.addHeadObjs(obj)
     return () => {
-      watchEffect(() => {
-        if (!slots.default) return
-        if (obj) {
-          head.removeHeadObjs(obj)
-        }
-        obj = ref(vnodesToHeadObj(slots.default()))
-        head.addHeadObjs(obj)
-        if (IS_BROWSER) {
-          head.updateDOM()
-        }
-      })
+      if (!slots.default) return
+      obj.value = vnodesToHeadObj(slots.default())
       return null
     }
   },

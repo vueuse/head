@@ -2,6 +2,7 @@ import { HeadClient } from "../../../src"
 import { createBrowser, startServer } from "./utils"
 import { ExecaChildProcess } from "execa"
 import { Browser } from "playwright"
+import { UnwrapRef } from "vue"
 
 describe("e2e: vite ssr", async () => {
   let serverProcess: ExecaChildProcess
@@ -35,7 +36,7 @@ describe("e2e: vite ssr", async () => {
           <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\">
           <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
           <title>count: 0 | @vueuse/head</title>
-        <meta name=\\"global-meta\\" content=\\"some global meta tag\\"><base href=\\"/\\"><meta name=\\"custom-priority\\" content=\\"of 1\\"><meta name=\\"description\\" content=\\"desc 2\\"><meta property=\\"og:locale:alternate\\" content=\\"fr\\"><meta property=\\"og:locale:alternate\\" content=\\"zh\\"><style>body {background: salmon}</style><noscript>This app requires javascript to work</noscript><script>console.log(\\"a\\")</script><link href=\\"/foo\\" rel=\\"stylesheet\\"><meta name=\\"head:count\\" content=\\"10\\">"
+        <base href=\\"/\\"><meta name=\\"custom-priority\\" content=\\"of 1\\"><meta name=\\"global-meta\\" content=\\"some global meta tag\\"><meta name=\\"description\\" content=\\"desc 2\\"><meta property=\\"og:locale:alternate\\" content=\\"fr\\"><meta property=\\"og:locale:alternate\\" content=\\"zh\\"><style>body {background: salmon}</style><noscript>This app requires javascript to work</noscript><script>console.log(\\"a\\")</script><link href=\\"/foo\\" rel=\\"stylesheet\\"><meta name=\\"head:count\\" content=\\"10\\">"
     `)
 
     await page.click("button.counter")
@@ -52,11 +53,13 @@ describe("e2e: vite ssr", async () => {
     const page = await browser.newPage()
     await page.goto(`${url}/contact`, { waitUntil: "networkidle" })
     const getHeadTags = async () => {
-      const head: HeadClient = await page.evaluate(() => {
-        // @ts-expect-error
-        return window.head
-      })
-      return head.headTags
+      const head: UnwrapRef<HeadClient["headTags"]> = await page.evaluate(
+        () => {
+          // @ts-expect-error
+          return window.headTags()
+        },
+      )
+      return head
     }
     expect(
       (await getHeadTags()).find((t) => t.tag === "title")!.props.children,

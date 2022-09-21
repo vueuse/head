@@ -7,3 +7,7 @@ export type MetaObject = HeadObject
 export function useHead(meta: HeadObject) {
   _useHead(meta as _MetaObject)
 }
+
+export function useMeta(meta: HeadObject) {
+  _useHead(meta as _MetaObject)
+}

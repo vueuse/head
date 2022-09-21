@@ -1,4 +1,4 @@
-import { MaybeComputedRef, resolveUnref } from "@vueuse/shared"
+import { MaybeComputedRef, resolveRef, resolveUnref } from "@vueuse/shared"
 import { HeadObjectPlain, UseHeadInput } from "./types"
 
 // Shamelessly taken from Next.js
@@ -16,6 +16,25 @@ export function isEqualNode(oldTag: Element, newTag: Element) {
   }
 
   return oldTag.isEqualNode(newTag)
+}
+
+function resolveRefDeeply<T>(ref: MaybeComputedRef<T>) {
+  const root = resolveRef(ref)
+  if (!ref || !root) {
+    return root
+  }
+  if (Array.isArray(root)) {
+    return root.map(resolveRefDeeply)
+  }
+  if (typeof root === "object") {
+    return Object.fromEntries(
+      Object.entries(root).map(([key, value]) => [
+        key,
+        resolveRefDeeply(value),
+      ]),
+    )
+  }
+  return root
 }
 
 function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>) {
