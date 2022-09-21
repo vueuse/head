@@ -7,4 +7,6 @@ router.isReady().then(() => {
 
   // @ts-expect-error
   window.head = head
+  // @ts-expect-error
+  window.headTags = () => head.headTags.value
 })
