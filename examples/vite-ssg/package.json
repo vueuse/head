@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "vite-ssg build",
+    "dev": "vite dev"
+  }
+}

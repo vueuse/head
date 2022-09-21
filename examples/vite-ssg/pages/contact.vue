@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue"
-import { Head } from "../../src"
+import { Head } from "../../../src"
 
 const count = ref(0)
 
@@ -16,6 +16,7 @@ const style = `button {color: red}`
     <component is="style">
       body { background: lightgreen; } {{ style }}</component
     >
+    <meta name="page" content="contact" />
   </Head>
 
   <router-link to="/">Back Home</router-link>
