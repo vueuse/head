@@ -10,8 +10,6 @@ import {
   unref,
   shallowRef,
   getCurrentInstance,
-  computed,
-  markRaw,
 } from "vue"
 import {
   PROVIDE_KEY,
@@ -43,8 +41,8 @@ export type HeadTag = {
     HasRenderPriority &
     RendersToBody &
     RendersInnerContent & {
-    [k: string]: any
-  }
+      [k: string]: any
+    }
 }
 
 export type HeadClient = {
@@ -64,6 +62,15 @@ export type HeadClient = {
    * Otherwise, when a number is provided we need to wait for that node id to render before we can update the DOM.
    */
   _ssrHydrateFromNodeId: Ref<number | false>
+
+  /**
+   * When set to true will skip any DOM update function calls.
+   *
+   * This can be useful when delaying the dom updates between route changes.
+   *
+   * @default false
+   */
+  _pauseDOMUpdates: Ref<boolean>
 
   addHeadObjs: (objs: Ref<HeadObjectPlain>) => void
 
@@ -297,22 +304,27 @@ const updateElements = (
   headCountEl.setAttribute(
     "content",
     "" +
-    (headCount -
-      oldHeadElements.length +
-      newElements.filter((t) => !t.body).length),
+      (headCount -
+        oldHeadElements.length +
+        newElements.filter((t) => !t.body).length),
   )
 }
 
 export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
   let allHeadObjs: Ref<HeadObjectPlain>[] = []
 
-  let ssrHydrateFromNodeId: Ref<number | false> = ref(false)
+  const pauseDOMUpdates = ref(false)
+
+  const ssrHydrateFromNodeId: Ref<number | false> = ref(false)
   if (IS_BROWSER) {
     // ssr may have written the last node id that was used rendering head data
     ssrHydrateFromNodeId.value =
       Number.parseInt(
         document.children[0]?.getAttribute("data-head-ssr") || "0",
       ) || false
+    if (ssrHydrateFromNodeId.value) {
+      pauseDOMUpdates.value = true
+    }
   }
 
   let previousTags = new Set<string>()
@@ -327,6 +339,7 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
       app.provide(PROVIDE_KEY, head)
     },
 
+    _pauseDOMUpdates: pauseDOMUpdates,
     _ssrHydrateFromNodeId: ssrHydrateFromNodeId,
 
     /**
@@ -362,7 +375,7 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
               else if (
                 dedupe.propValue &&
                 unref(prev.props[dedupe.propValue]) ===
-                unref(tag.props[dedupe.propValue])
+                  unref(tag.props[dedupe.propValue])
               ) {
                 index = i
               }
@@ -407,6 +420,9 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
     },
 
     updateDOM(document = window.document) {
+      if (pauseDOMUpdates.value) {
+        return
+      }
       let title: string | undefined
       let htmlAttrs: HeadAttrs = {}
       let bodyAttrs: HeadAttrs = {}
@@ -458,25 +474,23 @@ export const useHead = (obj: MaybeRef<HeadObject>) => {
 
   const vm = getCurrentInstance()
   // need to offset the root uid for HMR
-  const vmUid = vm ? vm?.uid - vm.root.uid : 0
+  const vmUid = vm ? vm?.uid - vm.root.uid : false
 
   if (!IS_BROWSER) {
-    if (vm) {
-      // for SSR we keep track of the last node to update the head
-      head._ssrHydrateFromNodeId.value = vmUid
-    }
+    // for SSR we keep track of the last node to update the head
+    head._ssrHydrateFromNodeId.value = vmUid
     return
   }
 
+  if (
+    head._pauseDOMUpdates.value &&
+    head._ssrHydrateFromNodeId.value === vmUid
+  ) {
+    head._pauseDOMUpdates.value = false
+  }
+
   watchEffect(() => {
-    if (
-      head._ssrHydrateFromNodeId.value === false ||
-      head._ssrHydrateFromNodeId.value === vmUid
-    ) {
-      head.updateDOM()
-      // allows other nodes to hydrate, required for any client-specific changes being made
-      head._ssrHydrateFromNodeId.value = false
-    }
+    head.updateDOM()
   })
 
   onBeforeUnmount(() => {
@@ -588,8 +602,8 @@ const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
     node.type === "html"
       ? "htmlAttrs"
       : node.type === "body"
-        ? "bodyAttrs"
-        : (node.type as keyof HeadObjectPlain)
+      ? "bodyAttrs"
+      : (node.type as keyof HeadObjectPlain)
 
   if (typeof type !== "string" || !(type in obj)) return
 
@@ -597,7 +611,7 @@ const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
     ...node.props,
     children: Array.isArray(node.children)
       ? // @ts-expect-error
-      node.children[0]!.children
+        node.children[0]!.children
       : node.children,
   } as HeadAttrs
   if (Array.isArray(obj[type])) {
@@ -658,7 +672,7 @@ export const Head = /*@__PURE__*/ defineComponent({
         obj = ref(vnodesToHeadObj(slots.default()))
         head.addHeadObjs(obj)
         const vm = getCurrentInstance()
-        const vmUid = vm ? vm?.uid - vm.root.uid : 0
+        const vmUid = vm ? vm?.uid - vm.root.uid : false
 
         if (!IS_BROWSER) {
           if (vm) {
@@ -666,14 +680,16 @@ export const Head = /*@__PURE__*/ defineComponent({
           }
           return
         }
+
+        if (
+          head._pauseDOMUpdates.value &&
+          head._ssrHydrateFromNodeId.value === vmUid
+        ) {
+          head._pauseDOMUpdates.value = false
+        }
+
         watchEffect(() => {
-          if (
-            head._ssrHydrateFromNodeId.value === false ||
-            head._ssrHydrateFromNodeId.value === vmUid
-          ) {
-            head.updateDOM()
-            head._ssrHydrateFromNodeId.value = false
-          }
+          head.updateDOM()
         })
       })
       return null

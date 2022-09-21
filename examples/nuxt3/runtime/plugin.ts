@@ -9,7 +9,8 @@ import {
 } from "vue"
 import defu from "defu"
 import type { MetaObject } from "."
-import { defineNuxtPlugin } from "#app"
+import { defineNuxtPlugin, useRoute } from "#app"
+import { useRouter, watch } from "#imports"
 
 // Note: This is just a copy of Nuxt's internal head plugin with modifications made for this issue
 
@@ -20,13 +21,25 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const headReady = ref(false)
   nuxtApp.hooks.hookOnce("app:mounted", () => {
-    if (head._ssrHydrateFromNodeId.value === false) {
-      watchEffect(() => {
-        head.updateDOM()
-      })
-    }
+    watchEffect(() => {
+      head.updateDOM()
+    })
     headReady.value = true
   })
+
+  if (process.client) {
+    nuxtApp.hooks.hookOnce("page:finish", () => {
+      // start pausing DOM updates when route changes (trigger immediately)
+      useRouter().beforeEach(() => {
+        head._pauseDOMUpdates.value = true
+      })
+
+      // watch for new route before unpausing dom updates (triggered after suspense resolved)
+      watch(useRoute(), () => {
+        head._pauseDOMUpdates.value = false
+      })
+    })
+  }
 
   nuxtApp._useHead = (_meta: MetaObject | ComputedGetter<MetaObject>) => {
     const meta = ref<MetaObject>(_meta)
@@ -44,7 +57,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     const vm = getCurrentInstance()
     // need to offset the root uid for HMR
-    const vmUid = vm ? (vm?.uid - vm.root.uid) : 0
+    const vmUid = vm ? vm?.uid - vm.root.uid : false
 
     if (process.server) {
       if (vmUid) {
@@ -53,15 +66,15 @@ export default defineNuxtPlugin((nuxtApp) => {
       return
     }
 
+    if (
+      head._pauseDOMUpdates.value &&
+      head._ssrHydrateFromNodeId.value === vmUid
+    ) {
+      head._pauseDOMUpdates.value = false
+    }
+
     watchEffect(() => {
-      if (
-        headReady.value &&
-        (head._ssrHydrateFromNodeId.value === false || head._ssrHydrateFromNodeId.value === vmUid)
-      ) {
-        head.updateDOM()
-        // allows other nodes to hydrate, required for any client-specific changes being made
-        head._ssrHydrateFromNodeId.value = false
-      }
+      head.updateDOM()
     })
 
     if (!vm) {
