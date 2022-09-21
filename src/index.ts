@@ -43,8 +43,8 @@ export type HeadTag = {
     HasRenderPriority &
     RendersToBody &
     RendersInnerContent & {
-      [k: string]: any
-    }
+    [k: string]: any
+  }
 }
 
 export type HeadClient = {
@@ -297,9 +297,9 @@ const updateElements = (
   headCountEl.setAttribute(
     "content",
     "" +
-      (headCount -
-        oldHeadElements.length +
-        newElements.filter((t) => !t.body).length),
+    (headCount -
+      oldHeadElements.length +
+      newElements.filter((t) => !t.body).length),
   )
 }
 
@@ -362,7 +362,7 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
               else if (
                 dedupe.propValue &&
                 unref(prev.props[dedupe.propValue]) ===
-                  unref(tag.props[dedupe.propValue])
+                unref(tag.props[dedupe.propValue])
               ) {
                 index = i
               }
@@ -588,8 +588,8 @@ const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
     node.type === "html"
       ? "htmlAttrs"
       : node.type === "body"
-      ? "bodyAttrs"
-      : (node.type as keyof HeadObjectPlain)
+        ? "bodyAttrs"
+        : (node.type as keyof HeadObjectPlain)
 
   if (typeof type !== "string" || !(type in obj)) return
 
@@ -597,7 +597,7 @@ const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
     ...node.props,
     children: Array.isArray(node.children)
       ? // @ts-expect-error
-        node.children[0]!.children
+      node.children[0]!.children
       : node.children,
   } as HeadAttrs
   if (Array.isArray(obj[type])) {
@@ -639,13 +639,42 @@ export const Head = /*@__PURE__*/ defineComponent({
   name: "Head",
 
   setup(_, { slots }) {
-    const input = ref({})
-    // @ts-expect-error untyped vue transforms
-    useHead(computed(() => markRaw(input.value)))
+    const head = injectHead()
+
+    let obj: Ref<HeadObjectPlain> | undefined
+
+    onBeforeUnmount(() => {
+      if (obj) {
+        head.removeHeadObjs(obj)
+        head.updateDOM()
+      }
+    })
     return () => {
       watchEffect(() => {
         if (!slots.default) return
-        input.value = vnodesToHeadObj(slots.default())
+        if (obj) {
+          head.removeHeadObjs(obj)
+        }
+        obj = ref(vnodesToHeadObj(slots.default()))
+        head.addHeadObjs(obj)
+        const vm = getCurrentInstance()
+        const vmUid = vm ? vm?.uid - vm.root.uid : 0
+
+        if (!IS_BROWSER) {
+          if (vm) {
+            head._ssrHydrateFromNodeId.value = vmUid
+          }
+          return
+        }
+        watchEffect(() => {
+          if (
+            head._ssrHydrateFromNodeId.value === false ||
+            head._ssrHydrateFromNodeId.value === vmUid
+          ) {
+            head.updateDOM()
+            head._ssrHydrateFromNodeId.value = false
+          }
+        })
       })
       return null
     }
