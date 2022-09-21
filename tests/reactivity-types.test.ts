@@ -116,7 +116,7 @@ describe("reactivity", () => {
           meta: [
             {
               name: "description",
-              content: computed(() => `${title.value} this is my description`),
+              content: () => `${title.value} this is my description`,
               "data-unknown-attr": "test",
             },
             {
