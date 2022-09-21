@@ -2,6 +2,12 @@
 
 No unreleased changes.
 
+## 0.7.12
+
+- chore: update deps
+- feat: sort critical tags and sort opt-in `renderPriority` (#89)
+- fix(types): export head schemas (#87)
+
 ## 0.7.11
 
 No unreleased changes.

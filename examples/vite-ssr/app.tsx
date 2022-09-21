@@ -6,7 +6,7 @@ import {
   RouterLink,
   RouterView,
 } from "vue-router"
-import { createHead, useHead } from "../src"
+import { createHead, useHead } from "../../src"
 import Contact from "./Contact.vue"
 
 export const createApp = () => {
@@ -64,7 +64,7 @@ export const createApp = () => {
           {
             name: "custom-priority",
             content: "of 1",
-            renderPriority: 1
+            renderPriority: 1,
           },
         ],
         script: [
