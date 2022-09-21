@@ -361,8 +361,8 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
       return deduped
     },
 
-    addHeadObjs(input) {
-      allHeadObjs.push(input)
+    addHeadObjs(objs) {
+      allHeadObjs.push(objs)
     },
 
     removeHeadObjs(objs) {
@@ -413,10 +413,10 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
 
 const IS_BROWSER = typeof window !== "undefined"
 
-export const useHead = (headInput: UseHeadInput) => {
+export const useHead = (headObj: UseHeadInput) => {
   const head = injectHead()
 
-  head.addHeadObjs(headInput)
+  head.addHeadObjs(headObj)
 
   if (IS_BROWSER) {
     watchEffect(() => {
@@ -424,7 +424,7 @@ export const useHead = (headInput: UseHeadInput) => {
     })
 
     onBeforeUnmount(() => {
-      head.removeHeadObjs(headInput)
+      head.removeHeadObjs(headObj)
       head.updateDOM()
     })
   }

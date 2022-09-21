@@ -172,10 +172,6 @@ describe("reactivity", () => {
         },
       ],
     })
-    expect(headResult.headTags).toMatchInlineSnapshot(`
-      "<title>function() {
-              return \\"my title\\";
-            }</title><meta name=\\"123\\" data-unknown-attr=\\"test\\"><meta name=\\"some-flag\\" content><meta property=\\"og:fake-prop\\" content=\\"test1,test2\\"><meta name=\\"head:count\\" content=\\"3\\">"
-    `)
+    expect(headResult.headTags).toMatchInlineSnapshot('"<title>my title</title><meta name=\\"123\\" data-unknown-attr=\\"test\\"><meta name=\\"some-flag\\" content><meta property=\\"og:fake-prop\\" content=\\"test1,test2\\"><meta name=\\"head:count\\" content=\\"3\\">"')
   })
 })
