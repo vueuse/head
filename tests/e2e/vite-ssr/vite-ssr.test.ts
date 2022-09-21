@@ -58,11 +58,13 @@ describe("e2e: vite ssr", async () => {
       })
       return head.headTags
     }
-    expect((await getHeadTags()).find(t => t.tag === 'title')!.props.children)
-      .toMatchInlineSnapshot('"0 | @vueuse/head"')
+    expect(
+      (await getHeadTags()).find((t) => t.tag === "title")!.props.children,
+    ).toMatchInlineSnapshot('"0 | @vueuse/head"')
     await page.click("button")
-    expect((await getHeadTags()).find(t => t.tag === 'title')!.props.children)
-      .toMatchInlineSnapshot('"1 | @vueuse/head"')
+    expect(
+      (await getHeadTags()).find((t) => t.tag === "title")!.props.children,
+    ).toMatchInlineSnapshot('"1 | @vueuse/head"')
   })
 
   test("body script", async () => {
