@@ -10,6 +10,8 @@ import {
   unref,
   shallowRef,
   getCurrentInstance,
+  computed,
+  markRaw,
 } from "vue"
 import {
   PROVIDE_KEY,
@@ -637,28 +639,13 @@ export const Head = /*@__PURE__*/ defineComponent({
   name: "Head",
 
   setup(_, { slots }) {
-    const head = injectHead()
-
-    let obj: Ref<HeadObjectPlain> | undefined
-
-    onBeforeUnmount(() => {
-      if (obj) {
-        head.removeHeadObjs(obj)
-        head.updateDOM()
-      }
-    })
-
+    const input = ref({})
+    // @ts-expect-error untyped vue transforms
+    useHead(computed(() => markRaw(input.value)))
     return () => {
       watchEffect(() => {
         if (!slots.default) return
-        if (obj) {
-          head.removeHeadObjs(obj)
-        }
-        obj = ref(vnodesToHeadObj(slots.default()))
-        head.addHeadObjs(obj)
-        if (IS_BROWSER) {
-          head.updateDOM()
-        }
+        input.value = vnodesToHeadObj(slots.default())
       })
       return null
     }
