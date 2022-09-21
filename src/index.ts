@@ -445,18 +445,16 @@ export const useHead = (obj: MaybeRef<HeadObject>) => {
 
   head.addHeadObjs(headObj)
 
-  if (!IS_BROWSER) {
-    return
+  if (IS_BROWSER) {
+    watchEffect(() => {
+      head.updateDOM()
+    })
+
+    onBeforeUnmount(() => {
+      head.removeHeadObjs(headObj)
+      head.updateDOM()
+    })
   }
-
-  watchEffect(() => {
-    head.updateDOM()
-  })
-
-  onBeforeUnmount(() => {
-    head.removeHeadObjs(headObj)
-    head.updateDOM()
-  })
 }
 
 const tagToString = (tag: HeadTag) => {
@@ -618,6 +616,7 @@ export const Head = /*@__PURE__*/ defineComponent({
         head.updateDOM()
       }
     })
+
     return () => {
       watchEffect(() => {
         if (!slots.default) return
@@ -627,13 +626,11 @@ export const Head = /*@__PURE__*/ defineComponent({
         obj = ref(vnodesToHeadObj(slots.default()))
         head.addHeadObjs(obj)
 
-        if (!IS_BROWSER) {
-          return
+        if (IS_BROWSER) {
+          watchEffect(() => {
+            head.updateDOM()
+          })
         }
-
-        watchEffect(() => {
-          head.updateDOM()
-        })
       })
       return null
     }
