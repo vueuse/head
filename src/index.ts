@@ -10,7 +10,6 @@ import {
   unref,
   shallowRef,
   getCurrentInstance,
-  watch,
 } from "vue"
 import {
   PROVIDE_KEY,
@@ -62,7 +61,7 @@ export type HeadClient = {
    *
    * Otherwise, when a number is provided we need to wait for that node id to render before we can update the DOM.
    */
-  _ssrHydrateFromNodeId: number | false
+  _ssrHydrateFromNodeId: Ref<number | false>
 
   addHeadObjs: (objs: Ref<HeadObjectPlain>) => void
 
@@ -305,10 +304,10 @@ const updateElements = (
 export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
   let allHeadObjs: Ref<HeadObjectPlain>[] = []
 
-  let ssrHydrateFromNodeId: number | false = false
+  let ssrHydrateFromNodeId: Ref<number | false> = ref(false)
   if (IS_BROWSER) {
     // ssr may have written the last node id that was used rendering head data
-    ssrHydrateFromNodeId =
+    ssrHydrateFromNodeId.value =
       Number.parseInt(
         document.children[0]?.getAttribute("data-head-ssr") || "0",
       ) || false
@@ -456,35 +455,27 @@ export const useHead = (obj: MaybeRef<HeadObject>) => {
   head.addHeadObjs(headObj)
 
   const vm = getCurrentInstance()
+  // need to offset the root uid for HMR
+  const vmUid = vm ? vm?.uid - vm.root.uid : 0
 
   if (!IS_BROWSER) {
     if (vm) {
       // for SSR we keep track of the last node to update the head
-      head._ssrHydrateFromNodeId = vm.uid - vm.root.uid
+      head._ssrHydrateFromNodeId.value = vmUid
     }
     return
   }
 
-  if (vm) {
-    // for client we hydrate the DOM when we hit the last node to update on the SSR
+  watchEffect(() => {
     if (
-      head._ssrHydrateFromNodeId === false ||
-      head._ssrHydrateFromNodeId === vm.uid - vm.root.uid
+      head._ssrHydrateFromNodeId.value === false ||
+      head._ssrHydrateFromNodeId.value === vmUid
     ) {
       head.updateDOM()
+      // allows other nodes to hydrate, required for any client-specific changes being made
+      head._ssrHydrateFromNodeId.value = false
     }
-  }
-
-  // any new reactive changes we push straight away
-  watch(
-    obj,
-    () => {
-      head.updateDOM()
-    },
-    {
-      deep: true,
-    },
-  )
+  })
 
   onBeforeUnmount(() => {
     head.removeHeadObjs(headObj)
@@ -549,8 +540,8 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
   let bodyTags: string[] = []
 
   // tell the client that we've server rendered at this final node so that the DOM update can be done at the right time
-  if (head._ssrHydrateFromNodeId >= 0) {
-    htmlAttrs["data-head-ssr"] = head._ssrHydrateFromNodeId
+  if (head._ssrHydrateFromNodeId.value !== false) {
+    htmlAttrs["data-head-ssr"] = head._ssrHydrateFromNodeId.value
   }
 
   for (const tag of head.headTags.sort(sortTags)) {

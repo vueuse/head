@@ -10,7 +10,6 @@ import {
 import defu from "defu"
 import type { MetaObject } from "."
 import { defineNuxtPlugin } from "#app"
-import { watch } from "#imports"
 
 // Note: This is just a copy of Nuxt's internal head plugin with modifications made for this issue
 
@@ -21,7 +20,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const headReady = ref(false)
   nuxtApp.hooks.hookOnce("app:mounted", () => {
-    if (head._ssrHydrateFromNodeId === false) {
+    if (head._ssrHydrateFromNodeId.value === false) {
       watchEffect(() => {
         head.updateDOM()
       })
@@ -44,36 +43,26 @@ export default defineNuxtPlugin((nuxtApp) => {
     head.addHeadObjs(headObj as any)
 
     const vm = getCurrentInstance()
-    const ctxUid = vm?.uid
-    const hydrateId = ctxUid - vm?.root.uid
+    // need to offset the root uid for HMR
+    const vmUid = vm ? (vm?.uid - vm.root.uid) : 0
 
     if (process.server) {
-      if (ctxUid) {
-        head._ssrHydrateFromNodeId = hydrateId
+      if (vmUid) {
+        head._ssrHydrateFromNodeId.value = vmUid
       }
       return
     }
 
-    watch(headReady, (ready) => {
+    watchEffect(() => {
       if (
-        ready &&
-        (head._ssrHydrateFromNodeId === hydrateId ||
-          head._ssrHydrateFromNodeId === false)
+        headReady.value &&
+        (head._ssrHydrateFromNodeId.value === false || head._ssrHydrateFromNodeId.value === vmUid)
       ) {
         head.updateDOM()
+        // allows other nodes to hydrate, required for any client-specific changes being made
+        head._ssrHydrateFromNodeId.value = false
       }
     })
-
-    // any reactive change we push straight away outside of hydration updateDOM
-    watch(
-      meta,
-      () => {
-        head.updateDOM()
-      },
-      {
-        deep: true,
-      },
-    )
 
     if (!vm) {
       return

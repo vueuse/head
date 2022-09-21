@@ -5,11 +5,14 @@ const title = ref("Intermediately title with 1s delay")
 
 useHead({
   title,
+  bodyAttrs: {
+    class: 'new-bg'
+  },
   style: [
     // this is an example of the side effects of this rendering strategy
-    // this style won't be hydrated until ModifyTitle has been mounted
+    // this style won't be hydrated at all
     {
-      children: `h2 { color: ${process.server ? "red" : "lime"}; }`,
+      children: `.new-bg { background-color: lemonchiffon; } h2 { color: ${process.server ? "red" : "lime"}; }`,
     },
   ],
 })
