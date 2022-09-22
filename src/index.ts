@@ -85,7 +85,7 @@ const getTagDeduper = <T extends HeadTag>(tag: T) => {
   if (props.charset) {
     return { propKey: "charset" }
   }
-  const name = ["key", "id", "name", "property", "http-equiv"]
+  const name = ["key", "hid", "vmid", "id", "name", "property", "http-equiv"]
   for (const n of name) {
     let value = undefined
     // Probably an HTML Element

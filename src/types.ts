@@ -6,6 +6,14 @@ export interface HandlesDuplicates {
    * to be made you can provide a unique key for each entry.
    */
   key?: string
+  /**
+   * @deprecated Use `key` instead
+   */
+  hid?: string
+  /**
+   * @deprecated Use `key` instead
+   */
+  vmid?: string
 }
 
 export interface RendersToBody {
