@@ -7,7 +7,11 @@
  * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2
  */
 export const stringifyAttrName = (str: string) =>
-  str.replace(/[\s"'><\/=]/g, "")
+  str
+    // replace special characters
+    .replace(/[\s"'><\/=]/g, "")
+    // replace noncharacters (except for - and _)
+    .replace(/[^a-zA-Z0-9_-]/g, "")
 /**
  * Double-quoted attribute value must not contain any literal U+0022 QUOTATION MARK characters ("). Including
  * < and > will cause HTML to be invalid.
