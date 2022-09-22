@@ -50,6 +50,8 @@ export interface HasRenderPriority {
 interface HeadAugmentations {
   base: {
     key?: never
+    vmid?: never
+    hid?: never
     renderPriority?: never
     body?: never
     children?: never
@@ -59,23 +61,27 @@ interface HeadAugmentations {
     HandlesDuplicates & { children?: never; body?: never }
   style: HasRenderPriority &
     RendersToBody &
-    RendersInnerContent & { key?: never }
+    RendersInnerContent & { key?: never; vmid?: never; hid?: never }
   script: HasRenderPriority &
     RendersToBody &
     RendersInnerContent &
     HandlesDuplicates
   noscript: HasRenderPriority &
     RendersToBody &
-    RendersInnerContent & { key?: never }
+    RendersInnerContent & { key?: never; vmid?: never; hid?: never }
   htmlAttrs: {
     renderPriority?: never
     key?: never
+    vmid?: never
+    hid?: never
     children?: never
     body?: never
   }
   bodyAttrs: {
     renderPriority?: never
     key?: never
+    vmid?: never
+    hid?: never
     children?: never
     body?: never
   }
