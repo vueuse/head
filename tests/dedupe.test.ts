@@ -157,4 +157,20 @@ describe("dedupe", () => {
     const { headTags } = renderHeadToString(head)
     expect(headTags.split("http-equiv").length === 2).toBeTruthy()
   })
+
+  test("issue #104", async () => {
+    const head = createHead()
+    head.addHeadObjs(
+      computed(() => ({
+        link: [
+          { rel: "icon", href: "/favicon.ico" }, // <-- this and,
+          { rel: "canonical", href: "https://mydomain.me" }, // <-- this. Please reverse the order to be sure.
+        ],
+      })),
+    )
+    const { headTags } = renderHeadToString(head)
+    expect(headTags).toMatchInlineSnapshot(
+      '"<link rel=\\"icon\\" href=\\"/favicon.ico\\"><link rel=\\"canonical\\" href=\\"https://mydomain.me\\"><meta name=\\"head:count\\" content=\\"2\\">"',
+    )
+  })
 })
