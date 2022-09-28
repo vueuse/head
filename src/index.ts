@@ -96,6 +96,7 @@ const tagDedupeKey = <T extends HeadTag>(tag: T) => {
       value = props[n]
     }
     if (value !== undefined) {
+      // for example: name-description
       return `${n}-${value}`
     }
   }
@@ -305,7 +306,7 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
      * Get deduped tags
      */
     get headTags() {
-      const deduped: HeadTag[] = []
+      const tags: HeadTag[] = []
       const deduping: Record<string, HeadTag> = {}
 
       const titleTemplate = allHeadObjs
@@ -316,6 +317,7 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
       allHeadObjs.forEach((objs, headObjectIdx) => {
         const tags = headObjToTags(unref(objs))
         tags.forEach((tag, tagIdx) => {
+          // used to restore the order after deduping
           tag._position = headObjectIdx * 10 + tagIdx
           // resolve titles
           if (titleTemplate && tag.tag === "title") {
@@ -324,21 +326,20 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
               tag.props.children,
             )
           }
-
           // Remove tags with the same key
           const dedupeKey = tagDedupeKey(tag)
           if (dedupeKey) {
             deduping[dedupeKey] = tag
           } else {
-            deduped.push(tag)
+            tags.push(tag)
           }
         })
       })
 
       // add the entries we were deduping
-      deduped.push(...Object.values(deduping))
-
-      return deduped.sort((a, b) => a._position! - b._position!)
+      tags.push(...Object.values(deduping))
+      // ensure their original positions are kept
+      return tags.sort((a, b) => a._position! - b._position!)
     },
 
     addHeadObjs(objs) {
