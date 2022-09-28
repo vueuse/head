@@ -174,7 +174,7 @@ describe("dedupe", () => {
     )
   })
 
-  test.only("doesn't dedupe over tag types", async () => {
+  test("doesn't dedupe over tag types", async () => {
     const head = createHead()
     head.addHeadObjs(
       computed(() => ({
