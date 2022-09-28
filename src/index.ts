@@ -318,7 +318,9 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
         const tags = headObjToTags(unref(objs))
         tags.forEach((tag, tagIdx) => {
           // used to restore the order after deduping
-          tag._position = headObjectIdx * 10 + tagIdx
+          // a large number is needed otherwise the position will potentially duplicate (this support 10k tags)
+          // ideally we'd use the total tag count but this is too hard to calculate with the current reactivity
+          tag._position = headObjectIdx * 10000 + tagIdx
           // resolve titles
           if (titleTemplate && tag.tag === "title") {
             tag.props.children = renderTemplate(
