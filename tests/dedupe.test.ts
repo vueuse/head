@@ -173,4 +173,24 @@ describe("dedupe", () => {
       '"<link rel=\\"icon\\" href=\\"/favicon.ico\\"><link rel=\\"canonical\\" href=\\"https://mydomain.me\\"><meta name=\\"head:count\\" content=\\"2\\">"',
     )
   })
+
+  test.only("doesn't dedupe over tag types", async () => {
+    const head = createHead()
+    head.addHeadObjs(
+      computed(() => ({
+        meta: [{
+          key: 'icon',
+          name: 'description',
+          content: 'test'
+        }],
+        link: [
+          { rel: "icon", href: "/favicon.ico", key: 'icon' },
+        ],
+      })),
+    )
+    const { headTags } = renderHeadToString(head)
+    expect(headTags).toMatchInlineSnapshot(
+      '"<meta name=\\"description\\" content=\\"test\\"><link rel=\\"icon\\" href=\\"/favicon.ico\\"><meta name=\\"head:count\\" content=\\"2\\">"',
+    )
+  })
 })

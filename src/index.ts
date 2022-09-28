@@ -96,8 +96,8 @@ const tagDedupeKey = <T extends HeadTag>(tag: T) => {
       value = props[n]
     }
     if (value !== undefined) {
-      // for example: name-description
-      return `${n}-${value}`
+      // for example: meta-name-description
+      return `${tagName}-${n}-${value}`
     }
   }
   return false
@@ -306,7 +306,7 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
      * Get deduped tags
      */
     get headTags() {
-      const tags: HeadTag[] = []
+      const deduped: HeadTag[] = []
       const deduping: Record<string, HeadTag> = {}
 
       const titleTemplate = allHeadObjs
@@ -331,15 +331,15 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
           if (dedupeKey) {
             deduping[dedupeKey] = tag
           } else {
-            tags.push(tag)
+            deduped.push(tag)
           }
         })
       })
 
       // add the entries we were deduping
-      tags.push(...Object.values(deduping))
+      deduped.push(...Object.values(deduping))
       // ensure their original positions are kept
-      return tags.sort((a, b) => a._position! - b._position!)
+      return deduped.sort((a, b) => a._position! - b._position!)
     },
 
     addHeadObjs(objs) {
