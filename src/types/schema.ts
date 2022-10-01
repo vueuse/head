@@ -92,3 +92,4 @@ export type HeadObjectPlain = PlainHead<HeadAugmentations>
 export type HeadObject = ReactiveHead<HeadAugmentations>
 export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>
 export type UseHeadInput = MaybeComputedRef<HeadObject>
+
