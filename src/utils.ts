@@ -1,5 +1,6 @@
 import type { MaybeComputedRef } from '@vueuse/shared'
 import { resolveUnref } from '@vueuse/shared'
+import { unref } from 'vue'
 import type { HeadObjectPlain, HeadTag, UseHeadInput } from './types'
 
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
@@ -75,9 +76,9 @@ function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>): any {
   if (typeof root === 'object') {
     return Object.fromEntries(
       Object.entries(root).map(([key, value]) => {
-        // title template must stay a function
+        // title template must stay a function, we support a ref'd string though
         if (key === 'titleTemplate')
-          return [key, value]
+          return [key, unref(value)]
 
         return [
           key,
