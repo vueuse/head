@@ -90,3 +90,4 @@ interface HeadAugmentations {
 export type HeadObjectPlain = PlainHead<HeadAugmentations>
 export type HeadObject = ReactiveHead<HeadAugmentations>
 export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>
+
