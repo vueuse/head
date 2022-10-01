@@ -4,7 +4,6 @@ import type {
 import {
   inject,
   onBeforeUnmount,
-  shallowRef,
   watchEffect,
 } from 'vue'
 import {
@@ -16,7 +15,7 @@ import {
 } from './constants'
 import { createElement } from './create-element'
 import { stringifyAttrs } from './stringify-attrs'
-import { isEqualNode, sortTags } from './utils'
+import { isEqualNode, resolveHeadInput, sortTags } from './utils'
 import type {
   HandlesDuplicates,
   HasRenderPriority,
@@ -299,7 +298,7 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
   const previousTags = new Set<string>()
 
   if (initHeadObject)
-    allHeadObjs.push(shallowRef(initHeadObject))
+    allHeadObjs.push(initHeadObject)
 
   const head: HeadClient = {
     install(app) {
