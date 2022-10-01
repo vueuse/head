@@ -1,9 +1,10 @@
-import fs from "fs"
-import { defineConfig } from "vite"
-import vueJsx from "@vitejs/plugin-vue-jsx"
-import vue from "@vitejs/plugin-vue"
-import { renderToString } from "@vue/server-renderer"
-import { renderHeadToString } from "../../src"
+import fs from 'fs'
+import { resolve } from 'node:path'
+import { defineConfig } from 'vite'
+import vueJsx from '@vitejs/plugin-vue-jsx'
+import vue from '@vitejs/plugin-vue'
+import { renderToString } from '@vue/server-renderer'
+import { renderHeadToString } from '../../src'
 
 export default defineConfig({
   plugins: [
@@ -12,30 +13,29 @@ export default defineConfig({
     }),
     vue({}),
     {
-      name: "ssr",
+      name: 'ssr',
       configureServer(server) {
         server.middlewares.use(async (req, res, next) => {
-          if (!req.url!.startsWith("/ssr/")) {
+          if (!req.url!.startsWith('/ssr/'))
             return next()
-          }
 
-          let html = fs.readFileSync(__dirname + "/index.html", "utf8")
+          let html = fs.readFileSync(resolve(__dirname, 'index.html'), 'utf8')
 
           const mod = (await server.ssrLoadModule(
-            `/app.tsx`,
-          )) as typeof import("./app")
+            '/app.tsx',
+          )) as typeof import('./app')
           const { app, router, head } = mod.createApp()
           await router.push(req.url!)
           await router.isReady()
           const appHTML = await renderToString(app)
           const headHTML = renderHeadToString(head)
           html = await server.transformIndexHtml(req.url!, html)
-          res.setHeader("content-type", "text/html")
+          res.setHeader('content-type', 'text/html')
           res.end(
             html
-              .replace("<html>", `<html${headHTML.htmlAttrs}>`)
-              .replace("<body>", `<body${headHTML.bodyAttrs}>`)
-              .replace("</head>", `${headHTML.headTags}</head>`)
+              .replace('<html>', `<html${headHTML.htmlAttrs}>`)
+              .replace('<body>', `<body${headHTML.bodyAttrs}>`)
+              .replace('</head>', `${headHTML.headTags}</head>`)
               .replace(
                 '<div id="app"></div>',
                 `<div id="app">${appHTML}</div>`,
