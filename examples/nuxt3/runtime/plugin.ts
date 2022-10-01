@@ -26,6 +26,24 @@ export default defineNuxtPlugin((nuxtApp) => {
     headReady.value = true
   })
 
+  if (process.client) {
+    let pauseDOMUpdates = true
+    head.hookBeforeDomUpdate.push(() => !pauseDOMUpdates)
+
+    nuxtApp.hooks.hookOnce('page:finish', () => {
+      pauseDOMUpdates = false
+      // start pausing DOM updates when route changes (trigger immediately)
+      useRouter().beforeEach(() => {
+        pauseDOMUpdates = true
+      })
+
+      // watch for new route before unpausing dom updates (triggered after suspense resolved)
+      watch(useRoute(), () => {
+        pauseDOMUpdates = false
+      })
+    })
+  }
+
   nuxtApp._useHead = (_meta: MetaObject | ComputedGetter<MetaObject>) => {
     const meta = ref<MetaObject>(_meta)
     const headObj = computed(() => {
@@ -43,11 +61,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     if (process.server)
       return
 
-    if (headReady.value) {
-      watchEffect(() => {
-        head.updateDOM()
-      })
-    }
+    if (headReady.value)
+      watchEffect(() => { head.updateDOM() })
 
     const vm = getCurrentInstance()
     if (!vm)

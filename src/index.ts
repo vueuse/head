@@ -13,7 +13,8 @@ import { resolveHeadInput, sortTags, tagDedupeKey } from './utils'
 import type {
   HeadAttrs,
   HeadObjectPlain, HeadTag,
-  TagKeys, UseHeadInput,
+  HookBeforeDomUpdate, TagKeys,
+  UseHeadInput,
 } from './types'
 import { setAttrs, updateElements } from './dom'
 
@@ -29,6 +30,16 @@ export interface HeadClient {
   removeHeadObjs: (objs: UseHeadInput) => void
 
   updateDOM: (document?: Document) => void
+
+  /**
+   * Array of user provided functions to hook into before the DOM is updated.
+   *
+   * When returning false from this function, it will block DOM updates, this can be useful when stopping dom updates
+   * between page transitions.
+   *
+   * You are able to modify the payload of hook using this.
+   */
+  hookBeforeDomUpdate: HookBeforeDomUpdate
 }
 
 /**
@@ -122,6 +133,8 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
   let allHeadObjs: UseHeadInput[] = []
   const previousTags = new Set<string>()
 
+  const hookBeforeDomUpdate: HookBeforeDomUpdate = []
+
   if (initHeadObject)
     allHeadObjs.push(initHeadObject)
 
@@ -130,6 +143,9 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
       app.config.globalProperties.$head = head
       app.provide(PROVIDE_KEY, head)
     },
+
+    hookBeforeDomUpdate,
+
     /**
      * Get deduped tags
      */
@@ -205,6 +221,15 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
 
         actualTags[tag.tag] = actualTags[tag.tag] || []
         actualTags[tag.tag].push(tag)
+      }
+
+      // allow integration to disable dom update and / or modify it
+      if (head.hookBeforeDomUpdate) {
+        for (const k in head.hookBeforeDomUpdate) {
+          const res = head.hookBeforeDomUpdate[k](actualTags)
+          if (res === false)
+            return
+        }
       }
 
       if (title !== undefined)
