@@ -62,10 +62,10 @@ const renderTitleTemplate = (
 ): string => {
   if (template == null)
     return ''
-  if (typeof template === 'string')
-    return template.replace('%s', title ?? '')
+  if (typeof template === 'function')
+    return template(title)
 
-  return template(title)
+  return template.replace('%s', title ?? '')
 }
 
 const headObjToTags = (obj: HeadObjectPlain) => {
