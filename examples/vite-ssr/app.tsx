@@ -1,4 +1,4 @@
-import { computed, createSSRApp, defineComponent, h, ref } from 'vue'
+import { computed, createSSRApp, defineComponent, ref } from 'vue'
 import {
   RouterLink,
   RouterView,

@@ -1,4 +1,5 @@
 import fs from 'fs'
+import { resolve } from 'node:path'
 import { defineConfig } from 'vite'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vue from '@vitejs/plugin-vue'
@@ -18,7 +19,7 @@ export default defineConfig({
           if (!req.url!.startsWith('/ssr/'))
             return next()
 
-          let html = fs.readFileSync(`${__dirname}/index.html`, 'utf8')
+          let html = fs.readFileSync(resolve(__dirname, 'index.html'), 'utf8')
 
           const mod = (await server.ssrLoadModule(
             '/app.tsx',
