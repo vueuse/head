@@ -1,4 +1,5 @@
 import type { Head as PlainHead, ReactiveHead } from '@zhead/schema-vue'
+import type { MaybeComputedRef } from '@vueuse/shared'
 
 export interface HandlesDuplicates {
   /**
@@ -90,4 +91,5 @@ interface HeadAugmentations {
 export type HeadObjectPlain = PlainHead<HeadAugmentations>
 export type HeadObject = ReactiveHead<HeadAugmentations>
 export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>
+export type UseHeadInput = MaybeComputedRef<HeadObject>
 

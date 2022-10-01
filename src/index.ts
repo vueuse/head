@@ -1,24 +1,19 @@
 import type {
   App,
-  Ref,
 } from 'vue'
 import {
   inject,
   onBeforeUnmount,
-  ref,
-  shallowRef,
-  unref,
   watchEffect,
 } from 'vue'
 import {
   PROVIDE_KEY,
 } from './constants'
-import { sortTags, tagDedupeKey } from './utils'
+import { resolveHeadInput, sortTags, tagDedupeKey } from './utils'
 import type {
   HeadAttrs,
-  HeadObject,
-  HeadObjectPlain, HeadTag, MaybeRef,
-  TagKeys,
+  HeadObjectPlain, HeadTag,
+  TagKeys, UseHeadInput,
 } from './types'
 import { setAttrs, updateElements } from './dom'
 
@@ -29,9 +24,9 @@ export interface HeadClient {
 
   headTags: HeadTag[]
 
-  addHeadObjs: (objs: Ref<HeadObjectPlain>) => void
+  addHeadObjs: (objs: UseHeadInput) => void
 
-  removeHeadObjs: (objs: Ref<HeadObjectPlain>) => void
+  removeHeadObjs: (objs: UseHeadInput) => void
 
   updateDOM: (document?: Document) => void
 }
@@ -67,10 +62,10 @@ const renderTitleTemplate = (
 ): string => {
   if (template == null)
     return ''
-  if (typeof template === 'string')
-    return template.replace('%s', title ?? '')
+  if (typeof template === 'function')
+    return template(title)
 
-  return template(unref(title))
+  return template.replace('%s', title ?? '')
 }
 
 const headObjToTags = (obj: HeadObjectPlain) => {
@@ -107,7 +102,7 @@ const headObjToTags = (obj: HeadObjectPlain) => {
           const value = obj[key]
           if (Array.isArray(value)) {
             value.forEach((item) => {
-              const props = convertLegacyKey(unref(item))
+              const props = convertLegacyKey(item)
               // unref item to support ref array entries
               tags.push({ tag: key, props })
             })
@@ -123,12 +118,12 @@ const headObjToTags = (obj: HeadObjectPlain) => {
   return tags
 }
 
-export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
-  let allHeadObjs: Ref<HeadObjectPlain>[] = []
+export const createHead = (initHeadObject?: UseHeadInput) => {
+  let allHeadObjs: UseHeadInput[] = []
   const previousTags = new Set<string>()
 
   if (initHeadObject)
-    allHeadObjs.push(shallowRef(initHeadObject))
+    allHeadObjs.push(initHeadObject)
 
   const head: HeadClient = {
     install(app) {
@@ -142,13 +137,15 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
       const deduped: HeadTag[] = []
       const deduping: Record<string, HeadTag> = {}
 
-      const titleTemplate = allHeadObjs
-        .map(i => unref(i).titleTemplate)
+      const resolvedHeadObjs = allHeadObjs.map(resolveHeadInput)
+
+      const titleTemplate = resolvedHeadObjs
+        .map(i => i.titleTemplate)
         .reverse()
         .find(i => i != null)
 
-      allHeadObjs.forEach((objs, headObjectIdx) => {
-        const tags = headObjToTags(unref(objs))
+      resolvedHeadObjs.forEach((objs, headObjectIdx) => {
+        const tags = headObjToTags(objs)
         tags.forEach((tag, tagIdx) => {
           // used to restore the order after deduping
           // a large number is needed otherwise the position will potentially duplicate (this support 10k tags)
@@ -228,9 +225,8 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
 
 const IS_BROWSER = typeof window !== 'undefined'
 
-export const useHead = (obj: MaybeRef<HeadObject>) => {
+export const useHead = (headObj: UseHeadInput) => {
   const head = injectHead()
-  const headObj = ref(obj) as Ref<HeadObjectPlain>
 
   head.addHeadObjs(headObj)
 

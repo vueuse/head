@@ -1,4 +1,7 @@
-import type { HeadTag } from './index'
+import type { MaybeComputedRef } from '@vueuse/shared'
+import { resolveUnref } from '@vueuse/shared'
+import { unref } from 'vue'
+import type { HeadObjectPlain, HeadTag, UseHeadInput } from './types'
 
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   const tagWeight = (tag: HeadTag) => {
@@ -60,4 +63,33 @@ export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
     }
   }
   return false
+}
+
+function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>): any {
+  const root = resolveUnref(ref)
+  if (!ref || !root)
+    return root
+
+  if (Array.isArray(root))
+    return root.map(resolveUnrefDeeply)
+
+  if (typeof root === 'object') {
+    return Object.fromEntries(
+      Object.entries(root).map(([key, value]) => {
+        // title template must stay a function, we support a ref'd string though
+        if (key === 'titleTemplate')
+          return [key, unref(value)]
+
+        return [
+          key,
+          resolveUnrefDeeply(value),
+        ]
+      }),
+    )
+  }
+  return root
+}
+
+export function resolveHeadInput(obj: UseHeadInput): HeadObjectPlain {
+  return resolveUnrefDeeply(obj)
 }
