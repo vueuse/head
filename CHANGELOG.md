@@ -2,6 +2,18 @@
 
 No unreleased changes.
 
+## 0.8.0
+
+- feat: before dom update hookable (#114)
+- feat: computed getter support (#110)
+- refactor: modify internal API to better isolate envs (#113)
+- chore: migrate to eslint (#111)
+- chore(tests): improve nuxt3 tests / example (#107)
+- feat: support deprecated dedupe keys (#106)
+- chore(github): add harlan to funding
+- chore(doc): fix links
+- chore: harlan as maintainer and wording improvements
+
 ## 0.7.13
 
 - chore: ignore .idea files
