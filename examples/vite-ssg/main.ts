@@ -1,25 +1,25 @@
-import { ViteSSG } from "vite-ssg"
-import App from "./App.vue"
-import Home from "./pages/index.vue"
-import About from "./pages/about.vue"
-import Contact from "./pages/contact.vue"
+import { ViteSSG } from 'vite-ssg'
+import App from './App.vue'
+import Home from './pages/index.vue'
+import About from './pages/about.vue'
+import Contact from './pages/contact.vue'
 
 const routes = [
   {
-    path: "/",
+    path: '/',
     component: Home,
   },
   {
-    path: "/about",
+    path: '/about',
     component: About,
   },
   {
-    path: "/contact",
+    path: '/contact',
     component: Contact,
   },
   {
-    path: "/ssr/dedup",
-    component: () => import("./pages/ssr/dedup.vue"),
+    path: '/ssr/dedup',
+    component: () => import('./pages/ssr/dedup.vue'),
   },
 ]
 
