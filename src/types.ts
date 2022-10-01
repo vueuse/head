@@ -1,4 +1,4 @@
-import type { Head as PlainHead, ReactiveHead } from "@zhead/schema-vue"
+import type { Head as PlainHead, ReactiveHead } from '@zhead/schema-vue'
 
 export interface HandlesDuplicates {
   /**
@@ -6,6 +6,14 @@ export interface HandlesDuplicates {
    * to be made you can provide a unique key for each entry.
    */
   key?: string
+  /**
+   * @deprecated Use `key` instead
+   */
+  hid?: string
+  /**
+   * @deprecated Use `key` instead
+   */
+  vmid?: string
 }
 
 export interface RendersToBody {
@@ -42,32 +50,38 @@ export interface HasRenderPriority {
 interface HeadAugmentations {
   base: {
     key?: never
+    vmid?: never
+    hid?: never
     renderPriority?: never
     body?: never
     children?: never
   }
   link: HasRenderPriority & RendersToBody & { key?: never; children?: never }
   meta: HasRenderPriority &
-    HandlesDuplicates & { children?: never; body?: never }
+  HandlesDuplicates & { children?: never; body?: never }
   style: HasRenderPriority &
-    RendersToBody &
-    RendersInnerContent & { key?: never }
+  RendersToBody &
+  RendersInnerContent & { key?: never; vmid?: never; hid?: never }
   script: HasRenderPriority &
-    RendersToBody &
-    RendersInnerContent &
-    HandlesDuplicates
+  RendersToBody &
+  RendersInnerContent &
+  HandlesDuplicates
   noscript: HasRenderPriority &
-    RendersToBody &
-    RendersInnerContent & { key?: never }
+  RendersToBody &
+  RendersInnerContent & { key?: never; vmid?: never; hid?: never }
   htmlAttrs: {
     renderPriority?: never
     key?: never
+    vmid?: never
+    hid?: never
     children?: never
     body?: never
   }
   bodyAttrs: {
     renderPriority?: never
     key?: never
+    vmid?: never
+    hid?: never
     children?: never
     body?: never
   }
@@ -75,4 +89,4 @@ interface HeadAugmentations {
 
 export type HeadObjectPlain = PlainHead<HeadAugmentations>
 export type HeadObject = ReactiveHead<HeadAugmentations>
-export type TagKeys = keyof Omit<HeadObjectPlain, "titleTemplate">
+export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>

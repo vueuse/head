@@ -1,9 +1,9 @@
-import { HeadClient } from "../../../src"
-import { createBrowser, startServer } from "./utils"
-import { ExecaChildProcess } from "execa"
-import { Browser } from "playwright"
+import type { ExecaChildProcess } from 'execa'
+import type { Browser } from 'playwright'
+import type { HeadClient } from '../../../src'
+import { createBrowser, startServer } from './utils'
 
-describe("e2e: vite ssr", async () => {
+describe('e2e: vite ssr', async () => {
   let serverProcess: ExecaChildProcess
   let browser: Browser
   let url: string
@@ -16,15 +16,14 @@ describe("e2e: vite ssr", async () => {
   }, 60000)
 
   afterAll(async () => {
-    if (serverProcess) {
+    if (serverProcess)
       serverProcess.kill()
-    }
   })
 
-  test("browser", async () => {
+  test('browser', async () => {
     const page = await browser.newPage()
 
-    await page.goto(url, { waitUntil: "networkidle" })
+    await page.goto(url, { waitUntil: 'networkidle' })
     const headHTML = await page.evaluate(() => document.head.innerHTML)
 
     expect(headHTML).toMatchInlineSnapshot(`
@@ -38,39 +37,41 @@ describe("e2e: vite ssr", async () => {
         <meta name=\\"global-meta\\" content=\\"some global meta tag\\"><base href=\\"/\\"><meta name=\\"custom-priority\\" content=\\"of 1\\"><meta name=\\"description\\" content=\\"desc 2\\"><meta property=\\"og:locale:alternate\\" content=\\"fr\\"><meta property=\\"og:locale:alternate\\" content=\\"zh\\"><style>body {background: salmon}</style><noscript>This app requires javascript to work</noscript><script>console.log(\\"a\\")</script><link href=\\"/foo\\" rel=\\"stylesheet\\"><meta name=\\"head:count\\" content=\\"10\\">"
     `)
 
-    await page.click("button.counter")
-    expect(await page.title()).equals("count: 1 | @vueuse/head")
+    await page.click('button.counter')
+    expect(await page.title()).equals('count: 1 | @vueuse/head')
 
-    await page.click("button.change-home-title")
-    expect(await page.title()).equals("count: 1 | @vueuse/head")
+    await page.click('button.change-home-title')
+    expect(await page.title()).equals('count: 1 | @vueuse/head')
 
     await page.click('a[href="/about"]')
-    expect(await page.title()).equals("About | About Template")
+    expect(await page.title()).equals('About | About Template')
   })
 
-  test("<Head>: basic", async () => {
+  test('<Head>: basic', async () => {
     const page = await browser.newPage()
-    await page.goto(`${url}/contact`, { waitUntil: "networkidle" })
+    await page.goto(`${url}/contact`, { waitUntil: 'networkidle' })
     const getHeadTags = async () => {
       const head: HeadClient = await page.evaluate(() => {
-        // @ts-expect-error
+        // @ts-expect-error untyped
         return window.head
       })
       return head.headTags
     }
-    expect((await getHeadTags()).find(t => t.tag === 'title')!.props.children)
-      .toMatchInlineSnapshot('"0 | @vueuse/head"')
-    await page.click("button")
-    expect((await getHeadTags()).find(t => t.tag === 'title')!.props.children)
-      .toMatchInlineSnapshot('"1 | @vueuse/head"')
+    expect(
+      (await getHeadTags()).find(t => t.tag === 'title')!.props.children,
+    ).toMatchInlineSnapshot('"0 | @vueuse/head"')
+    await page.click('button')
+    expect(
+      (await getHeadTags()).find(t => t.tag === 'title')!.props.children,
+    ).toMatchInlineSnapshot('"1 | @vueuse/head"')
   })
 
-  test("body script", async () => {
+  test('body script', async () => {
     const page = await browser.newPage()
-    await page.goto(url, { waitUntil: "networkidle" })
+    await page.goto(url, { waitUntil: 'networkidle' })
 
-    const script = await page.$("[data-meta-body]")
+    const script = await page.$('[data-meta-body]')
     const scriptHtml = await script.innerHTML()
-    expect(scriptHtml).equals(`console.log('hi')`)
+    expect(scriptHtml).equals('console.log(\'hi\')')
   })
 })

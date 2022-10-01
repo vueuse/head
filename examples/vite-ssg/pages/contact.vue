@@ -1,27 +1,30 @@
 <script setup>
-import { ref } from "vue"
-import { Head } from "../../../src"
+import { ref } from 'vue'
+import { Head } from '../../src'
 
 const count = ref(0)
 
-const style = `button {color: red}`
+const style = 'button {color: red}'
 </script>
 
 <template>
   <Head>
     <title>{{ count }}</title>
-    <html lang="en"></html>
-    <body class="body"></body>
-    <meta name="description" content="desc" />
+    <html lang="en" />
+    <body class="body" />
+    <meta name="description" content="desc">
     <component is="style">
-      body { background: lightgreen; } {{ style }}</component
-    >
-    <meta name="page" content="contact" />
+      body { background: lightgreen; } {{ style }}
+    </component>
   </Head>
 
-  <router-link to="/">Back Home</router-link>
+  <router-link to="/">
+    Back Home
+  </router-link>
 
-  <hr />
+  <hr>
 
-  <button @click="count++">{{ count }}</button>
+  <button @click="count++">
+    {{ count }}
+  </button>
 </template>
