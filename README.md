@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-A [Vue composition API](https://v3.vuejs.org/guide/composition-api-introduction.html) to manage your document head.
+A <a href="https://v3.vuejs.org/guide/composition-api-introduction.html">Vue composition API</a> to manage your document head.
 </p>
 
 <p align="center">
@@ -16,8 +16,8 @@ A [Vue composition API](https://v3.vuejs.org/guide/composition-api-introduction.
 <tbody>
 <td align="center">
 <img width="800" height="0" /><br>
-Created by [egoist](https://github.com/sponsors/egoist), maintained by [harlan-zw](https://github.com/harlan-zw) <br>
-<sub>Support ongoing development by sponsoring us.<br> 
+Created by <a href="https://github.com/sponsors/egoist">egoist</a>, maintained by <a href="https://github.com/harlan-zw">harlan-zw</a> <br>
+<sub>💛 Support ongoing development by sponsoring us.</sub><br> 
 <sub>Follow <a href="https://twitter.com/harlan_zw">🐦 @harlan_zw</a> for updates  • Join <a href="https://discord.gg/275MBUBvgP">Discord</a> for support</sub><br>
 <img width="800" height="0" />
 </td>
