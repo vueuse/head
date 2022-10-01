@@ -18,6 +18,7 @@ const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
   const props = {
     ...node.props,
     children: Array.isArray(node.children)
+      // @ts-expect-error untyped
       ? node.children[0]!.children
       : node.children,
   } as HeadAttrs
