@@ -74,10 +74,16 @@ function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>): any {
 
   if (typeof root === 'object') {
     return Object.fromEntries(
-      Object.entries(root).map(([key, value]) => [
-        key,
-        resolveUnrefDeeply(value),
-      ]),
+      Object.entries(root).map(([key, value]) => {
+        // title template must stay a function
+        if (key === 'titleTemplate')
+          return [key, value]
+
+        return [
+          key,
+          resolveUnrefDeeply(value),
+        ]
+      }),
     )
   }
   return root
