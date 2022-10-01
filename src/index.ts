@@ -11,39 +11,18 @@ import {
   watchEffect,
 } from 'vue'
 import {
-  BODY_TAG_ATTR_NAME,
-  HEAD_ATTRS_KEY,
-  HEAD_COUNT_KEY,
   PROVIDE_KEY,
-  SELF_CLOSING_TAGS,
 } from './constants'
-import { createElement } from './create-element'
-import { stringifyAttrs } from './stringify-attrs'
-import { isEqualNode, sortTags } from './utils'
+import { sortTags, tagDedupeKey } from './utils'
 import type {
-  HandlesDuplicates,
-  HasRenderPriority,
+  HeadAttrs,
   HeadObject,
-  HeadObjectPlain,
-  RendersInnerContent, RendersToBody, TagKeys,
+  HeadObjectPlain, HeadTag, MaybeRef,
+  TagKeys,
 } from './types'
+import { setAttrs, updateElements } from './dom'
 
 export * from './types'
-
-type MaybeRef<T> = T | Ref<T>
-
-export interface HeadAttrs { [k: string]: any }
-
-export interface HeadTag {
-  tag: TagKeys
-  props: HandlesDuplicates &
-  HasRenderPriority &
-  RendersToBody &
-  RendersInnerContent & {
-    [k: string]: any
-  }
-  _position?: number
-}
 
 export interface HeadClient {
   install: (app: App) => void
@@ -55,52 +34,6 @@ export interface HeadClient {
   removeHeadObjs: (objs: Ref<HeadObjectPlain>) => void
 
   updateDOM: (document?: Document) => void
-}
-
-export interface HTMLResult {
-  // Tags in `<head>`
-  readonly headTags: string
-  // Attributes for `<html>`
-  readonly htmlAttrs: string
-  // Attributes for `<body>`
-  readonly bodyAttrs: string
-  // Tags in `<body>`
-  readonly bodyTags: string
-}
-
-const tagDedupeKey = <T extends HeadTag>(tag: T) => {
-  // only meta, base and script tags will be deduped
-  if (!['meta', 'base', 'script', 'link'].includes(tag.tag))
-    return false
-
-  const { props, tag: tagName } = tag
-  // must only be a single base so we always dedupe
-  if (tagName === 'base')
-    return 'base'
-
-  // support only a single canonical
-  if (tagName === 'link' && props.rel === 'canonical')
-    return 'canonical'
-
-  // must only be a single charset
-  if (props.charset)
-    return 'charset'
-
-  const name = ['key', 'id', 'name', 'property', 'http-equiv']
-  for (const n of name) {
-    let value
-    // Probably an HTML Element
-    if (typeof props.getAttribute === 'function' && props.hasAttribute(n))
-      value = props.getAttribute(n)
-    else
-      value = props[n]
-
-    if (value !== undefined) {
-      // for example: meta-name-description
-      return `${tagName}-${n}-${value}`
-    }
-  }
-  return false
 }
 
 /**
@@ -128,7 +61,7 @@ const acceptFields: Array<TagKeys> = [
   'bodyAttrs',
 ]
 
-const renderTemplate = (
+const renderTitleTemplate = (
   template: Required<HeadObjectPlain>['titleTemplate'],
   title?: string,
 ): string => {
@@ -190,116 +123,6 @@ const headObjToTags = (obj: HeadObjectPlain) => {
   return tags
 }
 
-const setAttrs = (el: Element, attrs: HeadAttrs) => {
-  const existingAttrs = el.getAttribute(HEAD_ATTRS_KEY)
-  if (existingAttrs) {
-    for (const key of existingAttrs.split(',')) {
-      if (!(key in attrs))
-        el.removeAttribute(key)
-    }
-  }
-
-  const keys: string[] = []
-
-  for (const key in attrs) {
-    const value = attrs[key]
-    if (value == null)
-      continue
-
-    if (value === false)
-      el.removeAttribute(key)
-    else
-      el.setAttribute(key, value)
-
-    keys.push(key)
-  }
-
-  if (keys.length)
-    el.setAttribute(HEAD_ATTRS_KEY, keys.join(','))
-  else
-    el.removeAttribute(HEAD_ATTRS_KEY)
-}
-
-const updateElements = (
-  document = window.document,
-  type: string,
-  tags: HeadTag[],
-) => {
-  const head = document.head
-  const body = document.body
-  let headCountEl = head.querySelector(`meta[name="${HEAD_COUNT_KEY}"]`)
-  const bodyMetaElements = body.querySelectorAll(`[${BODY_TAG_ATTR_NAME}]`)
-  const headCount = headCountEl
-    ? Number(headCountEl.getAttribute('content'))
-    : 0
-  const oldHeadElements: Element[] = []
-  const oldBodyElements: Element[] = []
-
-  if (bodyMetaElements) {
-    for (let i = 0; i < bodyMetaElements.length; i++) {
-      if (
-        bodyMetaElements[i]
-        && bodyMetaElements[i].tagName?.toLowerCase() === type
-      )
-        oldBodyElements.push(bodyMetaElements[i])
-    }
-  }
-  if (headCountEl) {
-    for (
-      let i = 0, j = headCountEl.previousElementSibling;
-      i < headCount;
-      i++, j = j?.previousElementSibling || null
-    ) {
-      if (j?.tagName?.toLowerCase() === type)
-        oldHeadElements.push(j)
-    }
-  }
-  else {
-    headCountEl = document.createElement('meta')
-    headCountEl.setAttribute('name', HEAD_COUNT_KEY)
-    headCountEl.setAttribute('content', '0')
-    head.append(headCountEl)
-  }
-  let newElements = tags.map(tag => ({
-    element: createElement(tag.tag, tag.props, document),
-    body: tag.props.body ?? false,
-  }))
-
-  newElements = newElements.filter((newEl) => {
-    for (let i = 0; i < oldHeadElements.length; i++) {
-      const oldEl = oldHeadElements[i]
-      if (isEqualNode(oldEl, newEl.element)) {
-        oldHeadElements.splice(i, 1)
-        return false
-      }
-    }
-    for (let i = 0; i < oldBodyElements.length; i++) {
-      const oldEl = oldBodyElements[i]
-      if (isEqualNode(oldEl, newEl.element)) {
-        oldBodyElements.splice(i, 1)
-        return false
-      }
-    }
-    return true
-  })
-
-  oldBodyElements.forEach(t => t.parentNode?.removeChild(t))
-  oldHeadElements.forEach(t => t.parentNode?.removeChild(t))
-  newElements.forEach((t) => {
-    if (t.body === true)
-      body.insertAdjacentElement('beforeend', t.element)
-    else
-      head.insertBefore(t.element, headCountEl)
-  })
-  headCountEl.setAttribute(
-    'content',
-    `${
-      headCount
-        - oldHeadElements.length
-        + newElements.filter(t => !t.body).length}`,
-  )
-}
-
 export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
   let allHeadObjs: Ref<HeadObjectPlain>[] = []
   const previousTags = new Set<string>()
@@ -333,7 +156,7 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
           tag._position = headObjectIdx * 10000 + tagIdx
           // resolve titles
           if (titleTemplate && tag.tag === 'title') {
-            tag.props.children = renderTemplate(
+            tag.props.children = renderTitleTemplate(
               titleTemplate,
               tag.props.children,
             )
@@ -423,69 +246,7 @@ export const useHead = (obj: MaybeRef<HeadObject>) => {
   }
 }
 
-const tagToString = (tag: HeadTag) => {
-  let isBodyTag = false
-  if (tag.props.body) {
-    isBodyTag = true
-    // avoid rendering body attr
-    delete tag.props.body
-  }
-  if (tag.props.renderPriority)
-    delete tag.props.renderPriority
-
-  const attrs = stringifyAttrs(tag.props)
-  if (SELF_CLOSING_TAGS.includes(tag.tag)) {
-    return `<${tag.tag}${attrs}${
-      isBodyTag ? ' ' + ` ${BODY_TAG_ATTR_NAME}="true"` : ''
-    }>`
-  }
-
-  return `<${tag.tag}${attrs}${
-    isBodyTag ? ` ${BODY_TAG_ATTR_NAME}="true"` : ''
-  }>${tag.props.children || ''}</${tag.tag}>`
-}
-
-export const renderHeadToString = (head: HeadClient): HTMLResult => {
-  const tags: string[] = []
-  let titleTag = ''
-  const htmlAttrs: HeadAttrs = {}
-  const bodyAttrs: HeadAttrs = {}
-  const bodyTags: string[] = []
-
-  for (const tag of head.headTags.sort(sortTags)) {
-    if (tag.tag === 'title')
-      titleTag = tagToString(tag)
-    else if (tag.tag === 'htmlAttrs')
-      Object.assign(htmlAttrs, tag.props)
-    else if (tag.tag === 'bodyAttrs')
-      Object.assign(bodyAttrs, tag.props)
-    else if (tag.props.body)
-      bodyTags.push(tagToString(tag))
-    else
-      tags.push(tagToString(tag))
-  }
-  tags.push(`<meta name="${HEAD_COUNT_KEY}" content="${tags.length}">`)
-
-  return {
-    get headTags() {
-      return titleTag + tags.join('')
-    },
-    get htmlAttrs() {
-      return stringifyAttrs({
-        ...htmlAttrs,
-        [HEAD_ATTRS_KEY]: Object.keys(htmlAttrs).join(','),
-      })
-    },
-    get bodyAttrs() {
-      return stringifyAttrs({
-        ...bodyAttrs,
-        [HEAD_ATTRS_KEY]: Object.keys(bodyAttrs).join(','),
-      })
-    },
-    get bodyTags() {
-      return bodyTags.join('')
-    },
-  }
-}
-
 export * from './components'
+export * from './dom'
+export * from './ssr'
+export * from './utils'

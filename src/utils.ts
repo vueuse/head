@@ -1,3 +1,5 @@
+import type { HeadTag } from './index'
+
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   const tagWeight = (tag: HeadTag) => {
     if (tag.props.renderPriority)
@@ -25,19 +27,37 @@ export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   return tagWeight(aTag) - tagWeight(bTag)
 }
 
-// Shamelessly taken from Next.js
-export function isEqualNode(oldTag: Element, newTag: Element) {
-  if (oldTag instanceof HTMLElement && newTag instanceof HTMLElement) {
-    const nonce = newTag.getAttribute('nonce')
-    // Only strip the nonce if `oldTag` has had it stripped. An element's nonce attribute will not
-    // be stripped if there is no content security policy response header that includes a nonce.
-    if (nonce && !oldTag.getAttribute('nonce')) {
-      const cloneTag = newTag.cloneNode(true) as typeof newTag
-      cloneTag.setAttribute('nonce', '')
-      cloneTag.nonce = nonce
-      return nonce === oldTag.nonce && oldTag.isEqualNode(cloneTag)
+export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
+  // only meta, base and script tags will be deduped
+  if (!['meta', 'base', 'script', 'link'].includes(tag.tag))
+    return false
+
+  const { props, tag: tagName } = tag
+  // must only be a single base so we always dedupe
+  if (tagName === 'base')
+    return 'base'
+
+  // support only a single canonical
+  if (tagName === 'link' && props.rel === 'canonical')
+    return 'canonical'
+
+  // must only be a single charset
+  if (props.charset)
+    return 'charset'
+
+  const name = ['key', 'id', 'name', 'property', 'http-equiv']
+  for (const n of name) {
+    let value
+    // Probably an HTML Element
+    if (typeof props.getAttribute === 'function' && props.hasAttribute(n))
+      value = props.getAttribute(n)
+    else
+      value = props[n]
+
+    if (value !== undefined) {
+      // for example: meta-name-description
+      return `${tagName}-${n}-${value}`
     }
   }
-
-  return oldTag.isEqualNode(newTag)
+  return false
 }
