@@ -178,19 +178,49 @@ describe("dedupe", () => {
     const head = createHead()
     head.addHeadObjs(
       computed(() => ({
-        meta: [{
-          key: 'icon',
-          name: 'description',
-          content: 'test'
-        }],
-        link: [
-          { rel: "icon", href: "/favicon.ico", key: 'icon' },
+        meta: [
+          {
+            key: "icon",
+            name: "description",
+            content: "test",
+          },
         ],
+        link: [{ rel: "icon", href: "/favicon.ico", key: "icon" }],
       })),
     )
     const { headTags } = renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot(
       '"<meta name=\\"description\\" content=\\"test\\"><link rel=\\"icon\\" href=\\"/favicon.ico\\"><meta name=\\"head:count\\" content=\\"2\\">"',
+    )
+  })
+
+  test("dedupes legacy", async () => {
+    const head = createHead()
+    head.addHeadObjs(
+      computed(() => ({
+        meta: [
+          {
+            "unknown-key": "description",
+            vmid: "desc-1",
+            content: "test",
+          },
+        ],
+      })),
+    )
+    head.addHeadObjs(
+      computed(() => ({
+        meta: [
+          {
+            "unknown-key": "description",
+            vmid: "desc-2",
+            content: "test 2",
+          },
+        ],
+      })),
+    )
+    const { headTags } = renderHeadToString(head)
+    expect(headTags).toMatchInlineSnapshot(
+      '"<meta unknown-key=\\"description\\" content=\\"test\\"><meta unknown-key=\\"description\\" content=\\"test 2\\"><meta name=\\"head:count\\" content=\\"2\\">"',
     )
   })
 })

@@ -144,6 +144,18 @@ const headObjToTags = (obj: HeadObjectPlain) => {
   const tags: HeadTag[] = []
   const keys = Object.keys(obj) as Array<keyof HeadObjectPlain>
 
+  const convertLegacyKey = (value: any) => {
+    if (value.hid) {
+      value.key = value.hid
+      delete value.hid
+    }
+    if (value.vmid) {
+      value.key = value.vmid
+      delete value.vmid
+    }
+    return value
+  }
+
   for (const key of keys) {
     if (obj[key] == null) continue
 
@@ -161,11 +173,12 @@ const headObjToTags = (obj: HeadObjectPlain) => {
           const value = obj[key]
           if (Array.isArray(value)) {
             value.forEach((item) => {
+              const props = convertLegacyKey(unref(item))
               // unref item to support ref array entries
-              tags.push({ tag: key, props: unref(item) })
+              tags.push({ tag: key, props })
             })
           } else if (value) {
-            tags.push({ tag: key, props: value })
+            tags.push({ tag: key, props: convertLegacyKey(value) })
           }
         }
         break
