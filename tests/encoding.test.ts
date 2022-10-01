@@ -1,15 +1,15 @@
-import { computed } from "vue"
-import { createHead, renderHeadToString } from "../src"
+import { computed } from 'vue'
+import { createHead, renderHeadToString } from '../src'
 
-describe("encoding", () => {
-  it("jailbreak", async () => {
+describe('encoding', () => {
+  it('jailbreak', async () => {
     const head = createHead()
     head.addHeadObjs(
       computed(() => ({
         meta: [
           {
-            ['> console.alert("test")']:
-              "<style>body { background: red; }</style>",
+            '> console.alert("test")':
+              '<style>body { background: red; }</style>',
           },
         ],
       })),
@@ -21,20 +21,20 @@ describe("encoding", () => {
     )
   })
 
-  it("google maps", async () => {
+  it('google maps', async () => {
     const head = createHead()
     head.addHeadObjs(
       // @ts-expect-error computed issue
       computed(() => ({
         script: [
           {
-            src: "https://polyfill.io/v3/polyfill.min.js?features=default",
+            src: 'https://polyfill.io/v3/polyfill.min.js?features=default',
           },
           {
-            src: "https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly",
-            ["data-key"]: "AIzaSyD9hQ0Z7Y9XQX8Zjwq7Q9Z2YQ9Z2YQ9Z2Y",
-            defer: true,
-            body: true,
+            'src': 'https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly',
+            'data-key': 'AIzaSyD9hQ0Z7Y9XQX8Zjwq7Q9Z2YQ9Z2YQ9Z2Y',
+            'defer': true,
+            'body': true,
           },
         ],
       })),
@@ -51,7 +51,7 @@ describe("encoding", () => {
   })
 
   // Note: This should be fixed in a separate PR, possibly don't allow scripts without using useHeadRaw
-  it("xss", async () => {
+  it('xss', async () => {
     const externalApiHeadData = {
       script: [
         {

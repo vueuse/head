@@ -1,5 +1,5 @@
-import type { HeadObject } from "@vueuse/head"
-import { useNuxtApp } from "#app"
+import type { HeadObject } from '@vueuse/head'
+import { useNuxtApp } from '#app'
 
 export type MetaObject = HeadObject
 

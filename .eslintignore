@@ -1,0 +1,4 @@
+dist
+node_modules
+examples/vite-ssr
+tests/e2e/vite-ssr

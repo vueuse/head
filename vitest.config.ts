@@ -1,9 +1,8 @@
-/* eslint-disable spaced-comment */
 /// <reference types="vitest" />
 /// <reference types="vitest/globals" />
 
-import { defineConfig } from "vite"
-import { resolve } from "node:path"
+import { resolve } from 'node:path'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   resolve: {

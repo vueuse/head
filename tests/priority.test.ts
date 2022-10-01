@@ -1,29 +1,30 @@
-import { createHead, renderHeadToString } from "../src"
+import { computed } from 'vue'
+import { createHead, renderHeadToString } from '../src'
 
-describe("tag priority", () => {
-  test("charset first", async () => {
+describe('tag priority', () => {
+  test('charset first', async () => {
     const head = createHead()
     head.addHeadObjs(() => ({
       script: [
         {
-          src: "/my-important-script.js",
+          src: '/my-important-script.js',
         },
       ],
       meta: [
         {
-          name: "something-else",
-          content: "test",
+          name: 'something-else',
+          content: 'test',
         },
         {
-          name: "description",
-          content: "desc",
+          name: 'description',
+          content: 'desc',
         },
       ],
     }))
     head.addHeadObjs(() => ({
       meta: [
         {
-          charset: "utf-8",
+          charset: 'utf-8',
         },
       ],
     }))
@@ -31,33 +32,33 @@ describe("tag priority", () => {
     expect(headTags.startsWith('<meta charset="utf-8">')).toBeTruthy()
   })
 
-  test("base early", async () => {
+  test('base early', async () => {
     const head = createHead()
     head.addHeadObjs(() => ({
       script: [
         {
-          src: "/my-important-script.js",
+          src: '/my-important-script.js',
         },
       ],
       meta: [
         {
-          name: "something-else",
-          content: "test",
+          name: 'something-else',
+          content: 'test',
         },
         {
-          name: "description",
-          content: "desc",
+          name: 'description',
+          content: 'desc',
         },
       ],
     }))
     head.addHeadObjs(() => ({
       meta: [
         {
-          charset: "utf-8",
+          charset: 'utf-8',
         },
       ],
       base: {
-        href: "/base",
+        href: '/base',
       },
     }))
     const { headTags } = renderHeadToString(head)
@@ -66,30 +67,30 @@ describe("tag priority", () => {
     ).toBeTruthy()
   })
 
-  test("CSP early", async () => {
+  test('CSP early', async () => {
     const head = createHead()
     head.addHeadObjs(() => ({
       script: [
         {
-          src: "/my-important-script.js",
+          src: '/my-important-script.js',
         },
       ],
       meta: [
         {
-          name: "something-else",
-          content: "test",
+          name: 'something-else',
+          content: 'test',
         },
         {
-          name: "description",
-          content: "desc",
+          name: 'description',
+          content: 'desc',
         },
       ],
     }))
     head.addHeadObjs(() => ({
       meta: [
         {
-          "http-equiv": "content-security-policy",
-          content: "test",
+          'http-equiv': 'content-security-policy',
+          'content': 'test',
         },
       ],
     }))
@@ -101,19 +102,19 @@ describe("tag priority", () => {
     ).toBeTruthy()
   })
 
-  test("manual priority", async () => {
+  test('manual priority', async () => {
     const head = createHead()
     head.addHeadObjs({
       script: [
         {
-          src: "/not-important-script.js",
+          src: '/not-important-script.js',
         },
       ],
     })
     head.addHeadObjs({
       script: [
         {
-          src: "/very-important-script.js",
+          src: '/very-important-script.js',
           renderPriority: 1,
         },
       ],
