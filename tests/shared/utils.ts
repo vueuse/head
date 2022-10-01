@@ -1,13 +1,14 @@
-import { createHead, HeadObject, renderHeadToString, useHead } from "../../src"
-import { createSSRApp } from "vue"
-import { renderToString } from "@vue/server-renderer"
+import { createSSRApp } from 'vue'
+import { renderToString } from '@vue/server-renderer'
+import type { UseHeadInput } from '../../src'
+import { createHead, renderHeadToString, useHead } from '../../src'
 
-export async function ssrRenderHeadToString(input: HeadObject) {
+export async function ssrRenderHeadToString(input: UseHeadInput) {
   const head = createHead()
   const app = createSSRApp({
     setup() {
       useHead(input)
-      return () => "<div>hi</div>"
+      return () => '<div>hi</div>'
     },
   })
   app.use(head)

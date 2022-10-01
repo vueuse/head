@@ -1,10 +1,10 @@
-import { createApp } from "./app"
+import { createApp } from './app'
 
 const { app, router, head } = createApp()
 
 router.isReady().then(() => {
-  app.mount("#app")
+  app.mount('#app')
 
-  // @ts-expect-error
+  // @ts-expect-error untyped
   window.head = head
 })
