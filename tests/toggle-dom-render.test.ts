@@ -1,28 +1,29 @@
-import { computed, createSSRApp, ref } from "vue"
-import { createHead, useHead, injectHead } from "../src"
-import { JSDOM } from "jsdom"
-import { renderToString } from "@vue/server-renderer"
+import { computed, createSSRApp, ref } from 'vue'
+import { JSDOM } from 'jsdom'
+import { renderToString } from '@vue/server-renderer'
+import { createHead, useHead } from '../src'
 
-describe("toggle dom render", () => {
-  test("basic", async () => {
+describe('toggle dom render', () => {
+  test('basic', async () => {
     const head = createHead()
     head.addHeadObjs(
       computed(() => ({
-        title: "test",
+        title: 'test',
       })),
     )
 
-    head._pauseDOMUpdates.value = true
+    let pauseDOMUpdates = true
+    head.hookBeforeDomUpdate.push(() => !pauseDOMUpdates)
 
     const dom = new JSDOM(
-      "<!DOCTYPE html><html><head></head><body></body></html>",
+      '<!DOCTYPE html><html><head></head><body></body></html>',
     )
 
     head.updateDOM(dom.window.document)
 
     expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot('""')
 
-    head._pauseDOMUpdates.value = false
+    pauseDOMUpdates = false
 
     head.updateDOM(dom.window.document)
 
@@ -31,26 +32,26 @@ describe("toggle dom render", () => {
     )
   })
 
-  test("vue", async () => {
+  test('vue', async () => {
     const head = createHead()
     const app = createSSRApp({
       setup() {
-        const client = injectHead()
-        client._pauseDOMUpdates.value = true
-        const title = ref("")
+        let pauseDOMUpdates = true
+        head.hookBeforeDomUpdate.push(() => !pauseDOMUpdates)
+        const title = ref('')
         useHead({
           title,
         })
         const dom = new JSDOM(
-          "<!DOCTYPE html><html><head></head><body></body></html>",
+          '<!DOCTYPE html><html><head></head><body></body></html>',
         )
 
         head.updateDOM(dom.window.document)
 
         expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot('""')
 
-        client._pauseDOMUpdates.value = false
-        title.value = "hello"
+        pauseDOMUpdates = false
+        title.value = 'hello'
 
         head.updateDOM(dom.window.document)
 
@@ -58,7 +59,7 @@ describe("toggle dom render", () => {
           '"<title>hello</title>"',
         )
 
-        return () => "<div>hi</div>"
+        return () => '<div>hi</div>'
       },
     })
     app.use(head)

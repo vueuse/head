@@ -7,6 +7,8 @@ export type MaybeRef<T> = T | Ref<T>
 
 export interface HeadAttrs { [k: string]: any }
 
+export type HookBeforeDomUpdate = ((tags: Record<string, HeadTag[]>) => void | boolean | Record<string, HeadTag[]>)[]
+
 export interface HeadTag {
   tag: TagKeys
   props: HandlesDuplicates &
