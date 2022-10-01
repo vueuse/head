@@ -1,12 +1,36 @@
-# @vueuse/head
+<h1 align='center'>@vueuse/head</h1>
 
-[![npm version](https://badgen.net/npm/v/@vueuse/head)](https://npm.im/@vueuse/head) [![npm downloads](https://badgen.net/npm/dm/@vueuse/head)](https://npm.im/@vueuse/head)
+<p align="center">
+<a href="https://www.npmjs.com/package/@vueuse/head" target="__blank"><img src="https://img.shields.io/npm/v/@vueuse/head?color=a1b858&label=" alt="NPM version"></a>
+<a href="https://www.npmjs.com/package/@vueuse/head" target="__blank"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/@vueuse/head?color=50a36f&label="></a>
+<br>
+<a href="https://github.com/vueuse/head" target="__blank"><img alt="GitHub stars" src="https://img.shields.io/github/stars/vueuse/head?style=social"></a>
+</p>
 
-Document head manager for Vue 3.
+<p align="center">
+A [Vue composition API](https://v3.vuejs.org/guide/composition-api-introduction.html) to manage your document head.
+</p>
 
-`@vueuse/head` is a [Vue composition API](https://v3.vuejs.org/guide/composition-api-introduction.html) that helps you manage `<title>`, `<meta>` and other elements inside document head, it has no dependencies and we always try to keep it as slim as possible.
+<p align="center">
+<table>
+<tbody>
+<td align="center">
+<img width="800" height="0" /><br>
+Created by [egoist](https://github.com/sponsors/egoist), maintained by [harlan-zw](https://github.com/harlan-zw) <br>
+<sub>Support ongoing development by sponsoring us.<br> 
+<sub>Follow <a href="https://twitter.com/harlan_zw">🐦 @harlan_zw</a> for updates  • Join <a href="https://discord.gg/275MBUBvgP">Discord</a> for support</sub><br>
+<img width="800" height="0" />
+</td>
+</tbody>
+</table>
+</p>
 
-**💛 Support the ongoing development of this project by [becoming a GitHub Sponsor](https://github.com/sponsors/egoist)**.
+## Features
+
+- ✨ Best practice head with deduping and default ordering
+- 🤖 SSR ready
+- 🔨 Deeply reactive with computed getter support
+- 🌳 Fully typed document &lt;head&gt; with inline doc
 
 ## Installation
 
@@ -15,6 +39,13 @@ npm i @vueuse/head
 # Or Yarn
 yarn add @vueuse/head
 ```
+
+> Requires vue >= v3 or >=2.7
+
+### Ecosystem Examples
+
+- [Nuxt - vueuse-head.plugin.ts](https://github.com/nuxt/framework/blob/main/packages/nuxt/src/head/runtime/lib/vueuse-head.plugin.ts)
+- [Vite - SSG](https://github.com/antfu/vite-ssg/blob/main/src/client/index.ts)
 
 ## Usage
 
