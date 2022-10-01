@@ -1,7 +1,6 @@
 import type { MaybeComputedRef } from '@vueuse/shared'
 import { resolveUnref } from '@vueuse/shared'
-import type { HeadObjectPlain, UseHeadInput } from './types'
-import type { HeadTag } from './types'
+import type { HeadObjectPlain, HeadTag, UseHeadInput } from './types'
 
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   const tagWeight = (tag: HeadTag) => {
@@ -65,7 +64,7 @@ export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
   return false
 }
 
-function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>) {
+function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>): any {
   const root = resolveUnref(ref)
   if (!ref || !root)
     return root

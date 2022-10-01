@@ -9,10 +9,10 @@ import {
 import {
   PROVIDE_KEY,
 } from './constants'
-import { sortTags, tagDedupeKey } from './utils'
+import { resolveHeadInput, sortTags, tagDedupeKey } from './utils'
 import type {
   HeadAttrs,
-  HeadObjectPlain, HeadTag, MaybeRef,
+  HeadObjectPlain, HeadTag,
   TagKeys, UseHeadInput,
 } from './types'
 import { setAttrs, updateElements } from './dom'
