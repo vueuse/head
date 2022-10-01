@@ -1,5 +1,5 @@
 <script setup>
-import { useHead } from "../../../src"
+import { useHead } from "../../../../src"
 
 useHead({
   style: [

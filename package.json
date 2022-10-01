@@ -1,7 +1,7 @@
 {
   "name": "@vueuse/head",
   "packageManager": "pnpm@7.5.0",
-  "version": "0.7.12",
+  "version": "0.7.13",
   "license": "MIT",
   "description": "Document head manager for Vue 3. SSR ready.",
   "keywords": [
@@ -48,7 +48,8 @@
   "sideEffects": false,
   "devDependencies": {
     "@egoist/prettier-config": "^1.0.0",
-    "@nuxt/test-utils": "3.0.0-rc.10",
+    "@nuxt/kit": "3.0.0-rc.11",
+    "@nuxt/test-utils": "3.0.0-rc.11",
     "@vitejs/plugin-vue": "^3.1.0",
     "@vitejs/plugin-vue-jsx": "^2.0.1",
     "@vue/compiler-sfc": "^3.2.39",
@@ -60,7 +61,7 @@
     "kanpai": "^0.11.0",
     "lint-staged": "^13.0.3",
     "mlly": "^0.5.14",
-    "nuxt": "3.0.0-rc.10",
+    "nuxt": "3.0.0-rc.11",
     "pathe": "^0.3.7",
     "playwright": "^1.25.2",
     "prettier": "^2.7.1",

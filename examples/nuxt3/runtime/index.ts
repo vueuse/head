@@ -1,9 +1,12 @@
-import { useHead as _useHead } from "#_head"
-import { HeadObject } from "@vueuse/head"
-import type { MetaObject as _MetaObject } from "#_head"
+import type { HeadObject } from "@vueuse/head"
+import { useNuxtApp } from "#app"
 
 export type MetaObject = HeadObject
 
-export function useHead(meta: HeadObject) {
-  _useHead(meta as _MetaObject)
+export function useHead(meta: MetaObject) {
+  useNuxtApp()._useHead(meta)
+}
+
+export function useMeta(meta: MetaObject) {
+  useHead(meta)
 }
