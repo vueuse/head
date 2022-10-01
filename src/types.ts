@@ -1,4 +1,4 @@
-import type { Head as PlainHead, ReactiveHead } from "@zhead/schema-vue"
+import type { Head as PlainHead, ReactiveHead } from '@zhead/schema-vue'
 
 export interface HandlesDuplicates {
   /**
@@ -58,17 +58,17 @@ interface HeadAugmentations {
   }
   link: HasRenderPriority & RendersToBody & { key?: never; children?: never }
   meta: HasRenderPriority &
-    HandlesDuplicates & { children?: never; body?: never }
+  HandlesDuplicates & { children?: never; body?: never }
   style: HasRenderPriority &
-    RendersToBody &
-    RendersInnerContent & { key?: never; vmid?: never; hid?: never }
+  RendersToBody &
+  RendersInnerContent & { key?: never; vmid?: never; hid?: never }
   script: HasRenderPriority &
-    RendersToBody &
-    RendersInnerContent &
-    HandlesDuplicates
+  RendersToBody &
+  RendersInnerContent &
+  HandlesDuplicates
   noscript: HasRenderPriority &
-    RendersToBody &
-    RendersInnerContent & { key?: never; vmid?: never; hid?: never }
+  RendersToBody &
+  RendersInnerContent & { key?: never; vmid?: never; hid?: never }
   htmlAttrs: {
     renderPriority?: never
     key?: never
@@ -89,4 +89,4 @@ interface HeadAugmentations {
 
 export type HeadObjectPlain = PlainHead<HeadAugmentations>
 export type HeadObject = ReactiveHead<HeadAugmentations>
-export type TagKeys = keyof Omit<HeadObjectPlain, "titleTemplate">
+export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>

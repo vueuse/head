@@ -1,4 +1,4 @@
-import { BODY_TAG_ATTR_NAME } from "./constants"
+import { BODY_TAG_ATTR_NAME } from './constants'
 
 export const createElement = (
   tag: string,
@@ -8,21 +8,20 @@ export const createElement = (
   const el = document.createElement(tag)
 
   for (const key of Object.keys(attrs)) {
-    if (key === "body" && attrs.body === true) {
+    if (key === 'body' && attrs.body === true) {
       // set meta-body attribute to add the tag before </body>
-      el.setAttribute(BODY_TAG_ATTR_NAME, "true")
-    } else {
-      let value = attrs[key]
+      el.setAttribute(BODY_TAG_ATTR_NAME, 'true')
+    }
+    else {
+      const value = attrs[key]
 
-      if (key === "renderPriority" || key === "key" || value === false) {
+      if (key === 'renderPriority' || key === 'key' || value === false)
         continue
-      }
 
-      if (key === "children") {
+      if (key === 'children')
         el.textContent = value
-      } else {
+      else
         el.setAttribute(key, value)
-      }
     }
   }
 
