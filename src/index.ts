@@ -42,6 +42,7 @@ export type HeadTag = {
     RendersInnerContent & {
       [k: string]: any
     }
+  _position?: number
 }
 
 export type HeadClient = {
@@ -76,7 +77,7 @@ export interface HTMLResult {
   readonly bodyTags: string
 }
 
-const getTagDeduper = <T extends HeadTag>(tag: T) => {
+const tagDedupeKey = <T extends HeadTag>(tag: T) => {
   // only meta, base and script tags will be deduped
   if (!["meta", "base", "script", "link"].includes(tag.tag)) {
     return false
@@ -84,15 +85,15 @@ const getTagDeduper = <T extends HeadTag>(tag: T) => {
   const { props, tag: tagName } = tag
   // must only be a single base so we always dedupe
   if (tagName === "base") {
-    return true
+    return "base"
   }
   // support only a single canonical
   if (tagName === "link" && props.rel === "canonical") {
-    return { propValue: "canonical" }
+    return "canonical"
   }
   // must only be a single charset
   if (props.charset) {
-    return { propKey: "charset" }
+    return "charset"
   }
   const name = ["key", "id", "name", "property", "http-equiv"]
   for (const n of name) {
@@ -104,7 +105,8 @@ const getTagDeduper = <T extends HeadTag>(tag: T) => {
       value = props[n]
     }
     if (value !== undefined) {
-      return { propValue: n }
+      // for example: meta-name-description
+      return `${tagName}-${n}-${value}`
     }
   }
   return false
@@ -151,6 +153,18 @@ const headObjToTags = (obj: HeadObjectPlain) => {
   const tags: HeadTag[] = []
   const keys = Object.keys(obj) as Array<keyof HeadObjectPlain>
 
+  const convertLegacyKey = (value: any) => {
+    if (value.hid) {
+      value.key = value.hid
+      delete value.hid
+    }
+    if (value.vmid) {
+      value.key = value.vmid
+      delete value.vmid
+    }
+    return value
+  }
+
   for (const key of keys) {
     if (obj[key] == null) continue
 
@@ -168,11 +182,12 @@ const headObjToTags = (obj: HeadObjectPlain) => {
           const value = obj[key]
           if (Array.isArray(value)) {
             value.forEach((item) => {
+              const props = convertLegacyKey(unref(item))
               // unref item to support ref array entries
-              tags.push({ tag: key, props: unref(item) })
+              tags.push({ tag: key, props })
             })
           } else if (value) {
-            tags.push({ tag: key, props: value })
+            tags.push({ tag: key, props: convertLegacyKey(value) })
           }
         }
         break
@@ -320,68 +335,41 @@ export const createHead = (initHeadObject?: MaybeRef<HeadObjectPlain>) => {
      */
     get headTags() {
       const deduped: HeadTag[] = []
+      const deduping: Record<string, HeadTag> = {}
 
       const titleTemplate = allHeadObjs
         .map((i) => unref(i).titleTemplate)
         .reverse()
         .find((i) => i != null)
 
-      allHeadObjs.forEach((objs) => {
+      allHeadObjs.forEach((objs, headObjectIdx) => {
         const tags = headObjToTags(unref(objs))
-        tags.forEach((tag) => {
-          // Remove tags with the same key
-          const dedupe = getTagDeduper(tag)
-          if (dedupe) {
-            let index = -1
-
-            for (let i = 0; i < deduped.length; i++) {
-              const prev = deduped[i]
-              // only if the tags match
-              if (prev.tag !== tag.tag) {
-                continue
-              }
-              // dedupe based on tag, for example <base>
-              if (dedupe === true) {
-                index = i
-              }
-              // dedupe based on property key value, for example <meta name="description">
-              else if (
-                dedupe.propValue &&
-                unref(prev.props[dedupe.propValue]) ===
-                  unref(tag.props[dedupe.propValue])
-              ) {
-                index = i
-              }
-              // dedupe based on property keys, for example <meta charset="utf-8">
-              else if (
-                dedupe.propKey &&
-                prev.props[dedupe.propKey] &&
-                tag.props[dedupe.propKey]
-              ) {
-                index = i
-              }
-              if (index !== -1) {
-                break
-              }
-            }
-
-            if (index !== -1) {
-              deduped.splice(index, 1)
-            }
-          }
-
+        tags.forEach((tag, tagIdx) => {
+          // used to restore the order after deduping
+          // a large number is needed otherwise the position will potentially duplicate (this support 10k tags)
+          // ideally we'd use the total tag count but this is too hard to calculate with the current reactivity
+          tag._position = headObjectIdx * 10000 + tagIdx
+          // resolve titles
           if (titleTemplate && tag.tag === "title") {
             tag.props.children = renderTemplate(
               titleTemplate,
               tag.props.children,
             )
           }
-
-          deduped.push(tag)
+          // Remove tags with the same key
+          const dedupeKey = tagDedupeKey(tag)
+          if (dedupeKey) {
+            deduping[dedupeKey] = tag
+          } else {
+            deduped.push(tag)
+          }
         })
       })
 
-      return deduped
+      // add the entries we were deduping
+      deduped.push(...Object.values(deduping))
+      // ensure their original positions are kept
+      return deduped.sort((a, b) => a._position! - b._position!)
     },
 
     addHeadObjs(objs) {

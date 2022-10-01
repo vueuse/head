@@ -2,6 +2,14 @@
 
 No unreleased changes.
 
+## 0.7.13
+
+- chore: ignore .idea files
+- fix: use proper encoding for attr name / val pairs (#103)
+- fix: simplify tag dedupe logic (#105)
+- chore(ci): add export-size-action (#94)
+- tests: migrate to vitest, add nuxt e2e (#93)
+
 ## 0.7.12
 
 - chore: update deps
