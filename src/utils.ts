@@ -1,5 +1,7 @@
-import { MaybeComputedRef, resolveUnref } from "@vueuse/shared"
-import { HeadObjectPlain, UseHeadInput } from "./types"
+import type { MaybeComputedRef } from '@vueuse/shared'
+import { resolveUnref } from '@vueuse/shared'
+import type { HeadObjectPlain, UseHeadInput } from './types'
+import type { HeadTag } from './'
 
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   const tagWeight = (tag: HeadTag) => {
@@ -47,13 +49,13 @@ export function isEqualNode(oldTag: Element, newTag: Element) {
 
 function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>) {
   const root = resolveUnref(ref)
-  if (!ref || !root) {
+  if (!ref || !root)
     return root
-  }
-  if (Array.isArray(root)) {
+
+  if (Array.isArray(root))
     return root.map(resolveUnrefDeeply)
-  }
-  if (typeof root === "object") {
+
+  if (typeof root === 'object') {
     return Object.fromEntries(
       Object.entries(root).map(([key, value]) => [
         key,

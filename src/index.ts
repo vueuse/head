@@ -1,13 +1,10 @@
 import type {
   App,
-  Ref,
 } from 'vue'
 import {
   inject,
   onBeforeUnmount,
-  ref,
   shallowRef,
-  unref,
   watchEffect,
 } from 'vue'
 import {
@@ -23,9 +20,8 @@ import { isEqualNode, sortTags } from './utils'
 import type {
   HandlesDuplicates,
   HasRenderPriority,
-  HeadObject,
   HeadObjectPlain,
-  RendersInnerContent, RendersToBody, TagKeys,
+  RendersInnerContent, RendersToBody, TagKeys, UseHeadInput,
 } from './types'
 
 export * from './types'
@@ -302,9 +298,8 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
   let allHeadObjs: UseHeadInput[] = []
   const previousTags = new Set<string>()
 
-  if (initHeadObject) {
+  if (initHeadObject)
     allHeadObjs.push(shallowRef(initHeadObject))
-  }
 
   const head: HeadClient = {
     install(app) {

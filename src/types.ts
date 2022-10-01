@@ -1,5 +1,5 @@
 import type { Head as PlainHead, ReactiveHead } from '@zhead/schema-vue'
-import { MaybeComputedRef } from "@vueuse/shared"
+import type { MaybeComputedRef } from '@vueuse/shared'
 
 export interface HandlesDuplicates {
   /**

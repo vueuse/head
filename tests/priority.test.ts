@@ -1,4 +1,3 @@
-import { computed } from 'vue'
 import { createHead, renderHeadToString } from '../src'
 
 describe('tag priority', () => {

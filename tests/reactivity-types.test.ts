@@ -147,23 +147,23 @@ describe('reactivity', () => {
     )
   })
 
-  test("computed getter entry", async () => {
+  test('computed getter entry', async () => {
     const headResult = await ssrRenderHeadToString(() => ({
-      title: "test",
+      title: 'test',
     }))
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<title>test</title><meta name=\\"head:count\\" content=\\"0\\">"',
     )
   })
 
-  test("computed getter entries", async () => {
-    const test = ref("test")
+  test('computed getter entries', async () => {
+    const test = ref('test')
     const input = {
-      title: () => "my title",
+      title: () => 'my title',
       script: () => {
         return [
           {
-            src: "foo.js",
+            src: 'foo.js',
           },
         ]
       },
@@ -174,10 +174,10 @@ describe('reactivity', () => {
         }),
         {
           name: () => `some-flag-${test.value}`,
-          content: "test",
+          content: 'test',
         },
         {
-          property: "og:fake-prop",
+          property: 'og:fake-prop',
           content: () => test.value,
         },
       ],
@@ -186,7 +186,7 @@ describe('reactivity', () => {
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<title>my title</title><script src=\\"foo.js\\"></script><meta name=\\"test\\" content=\\"test\\"><meta name=\\"some-flag-test\\" content=\\"test\\"><meta property=\\"og:fake-prop\\" content=\\"test\\"><meta name=\\"head:count\\" content=\\"4\\">"',
     )
-    test.value = "test2"
+    test.value = 'test2'
     const headResult2 = await ssrRenderHeadToString(input)
     expect(headResult2.headTags).toMatchInlineSnapshot(
       '"<title>my title</title><script src=\\"foo.js\\"></script><meta name=\\"test2\\" content=\\"test2\\"><meta name=\\"some-flag-test2\\" content=\\"test\\"><meta property=\\"og:fake-prop\\" content=\\"test2\\"><meta name=\\"head:count\\" content=\\"4\\">"',
