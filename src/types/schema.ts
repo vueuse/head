@@ -48,44 +48,27 @@ export interface HasRenderPriority {
   renderPriority?: number
 }
 
-interface HeadAugmentations {
-  base: {
-    key?: never
-    vmid?: never
-    hid?: never
-    renderPriority?: never
-    body?: never
-    children?: never
-  }
-  link: HasRenderPriority & RendersToBody & { key?: never; children?: never }
+export type Never<T> = {
+  [P in keyof T]?: never
+}
+
+export interface HeadAugmentations {
+  base: Never<HandlesDuplicates & RendersInnerContent & HasRenderPriority & RendersToBody>
+  link: HasRenderPriority & RendersToBody & Never<RendersInnerContent & HandlesDuplicates>
   meta: HasRenderPriority &
-  HandlesDuplicates & { children?: never; body?: never }
+  HandlesDuplicates & Never<RendersInnerContent & RendersToBody>
   style: HasRenderPriority &
   RendersToBody &
-  RendersInnerContent & { key?: never; vmid?: never; hid?: never }
+  RendersInnerContent & Never<HandlesDuplicates>
   script: HasRenderPriority &
   RendersToBody &
   RendersInnerContent &
   HandlesDuplicates
   noscript: HasRenderPriority &
   RendersToBody &
-  RendersInnerContent & { key?: never; vmid?: never; hid?: never }
-  htmlAttrs: {
-    renderPriority?: never
-    key?: never
-    vmid?: never
-    hid?: never
-    children?: never
-    body?: never
-  }
-  bodyAttrs: {
-    renderPriority?: never
-    key?: never
-    vmid?: never
-    hid?: never
-    children?: never
-    body?: never
-  }
+  RendersInnerContent & Never<HandlesDuplicates>
+  htmlAttrs: Never<HandlesDuplicates & RendersInnerContent & HasRenderPriority & RendersToBody>
+  bodyAttrs: Never<HandlesDuplicates & RendersInnerContent & HasRenderPriority & RendersToBody>
 }
 
 export type HeadObjectPlain = PlainHead<HeadAugmentations>
