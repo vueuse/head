@@ -13,7 +13,7 @@ import { resolveHeadInput, sortTags, tagDedupeKey } from './utils'
 import type {
   HeadAttrs,
   HeadObjectPlain, HeadTag,
-  HookBeforeDomUpdate, TagKeys,
+  HookBeforeDomUpdate, HookTagsResolved, TagKeys,
   UseHeadInput,
 } from './types'
 import { setAttrs, updateElements } from './dom'
@@ -40,6 +40,10 @@ export interface HeadClient {
    * You are able to modify the payload of hook using this.
    */
   hookBeforeDomUpdate: HookBeforeDomUpdate
+  /**
+   * Array of user provided functions to hook into after the tags have been resolved (deduped and sorted).
+   */
+  hookTagsResolved: HookTagsResolved
 }
 
 /**
@@ -134,6 +138,7 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
   const previousTags = new Set<string>()
 
   const hookBeforeDomUpdate: HookBeforeDomUpdate = []
+  const hookTagsResolved: HookTagsResolved = []
 
   if (initHeadObject)
     allHeadObjs.push(initHeadObject)
@@ -145,6 +150,7 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
     },
 
     hookBeforeDomUpdate,
+    hookTagsResolved,
 
     /**
      * Get deduped tags
@@ -186,7 +192,14 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
       // add the entries we were deduping
       deduped.push(...Object.values(deduping))
       // ensure their original positions are kept
-      return deduped.sort((a, b) => a._position! - b._position!)
+      const tags = deduped.sort((a, b) => a._position! - b._position!)
+
+      if (head.hookTagsResolved) {
+        for (const k in head.hookTagsResolved)
+          head.hookTagsResolved[k](tags)
+      }
+
+      return tags
     },
 
     addHeadObjs(objs) {
