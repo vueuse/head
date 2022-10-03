@@ -2,6 +2,13 @@
 
 No unreleased changes.
 
+## 0.8.2
+
+- chore(doc): add example for primitives
+- chore(doc): improve type documentation
+- chore(doc): fix typo
+- chore(doc): improve readme
+
 ## 0.8.1
 
 - chore: bump dependencies (#116)
