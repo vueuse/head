@@ -42,7 +42,7 @@ yarn add @vueuse/head
 
 > Requires vue >= v3 or >=2.7
 
-For instructions on setting up @vueuse/head as an integration, see [integration](#integrations).
+For instructions on setting up @vueuse/head as an integration, see [integration](#integration).
 
 ## API
 
