@@ -42,90 +42,32 @@ yarn add @vueuse/head
 
 > Requires vue >= v3 or >=2.7
 
-### Ecosystem Examples
-
-- [Nuxt - vueuse-head.plugin.ts](https://github.com/nuxt/framework/blob/main/packages/nuxt/src/head/runtime/lib/vueuse-head.plugin.ts)
-- [Vite - SSG](https://github.com/antfu/vite-ssg/blob/main/src/client/index.ts)
-
-## Usage
-
-Register the Vue plugin:
-
-```ts
-import { createApp } from "vue"
-import { createHead } from "@vueuse/head"
-
-const app = createApp()
-const head = createHead()
-
-app.use(head)
-
-app.mount("#app")
-```
-
-Manage `head` with the composition API `useHead` in your component:
-
-```vue
-<script>
-import { defineComponent, computed, reactive } from "vue"
-import { useHead } from "@vueuse/head"
-
-export default defineComponent({
-  setup() {
-    const siteData = reactive({
-      title: `My website`,
-      description: `My beautiful website`,
-    })
-
-    useHead({
-      // Can be static or computed
-      title: computed(() => siteData.title),
-      meta: [
-        {
-          name: `description`,
-          content: computed(() => siteData.description),
-        },
-      ],
-    })
-  },
-})
-</script>
-```
-
-### Server-side rendering
-
-```ts
-import { renderToString } from "@vue/server-renderer"
-import { renderHeadToString } from "@vueuse/head"
-
-const appHTML = await renderToString(yourVueApp)
-
-// `head` is created from `createHead()`
-const { headTags, htmlAttrs, bodyAttrs, bodyTags } = renderHeadToString(head)
-
-const finalHTML = `
-<html${htmlAttrs}>
-
-  <head>
-    ${headTags}
-  </head>
-
-  <body${bodyAttrs}>
-    <div id="app">${appHTML}</div>
-    ${bodyTags}
-  </body>
-
-</html>
-`
-```
+For instructions on setting up @vueuse/head as an integration, see [integration](#integrations).
 
 ## API
 
-### `createHead(head?: HeadObject | Ref<HeadObject>)`
+### `useHead(head: MaybeComputedRef<HeadObject>)`
 
-Create the head manager instance.
+Used to modify the head of the document. You can call this function in any page or component.
 
-### `useHead(head: HeadObject | Ref<HeadObject>)`
+All values are reactive and supported ref and computed getter syntax.
+
+#### Example
+
+```ts
+const myPage = ref({
+  description: 'This is my page',
+})
+const title = ref('title')
+useHead({
+  // ref syntax
+  title,
+  meta: [
+    // computer getter syntax  
+    { name: 'description', content: () => myPage.value.description },
+  ]
+})
+```
 
 ```ts
 interface HeadObject {
@@ -140,11 +82,9 @@ interface HeadObject {
   htmlAttrs?: MaybeRef<HeadAttrs>
   bodyAttrs?: MaybeRef<HeadAttrs>
 }
-
-interface HeadAttrs {
-  [attrName: string]: any
-}
 ```
+
+#### Deduping
 
 For `meta` tags, we use `name` and `property` to prevent duplicated tags, you can instead use the `key` attribute if the same `name` or `property` is allowed:
 
@@ -165,6 +105,8 @@ useHead({
 })
 ```
 
+#### Body Tags
+
 To render tags at the end of the `<body>`, set `body: true` in a HeadAttrs Object.
 
 ```ts
@@ -177,6 +119,8 @@ useHead({
   ],
 })
 ```
+
+#### Text Content
 
 To set the `textContent` of an element, use the `children` attribute:
 
@@ -242,7 +186,7 @@ The following special tags have default priorities:
 
 All other tags have a default priority of 10: <meta>, <script>, <link>, <style>, etc
 
-### `<Head>`
+### `<Head>` component
 
 Besides `useHead`, you can also manipulate head tags using the `<Head>` component:
 
@@ -261,6 +205,93 @@ import { Head } from "@vueuse/head"
 ```
 
 Note that you need to use `<html>` and `<body>` to set `htmlAttrs` and `bodyAttrs` respectively, children for these two tags and self-closing tags like `<meta>`, `<link>` and `<base>` are also ignored.
+
+## Integration
+
+For integrating @vueuse/head with a framework.
+
+### Examples
+
+- [Nuxt - vueuse-head.plugin.ts](https://github.com/nuxt/framework/blob/main/packages/nuxt/src/head/runtime/lib/vueuse-head.plugin.ts)
+- [Vite - SSG](https://github.com/antfu/vite-ssg/blob/main/src/client/index.ts)
+
+### Usage
+
+Register the Vue plugin:
+
+```ts
+import { createApp } from "vue"
+import { createHead } from "@vueuse/head"
+
+const app = createApp()
+const head = createHead()
+
+app.use(head)
+
+app.mount("#app")
+```
+
+Manage `head` with the composition API `useHead` in your component:
+
+```vue
+<script>
+import { defineComponent, reactive } from "vue"
+import { useHead } from "@vueuse/head"
+
+export default defineComponent({
+  setup() {
+    const siteData = reactive({
+      title: `My website`,
+      description: `My beautiful website`,
+    })
+
+    useHead({
+      // Can be static or computed
+      title: () => siteData.title,
+      meta: [
+        {
+          name: `description`,
+          content: () => siteData.description,
+        },
+      ],
+    })
+  },
+})
+</script>
+```
+
+### Server-side rendering
+
+```ts
+import { renderToString } from "@vue/server-renderer"
+import { renderHeadToString } from "@vueuse/head"
+
+const appHTML = await renderToString(yourVueApp)
+
+// `head` is created from `createHead()`
+const { headTags, htmlAttrs, bodyAttrs, bodyTags } = renderHeadToString(head)
+
+const finalHTML = `
+<html${htmlAttrs}>
+
+  <head>
+    ${headTags}
+  </head>
+
+  <body${bodyAttrs}>
+    <div id="app">${appHTML}</div>
+    ${bodyTags}
+  </body>
+
+</html>
+`
+```
+
+### API
+
+#### `createHead(head?: HeadObject | Ref<HeadObject>)`
+
+Create the head manager instance.
 
 ### `renderHeadToString(head: Head)`
 
