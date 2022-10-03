@@ -30,7 +30,7 @@ Created by <a href="https://github.com/sponsors/egoist">egoist</a>, maintained b
 - ✨ Best practice head with deduping and default ordering
 - 🤖 SSR ready
 - 🔨 Deeply reactive with computed getter support
-- 🌳 Fully typed document &lt;head&gt; with inline doc
+- 🌳 Fully typed with augmentation support (powered by [zhead](https://github.com/harlan-zw/zhead))
 
 ## Installation
 
@@ -50,7 +50,7 @@ For instructions on setting up @vueuse/head as an integration, see [integration]
 
 Used to modify the head of the document. You can call this function in any page or component.
 
-All values are reactive and supported ref and computed getter syntax.
+All values are reactive and support ref and computed getter syntax.
 
 #### Example
 
@@ -68,6 +68,10 @@ useHead({
   ]
 })
 ```
+
+### Types
+
+You can check [@zhead/schema](https://github.com/harlan-zw/zhead/blob/main/packages/schema/src/head.ts) for full types.
 
 ```ts
 interface HeadObject {
