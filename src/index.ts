@@ -6,6 +6,7 @@ import {
   onBeforeUnmount,
   watchEffect,
 } from 'vue'
+import type { MergeHead } from '@zhead/schema'
 import {
   PROVIDE_KEY,
 } from './constants'
@@ -20,14 +21,14 @@ import { setAttrs, updateElements } from './dom'
 
 export * from './types'
 
-export interface HeadClient {
+export interface HeadClient<T extends MergeHead = {}> {
   install: (app: App) => void
 
   headTags: HeadTag[]
 
-  addHeadObjs: (objs: UseHeadInput) => void
+  addHeadObjs: (objs: UseHeadInput<T>) => void
 
-  removeHeadObjs: (objs: UseHeadInput) => void
+  removeHeadObjs: (objs: UseHeadInput<T>) => void
 
   updateDOM: (document?: Document) => void
 
@@ -50,8 +51,8 @@ export interface HeadClient {
  * Inject the head manager instance
  * Exported for advanced usage or library integration, you probably don't need this
  */
-export const injectHead = () => {
-  const head = inject<HeadClient>(PROVIDE_KEY)
+export const injectHead = <T extends MergeHead = {}>() => {
+  const head = inject<HeadClient<T>>(PROVIDE_KEY)
 
   if (!head)
     throw new Error('You may forget to apply app.use(head)')
@@ -133,8 +134,8 @@ const headObjToTags = (obj: HeadObjectPlain) => {
   return tags
 }
 
-export const createHead = (initHeadObject?: UseHeadInput) => {
-  let allHeadObjs: UseHeadInput[] = []
+export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInput<T>) => {
+  let allHeadObjs: UseHeadInput<T>[] = []
   const previousTags = new Set<string>()
 
   const hookBeforeDomUpdate: HookBeforeDomUpdate = []
@@ -143,7 +144,7 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
   if (initHeadObject)
     allHeadObjs.push(initHeadObject)
 
-  const head: HeadClient = {
+  const head: HeadClient<T> = {
     install(app) {
       app.config.globalProperties.$head = head
       app.provide(PROVIDE_KEY, head)
@@ -263,7 +264,7 @@ export const createHead = (initHeadObject?: UseHeadInput) => {
 
 const IS_BROWSER = typeof window !== 'undefined'
 
-export const useHead = (headObj: UseHeadInput) => {
+export const useHead = <T extends MergeHead = {}>(headObj: UseHeadInput<T>) => {
   const head = injectHead()
 
   head.addHeadObjs(headObj)

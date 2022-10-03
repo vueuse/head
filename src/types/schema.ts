@@ -1,5 +1,6 @@
 import type { Head as PlainHead, ReactiveHead } from '@zhead/schema-vue'
 import type { MaybeComputedRef } from '@vueuse/shared'
+import type { MergeHead } from '@zhead/schema'
 
 export interface HandlesDuplicates {
   /**
@@ -52,7 +53,7 @@ export type Never<T> = {
   [P in keyof T]?: never
 }
 
-export interface HeadAugmentations {
+export interface VueUseHeadSchema extends MergeHead {
   base: Never<HandlesDuplicates & RendersInnerContent & HasRenderPriority & RendersToBody>
   link: HasRenderPriority & RendersToBody & Never<RendersInnerContent & HandlesDuplicates>
   meta: HasRenderPriority &
@@ -71,8 +72,8 @@ export interface HeadAugmentations {
   bodyAttrs: Never<HandlesDuplicates & RendersInnerContent & HasRenderPriority & RendersToBody>
 }
 
-export type HeadObjectPlain = PlainHead<HeadAugmentations>
-export type HeadObject = ReactiveHead<HeadAugmentations>
-export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>
-export type UseHeadInput = MaybeComputedRef<HeadObject>
+export type HeadObjectPlain<T extends MergeHead = {}> = PlainHead<T & VueUseHeadSchema>
+export type HeadObject<T extends MergeHead = {}> = ReactiveHead<T & VueUseHeadSchema>
+export type UseHeadInput<T extends MergeHead = {}> = MaybeComputedRef<HeadObject<T>>
 
+export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>
