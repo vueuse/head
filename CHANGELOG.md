@@ -2,6 +2,12 @@
 
 No unreleased changes.
 
+## 0.8.1
+
+- chore: bump dependencies (#116)
+- feat: hook into resolved tags `hookTagsResolved` (#115)
+- refactor: improve HeadAugmentation types and add export
+
 ## 0.8.0
 
 - feat: before dom update hookable (#114)
