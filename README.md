@@ -65,7 +65,14 @@ useHead({
   meta: [
     // computer getter syntax  
     { name: 'description', content: () => myPage.value.description },
-  ]
+  ],
+  script: [
+    // primitive values are also fine
+    { 
+      src: 'https://example.com/script.js',
+      defer: true
+    },
+  ],
 })
 ```
 
