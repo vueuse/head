@@ -107,8 +107,7 @@ interface HeadObject {
 Has the same functionality as `useHead` but does not encode values. This is useful for inserting raw data such as scripts
 and attribute events.
 
-Typically, you would use `children` to insert the inner content of the DOM element. When inserting raw data you should use
-`innerHTML` explicitly.
+When inserting raw inner content you should use`innerHTML`.
 
 ```ts
 useHeadRaw({
