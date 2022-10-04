@@ -9,6 +9,12 @@ const page = ref({
 
 useHead({
   title: computed(() => `${page.value.title} | Nuxt`),
+  script: [
+    // note: this is still XSS vulnerable
+    {
+      children: 'alert(2)',
+    },
+  ],
   meta: [
     {
       name: 'description',

@@ -1,7 +1,7 @@
 import type { HTMLResult, HeadAttrs, HeadTag } from '../types'
 import { BODY_TAG_ATTR_NAME, HEAD_ATTRS_KEY, HEAD_COUNT_KEY, SELF_CLOSING_TAGS } from '../constants'
 import type { HeadClient } from '../index'
-import { sortTags } from '../index'
+import { escapeHtml, escapeJS, sortTags } from '../index'
 import { stringifyAttrs } from './stringify-attrs'
 
 export * from './stringify-attrs'
@@ -23,9 +23,20 @@ export const tagToString = (tag: HeadTag) => {
     }>`
   }
 
+  let innerContent = ''
+
+  if (!innerContent && tag.props.children) {
+    /*
+     * DOM updates is using textContent which doesn't allow HTML or JS already, so SSR needs to match
+     *
+     * @see https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html#rule-1-html-escape-then-javascript-escape-before-inserting-untrusted-data-into-html-subcontext-within-the-execution-context
+     */
+    innerContent = escapeJS(escapeHtml(tag.props.children))
+  }
+
   return `<${tag.tag}${attrs}${
     isBodyTag ? ` ${BODY_TAG_ATTR_NAME}="true"` : ''
-  }>${tag.props.children || ''}</${tag.tag}>`
+  }>${innerContent}</${tag.tag}>`
 }
 
 export const renderHeadToString = (head: HeadClient): HTMLResult => {
