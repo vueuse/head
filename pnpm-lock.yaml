@@ -12,7 +12,8 @@ specifiers:
   '@vue/compiler-sfc': ^3.2.40
   '@vue/server-renderer': ^3.2.40
   '@vueuse/shared': ^9.3.0
-  '@zhead/schema-vue': ^0.8.0
+  '@zhead/schema': ^0.8.2
+  '@zhead/schema-vue': ^0.8.2
   cheerio: 1.0.0-rc.12
   eslint: ^8.24.0
   execa: ^6.1.0
@@ -34,7 +35,8 @@ specifiers:
 
 dependencies:
   '@vueuse/shared': 9.3.0_vue@3.2.40
-  '@zhead/schema-vue': 0.8.0_vue@3.2.40
+  '@zhead/schema': 0.8.2
+  '@zhead/schema-vue': 0.8.2_vue@3.2.40
 
 devDependencies:
   '@antfu/eslint-config': 0.27.0_ypn2ylkkyfa5i233caldtndbqa
@@ -1330,27 +1332,27 @@ packages:
       - vue
     dev: false
 
-  /@zhead/schema-raw/0.8.0:
-    resolution: {integrity: sha512-mP7nPbnHOMMZCBh0QFIkQVM6PgTaFNEtN2rggP4Gi2QjFcEM35BWTNgxITRIt/O0qZnfXkUfR2jhqiXqF47AXQ==}
+  /@zhead/schema-raw/0.8.2:
+    resolution: {integrity: sha512-9X23yFbsuGKYYIzsBJVE3R0+6sT2iio1NPIwv7fSyINAyJ1T82gsmVSZ6IugoqdLBQBXsS0VpTaTNgqKk4yK/A==}
     dependencies:
-      '@zhead/schema': 0.8.0
+      '@zhead/schema': 0.8.2
     dev: false
 
-  /@zhead/schema-vue/0.8.0_vue@3.2.40:
-    resolution: {integrity: sha512-wRB6Jn1Da9ELNYFyQ6u5Qi20liT2X8RvxXblGmVFXlizWUjBGMiRHS6qmqMzDTT+DOF45MU4Q0KvReksOgjgxQ==}
+  /@zhead/schema-vue/0.8.2_vue@3.2.40:
+    resolution: {integrity: sha512-/MMcMs46iZVfQldWxaZZ7/2wT2EFAUMZqneoGkF2kfRP16F2q6qBuFDs3fdgkZH63UDUTTTfDUcOs56tXc8XFw==}
     peerDependencies:
       vue: '>=2.7 || >=3'
     dependencies:
       '@vueuse/shared': 9.3.0_vue@3.2.40
-      '@zhead/schema': 0.8.0
-      '@zhead/schema-raw': 0.8.0
+      '@zhead/schema': 0.8.2
+      '@zhead/schema-raw': 0.8.2
       vue: 3.2.40
     transitivePeerDependencies:
       - '@vue/composition-api'
     dev: false
 
-  /@zhead/schema/0.8.0:
-    resolution: {integrity: sha512-/uRApgsOmKdUmjmKeFAwc2mkA3DxJDbreHXLBy4QLYxBbrmCak2ibIlUKiN8LJtKo9LaUyW4GXgLUKaI2SuIew==}
+  /@zhead/schema/0.8.2:
+    resolution: {integrity: sha512-WDTmlI1tjQ/UlGKwL91kst/H5rCmVAOKRTXEkiSbvMzSWz1cGO24OljZ/2ai7DmWr/h/yF0jrmw/74zJe+yKqg==}
     dev: false
 
   /abab/2.0.6:

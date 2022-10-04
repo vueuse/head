@@ -1,6 +1,6 @@
-import type { Head as PlainHead, ReactiveHead } from '@zhead/schema-vue'
+import type { MergeHead, Head as PlainHead } from '@zhead/schema'
+import type { ReactiveHead } from '@zhead/schema-vue'
 import type { MaybeComputedRef } from '@vueuse/shared'
-import type { MergeHead } from '@zhead/schema'
 import type { RawHeadAugmentation } from '@zhead/schema-raw'
 
 export interface HandlesDuplicates {

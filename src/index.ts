@@ -108,7 +108,7 @@ const headObjToTags = (obj: HeadObjectPlain) => {
 
     switch (key) {
       case 'title':
-        tags.push({ tag: key, props: { children: obj[key] } })
+        tags.push({ tag: key, props: { textContent: obj[key] } })
         break
       case 'titleTemplate':
         break
@@ -185,9 +185,9 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
 
           // resolve titles
           if (titleTemplate && tag.tag === 'title') {
-            tag.props.children = renderTitleTemplate(
+            tag.props.textContent = renderTitleTemplate(
               titleTemplate,
-              tag.props.children,
+              tag.props.textContent,
             )
           }
           // Remove tags with the same key
@@ -230,7 +230,7 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
       // head sorting here is not guaranteed to be honoured
       for (const tag of head.headTags.sort(sortTags)) {
         if (tag.tag === 'title') {
-          title = tag.props.children
+          title = tag.props.textContent
           continue
         }
         if (tag.tag === 'htmlAttrs') {

@@ -24,13 +24,13 @@ describe('hook tags resolved', () => {
 
     const tags = await hookTags
     expect(tags[0].tag).toEqual('title')
-    expect(tags[0].props.children).toEqual('test')
+    expect(tags[0].props.textContent).toEqual('test')
     expect(tags).toMatchInlineSnapshot(`
       [
         {
           "_position": 0,
           "props": {
-            "children": "test",
+            "textContent": "test",
           },
           "tag": "title",
         },
@@ -66,8 +66,8 @@ describe('hook tags resolved', () => {
       {
         "_position": 0,
         "props": {
-          "children": "test",
           "extra": true,
+          "textContent": "test",
         },
         "tag": "title",
       }
