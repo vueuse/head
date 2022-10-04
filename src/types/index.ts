@@ -18,6 +18,13 @@ export interface HeadTag {
   _position?: number
 }
 
+export interface DomUpdateCtx {
+  title: string | undefined
+  htmlAttrs: HeadAttrs
+  bodyAttrs: HeadAttrs
+  actualTags: Record<string, HeadTag[]>
+}
+
 export interface HTMLResult {
   // Tags in `<head>`
   readonly headTags: string
