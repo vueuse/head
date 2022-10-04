@@ -218,7 +218,8 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
     addHeadObjs(objs, options?) {
       const ctx = allHeadObjs.push({ input: objs, options })
       return () => {
-        allHeadObjs = allHeadObjs.splice(ctx, 1)
+        // remove ctx
+        allHeadObjs.splice(ctx - 1, 1)
       }
     },
 
