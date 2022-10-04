@@ -33,13 +33,13 @@ export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
 
 export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
   // only meta, base and script tags will be deduped
-  if (!['meta', 'base', 'script', 'link'].includes(tag.tag))
+  if (!['meta', 'base', 'script', 'link', 'title'].includes(tag.tag))
     return false
 
   const { props, tag: tagName } = tag
   // must only be a single base so we always dedupe
-  if (tagName === 'base')
-    return 'base'
+  if (tagName === 'base' || tagName === 'title')
+    return tagName
 
   // support only a single canonical
   if (tagName === 'link' && props.rel === 'canonical')
