@@ -1,3 +1,5 @@
+import type { HeadEntryOptions } from '@vueuse/head'
+
 export const escapeHtml = (s: string) =>
   s.replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
@@ -51,7 +53,7 @@ export const stringifyAttrName = (str: string) =>
 export const stringifyAttrValue = (str: string) =>
   escapeJS(str.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'))
 
-export const stringifyAttrs = (attributes: Record<string, any>, options: { raw?: boolean } = {}) => {
+export const stringifyAttrs = (attributes: Record<string, any>, options: HeadEntryOptions = {}) => {
   const handledAttributes = []
 
   for (const [key, value] of Object.entries(attributes)) {
@@ -63,7 +65,7 @@ export const stringifyAttrs = (attributes: Record<string, any>, options: { raw?:
 
     let attribute = stringifyAttrName(key)
 
-    if (attribute.startsWith('on')) {
+    if (!options.raw && attribute.startsWith('on')) {
       console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to set event listeners.', attribute)
       continue
     }

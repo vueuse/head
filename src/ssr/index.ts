@@ -60,7 +60,7 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
     else if (tag.tag === 'htmlAttrs' || tag.tag === 'bodyAttrs') {
       for (const k in tag.props) {
         const keyName = stringifyAttrName(k)
-        if (keyName.startsWith('on')) {
+        if (!tag._options?.raw && keyName.startsWith('on')) {
           console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to set event listeners.', keyName)
           continue
         }

@@ -36,6 +36,6 @@ describe('use head raw', () => {
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<script autofocus>console.log(2)</script><noscript><iframe src=\\"https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX\\" height=\\"0\\" width=\\"0\\" style=\\"display:none;visibility:hidden\\"></iframe></noscript><meta name=\\"head:count\\" content=\\"2\\">"',
     )
-    expect(headResult.htmlAttrs).toMatchInlineSnapshot('" aria-label=\\"test\\" data-head-attrs=\\"aria-label\\""')
+    expect(headResult.htmlAttrs).toMatchInlineSnapshot('" aria-label=\\"test\\" onkeyup=\\"alert(1)\\" data-head-attrs=\\"aria-label,onkeyup\\""')
   })
 })

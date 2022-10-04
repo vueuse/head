@@ -162,26 +162,26 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
       const deduped: HeadTag[] = []
       const deduping: Record<string, HeadTag> = {}
 
-      const resolvedHeadEntries = allHeadObjs.map(resolveHeadEntry)
+      const resolvedHeadObjs = allHeadObjs.map(resolveHeadEntry)
 
-      const titleTemplate = resolvedHeadEntries
+      const titleTemplate = resolvedHeadObjs
         .map(i => i.input.titleTemplate)
         .reverse()
         .find(i => i != null)
 
-      resolvedHeadEntries.forEach((entry, headObjectIdx) => {
-        const tags = headObjToTags(entry.input)
+      resolvedHeadObjs.forEach((objs, headObjectIdx) => {
+        const tags = headObjToTags(objs.input)
         tags.forEach((tag, tagIdx) => {
           // used to restore the order after deduping
           // a large number is needed otherwise the position will potentially duplicate (this support 10k tags)
           // ideally we'd use the total tag count but this is too hard to calculate with the current reactivity
           tag._position = headObjectIdx * 10000 + tagIdx
-          // avoid XSS
+          // avoid untrusted data providing their own options key (fixes XSS)
           if (tag._options)
             delete tag._options
-
-          if (entry.options)
-            tag._options = entry.options
+          // tag inherits options from useHead registration
+          if (objs.options)
+            tag._options = objs.options
 
           // resolve titles
           if (titleTemplate && tag.tag === 'title') {

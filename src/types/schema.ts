@@ -26,7 +26,7 @@ export interface RendersToBody {
   body?: boolean
 }
 
-export interface RendersInnerContentSafely {
+export interface HasTextContent {
   /**
    * Sets the textContent of an element.
    *
@@ -61,22 +61,22 @@ export type Never<T> = {
 }
 
 export interface VueUseHeadSchema extends MergeHead {
-  base: Never<HandlesDuplicates & RendersInnerContentSafely & HasRenderPriority & RendersToBody>
-  link: HasRenderPriority & RendersToBody & Never<RendersInnerContentSafely & HandlesDuplicates>
+  base: Never<HandlesDuplicates & HasTextContent & HasRenderPriority & RendersToBody>
+  link: HasRenderPriority & RendersToBody & Never<HasTextContent & HandlesDuplicates>
   meta: HasRenderPriority &
-  HandlesDuplicates & Never<RendersInnerContentSafely & RendersToBody>
+  HandlesDuplicates & Never<HasTextContent & RendersToBody>
   style: HasRenderPriority &
   RendersToBody &
-  RendersInnerContentSafely & Never<HandlesDuplicates>
+  HasTextContent & Never<HandlesDuplicates>
   script: HasRenderPriority &
   RendersToBody &
-  RendersInnerContentSafely &
+  HasTextContent &
   HandlesDuplicates
   noscript: HasRenderPriority &
   RendersToBody &
-  RendersInnerContentSafely & Never<HandlesDuplicates>
-  htmlAttrs: Never<HandlesDuplicates & RendersInnerContentSafely & HasRenderPriority & RendersToBody>
-  bodyAttrs: Never<HandlesDuplicates & RendersInnerContentSafely & HasRenderPriority & RendersToBody>
+  HasTextContent & Never<HandlesDuplicates>
+  htmlAttrs: Never<HandlesDuplicates & HasTextContent & HasRenderPriority & RendersToBody>
+  bodyAttrs: Never<HandlesDuplicates & HasTextContent & HasRenderPriority & RendersToBody>
 }
 
 export type HeadObjectPlain<T extends MergeHead = {}> = PlainHead<T & VueUseHeadSchema>
