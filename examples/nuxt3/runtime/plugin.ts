@@ -57,7 +57,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
       return defu(overrides, meta.value)
     })
-    head.addHeadObjs(headObj as any)
+    const removeHeadObjs = head.addHeadObjs(headObj as any)
 
     if (process.server)
       return
@@ -70,7 +70,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       return
 
     onBeforeUnmount(() => {
-      head.removeHeadObjs(headObj as any)
+      removeHeadObjs()
       head.updateDOM()
     })
   }

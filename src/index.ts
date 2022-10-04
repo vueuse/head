@@ -28,7 +28,7 @@ export interface HeadClient<T extends MergeHead = {}> {
 
   headTags: HeadTag[]
 
-  addHeadObjs: (objs: UseHeadInput<T>, options?: HeadEntryOptions) => void
+  addHeadObjs: (objs: UseHeadInput<T>, options?: HeadEntryOptions) => () => void
 
   removeHeadObjs: (objs: UseHeadInput<T>) => void
 
@@ -213,7 +213,10 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
     },
 
     addHeadObjs(objs, options?) {
-      allHeadObjs.push({ input: objs, options })
+      const ctx = allHeadObjs.push({ input: objs, options })
+      return () => {
+        allHeadObjs = allHeadObjs.splice(ctx, 1)
+      }
     },
 
     removeHeadObjs(objs) {
@@ -276,7 +279,7 @@ const IS_BROWSER = typeof window !== 'undefined'
 const _useHead = <T extends MergeHead = {}>(headObj: UseHeadInput<T>, options: HeadEntryOptions = {}) => {
   const head = injectHead()
 
-  head.addHeadObjs(headObj, options)
+  const removeHeadObjs = head.addHeadObjs(headObj, options)
 
   if (IS_BROWSER) {
     watchEffect(() => {
@@ -284,7 +287,7 @@ const _useHead = <T extends MergeHead = {}>(headObj: UseHeadInput<T>, options: H
     })
 
     onBeforeUnmount(() => {
-      head.removeHeadObjs(headObj)
+      removeHeadObjs()
       head.updateDOM()
     })
   }
