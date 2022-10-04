@@ -52,6 +52,10 @@ Used to modify the head of the document. You can call this function in any page 
 
 All values are reactive and support ref and computed getter syntax.
 
+To provide inner content you should use the `textContent` attribute (previously `children` which is deprecated).
+
+Note: All values provided to `useHead` will be encoded to avoid XSS injection. If you need to insert raw data use `useHeadRaw`.
+
 #### Example
 
 ```ts
@@ -65,6 +69,9 @@ useHead({
   meta: [
     // computer getter syntax  
     { name: 'description', content: () => myPage.value.description },
+  ],
+  style: [
+    { type: 'text/css', textContent: 'body { background: red; }' },
   ],
   script: [
     // primitive values are also fine
@@ -93,6 +100,27 @@ interface HeadObject {
   htmlAttrs?: MaybeRef<HeadAttrs>
   bodyAttrs?: MaybeRef<HeadAttrs>
 }
+```
+
+### `useHeadRaw(head: MaybeComputedRef<HeadObject>)`
+
+Has the same functionality as `useHead` but does not encode values. This is useful for inserting raw data such as scripts
+and attribute events.
+
+Typically, you would use `children` to insert the inner content of the DOM element. When inserting raw data you should use
+`innerHTML` explicitly.
+
+```ts
+useHeadRaw({
+  bodyAttrs: {
+    onfocus: 'alert("hello")',
+  },
+  script: [
+    {
+      innerHTML: 'alert("hello world")',
+    },
+  ],
+})
 ```
 
 #### Deduping
