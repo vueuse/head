@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 0.9.3
+
+- fix: remove head objects at right index
+
 ## 0.9.2
 
 - chore: bump zhead schema
