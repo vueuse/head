@@ -36,7 +36,11 @@ export const tagToString = (tag: HeadTag) => {
 
   // children is deprecated
   if (!innerContent && tag.props.children) {
-    // Note, this previously wasn't escaped server side. It has always been escaped client side
+    /*
+     * DOM updates is using textContent which doesn't allow HTML or JS already, so SSR needs to match
+     *
+     * @see https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html#rule-1-html-escape-then-javascript-escape-before-inserting-untrusted-data-into-html-subcontext-within-the-execution-context
+     */
     innerContent = escapeJS(escapeHtml(tag.props.children))
   }
 

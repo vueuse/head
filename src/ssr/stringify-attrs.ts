@@ -74,6 +74,10 @@ export const stringifyAttrs = (attributes: Record<string, any>, options: { raw?:
         attribute += `="${val}"`
       }
       else {
+        /*
+         * Link attributes should be URI encoded to prevent XSS.
+         * @see https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html#rule-5-url-escape-then-javascript-escape-before-inserting-untrusted-data-into-url-attribute-subcontext-within-the-execution-context
+         */
         if (attribute === 'href' || attribute === 'src')
           attribute += `="${stringifyAttrValue(encodeURI(val))}"`
         else
