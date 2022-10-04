@@ -18,8 +18,10 @@ export const createElement = (
       if (key === 'renderPriority' || key === 'key' || value === false)
         continue
 
-      if (key === 'children')
+      if (key === 'children' || key === 'textContent')
         el.textContent = value
+      else if (key === 'innerHTML')
+        el.innerHTML = value
       else
         el.setAttribute(key, value)
     }

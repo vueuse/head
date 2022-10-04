@@ -10,12 +10,14 @@ import type { MergeHead } from '@zhead/schema'
 import {
   PROVIDE_KEY,
 } from './constants'
-import { resolveHeadInput, sortTags, tagDedupeKey } from './utils'
+import { resolveHeadEntry, sortTags, tagDedupeKey } from './utils'
 import type {
   HeadAttrs,
-  HeadObjectPlain, HeadTag,
-  HookBeforeDomUpdate, HookTagsResolved, TagKeys,
-  UseHeadInput,
+  HeadEntry, HeadEntryOptions,
+  HeadObjectPlain, HeadTag, HookBeforeDomUpdate,
+  HookTagsResolved,
+  TagKeys, UseHeadInput,
+  UseHeadRawInput,
 } from './types'
 import { setAttrs, updateElements } from './dom'
 
@@ -26,7 +28,7 @@ export interface HeadClient<T extends MergeHead = {}> {
 
   headTags: HeadTag[]
 
-  addHeadObjs: (objs: UseHeadInput<T>) => void
+  addHeadObjs: (objs: UseHeadInput<T>, options?: HeadEntryOptions) => void
 
   removeHeadObjs: (objs: UseHeadInput<T>) => void
 
@@ -106,7 +108,7 @@ const headObjToTags = (obj: HeadObjectPlain) => {
 
     switch (key) {
       case 'title':
-        tags.push({ tag: key, props: { children: obj[key] } })
+        tags.push({ tag: key, props: { textContent: obj[key] } })
         break
       case 'titleTemplate':
         break
@@ -135,14 +137,14 @@ const headObjToTags = (obj: HeadObjectPlain) => {
 }
 
 export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInput<T>) => {
-  let allHeadObjs: UseHeadInput<T>[] = []
+  let allHeadObjs: HeadEntry<T>[] = []
   const previousTags = new Set<string>()
 
   const hookBeforeDomUpdate: HookBeforeDomUpdate = []
   const hookTagsResolved: HookTagsResolved = []
 
   if (initHeadObject)
-    allHeadObjs.push(initHeadObject)
+    allHeadObjs.push({ input: initHeadObject })
 
   const head: HeadClient<T> = {
     install(app) {
@@ -160,25 +162,32 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
       const deduped: HeadTag[] = []
       const deduping: Record<string, HeadTag> = {}
 
-      const resolvedHeadObjs = allHeadObjs.map(resolveHeadInput)
+      const resolvedHeadObjs = allHeadObjs.map(resolveHeadEntry)
 
       const titleTemplate = resolvedHeadObjs
-        .map(i => i.titleTemplate)
+        .map(i => i.input.titleTemplate)
         .reverse()
         .find(i => i != null)
 
       resolvedHeadObjs.forEach((objs, headObjectIdx) => {
-        const tags = headObjToTags(objs)
+        const tags = headObjToTags(objs.input)
         tags.forEach((tag, tagIdx) => {
           // used to restore the order after deduping
           // a large number is needed otherwise the position will potentially duplicate (this support 10k tags)
           // ideally we'd use the total tag count but this is too hard to calculate with the current reactivity
           tag._position = headObjectIdx * 10000 + tagIdx
+          // avoid untrusted data providing their own options key (fixes XSS)
+          if (tag._options)
+            delete tag._options
+          // tag inherits options from useHead registration
+          if (objs.options)
+            tag._options = objs.options
+
           // resolve titles
           if (titleTemplate && tag.tag === 'title') {
-            tag.props.children = renderTitleTemplate(
+            tag.props.textContent = renderTitleTemplate(
               titleTemplate,
-              tag.props.children,
+              tag.props.textContent,
             )
           }
           // Remove tags with the same key
@@ -203,12 +212,12 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
       return tags
     },
 
-    addHeadObjs(objs) {
-      allHeadObjs.push(objs)
+    addHeadObjs(objs, options?) {
+      allHeadObjs.push({ input: objs, options })
     },
 
     removeHeadObjs(objs) {
-      allHeadObjs = allHeadObjs.filter(_objs => _objs !== objs)
+      allHeadObjs = allHeadObjs.filter(_objs => _objs.input !== objs)
     },
 
     updateDOM(document = window.document) {
@@ -221,7 +230,7 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
       // head sorting here is not guaranteed to be honoured
       for (const tag of head.headTags.sort(sortTags)) {
         if (tag.tag === 'title') {
-          title = tag.props.children
+          title = tag.props.textContent
           continue
         }
         if (tag.tag === 'htmlAttrs') {
@@ -264,10 +273,10 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
 
 const IS_BROWSER = typeof window !== 'undefined'
 
-export const useHead = <T extends MergeHead = {}>(headObj: UseHeadInput<T>) => {
+const _useHead = <T extends MergeHead = {}>(headObj: UseHeadInput<T>, options: HeadEntryOptions = {}) => {
   const head = injectHead()
 
-  head.addHeadObjs(headObj)
+  head.addHeadObjs(headObj, options)
 
   if (IS_BROWSER) {
     watchEffect(() => {
@@ -279,6 +288,14 @@ export const useHead = <T extends MergeHead = {}>(headObj: UseHeadInput<T>) => {
       head.updateDOM()
     })
   }
+}
+
+export const useHead = <T extends MergeHead = {}>(headObj: UseHeadInput<T>) => {
+  _useHead(headObj)
+}
+
+export const useHeadRaw = (headObj: UseHeadRawInput) => {
+  _useHead(headObj, { raw: true })
 }
 
 export * from './components'

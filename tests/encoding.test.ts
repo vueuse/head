@@ -2,6 +2,28 @@ import { computed } from 'vue'
 import { createHead, renderHeadToString } from '../src'
 
 describe('encoding', () => {
+  it('encodes textContent', () => {
+    const head = createHead()
+    head.addHeadObjs(
+      computed(() => ({
+        htmlAttrs: {
+          onload: 'console.log(\'executed\')',
+        },
+        script: [{
+          src: 'javascript:console.log(\'xss\');',
+        }],
+        noscript: [
+          {
+            textContent: '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX" height="0" width="0" style="display:none;visibility:hidden"></iframe>',
+          },
+        ],
+      })),
+    )
+    const { htmlAttrs, headTags } = renderHeadToString(head)
+    expect(headTags).toMatchInlineSnapshot('"<script src=\\"javascript:console.log(\\\\\'xss\\\\\');\\"></script><noscript>&lt;iframe src=&quot;https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX&quot; height=&quot;0&quot; width=&quot;0&quot; style=&quot;display:none;visibility:hidden&quot;&gt;&lt;/iframe&gt;</noscript><meta name=\\"head:count\\" content=\\"2\\">"')
+    expect(htmlAttrs).toMatchInlineSnapshot('" data-head-attrs=\\"\\""')
+  })
+
   it('jailbreak', async () => {
     const head = createHead()
     head.addHeadObjs(

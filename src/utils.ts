@@ -1,7 +1,8 @@
 import type { MaybeComputedRef } from '@vueuse/shared'
 import { resolveUnref } from '@vueuse/shared'
 import { unref } from 'vue'
-import type { HeadObjectPlain, HeadTag, UseHeadInput } from './types'
+import type { MergeHead } from '@zhead/schema'
+import type { HeadEntry, HeadTag, ResolvedHeadEntry } from './types'
 
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   const tagWeight = (tag: HeadTag) => {
@@ -90,6 +91,9 @@ function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>): any {
   return root
 }
 
-export function resolveHeadInput(obj: UseHeadInput): HeadObjectPlain {
-  return resolveUnrefDeeply(obj)
+export function resolveHeadEntry<T extends MergeHead = {}>(obj: HeadEntry<T>): ResolvedHeadEntry {
+  return {
+    ...obj,
+    input: resolveUnrefDeeply(obj.input),
+  }
 }

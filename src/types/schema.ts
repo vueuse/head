@@ -1,6 +1,7 @@
-import type { Head as PlainHead, ReactiveHead } from '@zhead/schema-vue'
+import type { MergeHead, Head as PlainHead } from '@zhead/schema'
+import type { ReactiveHead } from '@zhead/schema-vue'
 import type { MaybeComputedRef } from '@vueuse/shared'
-import type { MergeHead } from '@zhead/schema'
+import type { RawHeadAugmentation } from '@zhead/schema-raw'
 
 export interface HandlesDuplicates {
   /**
@@ -25,11 +26,17 @@ export interface RendersToBody {
   body?: boolean
 }
 
-export interface RendersInnerContent {
+export interface HasTextContent {
   /**
    * Sets the textContent of an element.
+   *
+   * @deprecated Use `textContent` instead.
    */
   children?: string
+  /**
+   * Sets the textContent of an element. This will be HTML encoded.
+   */
+  textContent?: string
 }
 
 export interface HasRenderPriority {
@@ -54,26 +61,32 @@ export type Never<T> = {
 }
 
 export interface VueUseHeadSchema extends MergeHead {
-  base: Never<HandlesDuplicates & RendersInnerContent & HasRenderPriority & RendersToBody>
-  link: HasRenderPriority & RendersToBody & Never<RendersInnerContent & HandlesDuplicates>
+  base: Never<HandlesDuplicates & HasTextContent & HasRenderPriority & RendersToBody>
+  link: HasRenderPriority & RendersToBody & Never<HasTextContent & HandlesDuplicates>
   meta: HasRenderPriority &
-  HandlesDuplicates & Never<RendersInnerContent & RendersToBody>
+  HandlesDuplicates & Never<HasTextContent & RendersToBody>
   style: HasRenderPriority &
   RendersToBody &
-  RendersInnerContent & Never<HandlesDuplicates>
+  HasTextContent & Never<HandlesDuplicates>
   script: HasRenderPriority &
   RendersToBody &
-  RendersInnerContent &
+  HasTextContent &
   HandlesDuplicates
   noscript: HasRenderPriority &
   RendersToBody &
-  RendersInnerContent & Never<HandlesDuplicates>
-  htmlAttrs: Never<HandlesDuplicates & RendersInnerContent & HasRenderPriority & RendersToBody>
-  bodyAttrs: Never<HandlesDuplicates & RendersInnerContent & HasRenderPriority & RendersToBody>
+  HasTextContent & Never<HandlesDuplicates>
+  htmlAttrs: Never<HandlesDuplicates & HasTextContent & HasRenderPriority & RendersToBody>
+  bodyAttrs: Never<HandlesDuplicates & HasTextContent & HasRenderPriority & RendersToBody>
 }
 
 export type HeadObjectPlain<T extends MergeHead = {}> = PlainHead<T & VueUseHeadSchema>
 export type HeadObject<T extends MergeHead = {}> = ReactiveHead<T & VueUseHeadSchema>
 export type UseHeadInput<T extends MergeHead = {}> = MaybeComputedRef<HeadObject<T>>
+export type UseHeadRawInput = MaybeComputedRef<ReactiveHead<RawHeadAugmentation & VueUseHeadSchema>>
+
+export interface HeadEntryOptions { raw?: boolean }
+
+export interface HeadEntry<T extends MergeHead = {}> { options?: HeadEntryOptions; input: UseHeadInput<T> }
+export interface ResolvedHeadEntry<T extends MergeHead = {}> { options?: HeadEntryOptions; input: PlainHead<T & VueUseHeadSchema> }
 
 export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>
