@@ -2,6 +2,12 @@
 
 No unreleased changes.
 
+## 0.9.0
+
+- fix: return remove fn from addHeadObj, fixes #48
+- feat: `useHeadRaw` to bypass XSS protections (#118)
+- fix(ssr): encode `children`, `href` and `url` more appropriately (#119)
+
 ## 0.8.2
 
 - chore(doc): add example for primitives
