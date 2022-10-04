@@ -58,11 +58,11 @@ describe('e2e: vite ssr', async () => {
       return head.headTags
     }
     expect(
-      (await getHeadTags()).find(t => t.tag === 'title')!.props.children,
+      (await getHeadTags()).find(t => t.tag === 'title')!.props.textContent,
     ).toMatchInlineSnapshot('"0 | @vueuse/head"')
     await page.click('button')
     expect(
-      (await getHeadTags()).find(t => t.tag === 'title')!.props.children,
+      (await getHeadTags()).find(t => t.tag === 'title')!.props.textContent,
     ).toMatchInlineSnapshot('"1 | @vueuse/head"')
   })
 

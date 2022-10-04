@@ -27,7 +27,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   })
 
   if (process.client) {
-    let pauseDOMUpdates = true
+    let pauseDOMUpdates = false
     head.hookBeforeDomUpdate.push(() => !pauseDOMUpdates)
 
     nuxtApp.hooks.hookOnce('page:finish', () => {
@@ -40,6 +40,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       // watch for new route before unpausing dom updates (triggered after suspense resolved)
       watch(useRoute(), () => {
         pauseDOMUpdates = false
+        head.updateDOM()
       })
     })
   }

@@ -1,4 +1,11 @@
-import type { HandlesDuplicates, HasRenderPriority, RendersInnerContent, RendersToBody, TagKeys } from './schema'
+import type {
+  HandlesDuplicates,
+  HasRenderPriority,
+  HasTextContent,
+  HeadEntryOptions,
+  RendersToBody,
+  TagKeys,
+} from './schema'
 
 export * from './schema'
 
@@ -12,9 +19,10 @@ export interface HeadTag {
   props: HandlesDuplicates &
   HasRenderPriority &
   RendersToBody &
-  RendersInnerContent & {
+  HasTextContent & {
     [k: string]: any
   }
+  _options?: HeadEntryOptions
   _position?: number
 }
 

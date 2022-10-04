@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { useHead } from '#head'
+
 await new Promise(resolve => setTimeout(resolve, 1000))
 
 const title = ref('Intermediately title with 1s delay')

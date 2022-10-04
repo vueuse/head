@@ -1,3 +1,5 @@
+import type { HeadEntryOptions } from '../types'
+
 export const escapeHtml = (s: string) =>
   s.replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
@@ -51,11 +53,11 @@ export const stringifyAttrName = (str: string) =>
 export const stringifyAttrValue = (str: string) =>
   escapeJS(str.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'))
 
-export const stringifyAttrs = (attributes: Record<string, any>) => {
+export const stringifyAttrs = (attributes: Record<string, any>, options: HeadEntryOptions = {}) => {
   const handledAttributes = []
 
   for (const [key, value] of Object.entries(attributes)) {
-    if (key === 'children' || key === 'key')
+    if (key === 'children' || key === 'innerHTML' || key === 'textContent' || key === 'key')
       continue
 
     if (value === false || value == null)
@@ -63,16 +65,26 @@ export const stringifyAttrs = (attributes: Record<string, any>) => {
 
     let attribute = stringifyAttrName(key)
 
+    if (!options.raw && attribute.startsWith('on')) {
+      console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to set event listeners. See https://github.com/vueuse/head/pull/118', attribute)
+      continue
+    }
+
     if (value !== true) {
       const val = String(value)
-      /*
-       * Link attributes should be URI encoded to prevent XSS.
-       * @see https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html#rule-5-url-escape-then-javascript-escape-before-inserting-untrusted-data-into-url-attribute-subcontext-within-the-execution-context
-       */
-      if (attribute === 'href' || attribute === 'src')
-        attribute += `="${stringifyAttrValue(encodeURI(val))}"`
-      else
-        attribute += `="${stringifyAttrValue(val)}"`
+      if (options.raw) {
+        attribute += `="${val}"`
+      }
+      else {
+        /*
+         * Link attributes should be URI encoded to prevent XSS.
+         * @see https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html#rule-5-url-escape-then-javascript-escape-before-inserting-untrusted-data-into-url-attribute-subcontext-within-the-execution-context
+         */
+        if (attribute === 'href' || attribute === 'src')
+          attribute += `="${stringifyAttrValue(encodeURI(val))}"`
+        else
+          attribute += `="${stringifyAttrValue(val)}"`
+      }
     }
 
     handledAttributes.push(attribute)
