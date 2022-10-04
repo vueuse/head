@@ -1,4 +1,4 @@
-import type { HeadEntryOptions } from '@vueuse/head'
+import type { HeadEntryOptions } from '../types'
 
 export const escapeHtml = (s: string) =>
   s.replace(/&/g, '&amp;')
