@@ -19,13 +19,13 @@ describe('toggle dom render', () => {
       '<!DOCTYPE html><html><head></head><body></body></html>',
     )
 
-    head.updateDOM(dom.window.document)
+    head.updateDOM(dom.window.document, true)
 
     expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot('""')
 
     pauseDOMUpdates = false
 
-    head.updateDOM(dom.window.document)
+    head.updateDOM(dom.window.document, true)
 
     expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot(
       '"<title>test</title>"',
@@ -46,14 +46,14 @@ describe('toggle dom render', () => {
           '<!DOCTYPE html><html><head></head><body></body></html>',
         )
 
-        head.updateDOM(dom.window.document)
+        head.updateDOM(dom.window.document, true)
 
         expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot('""')
 
         pauseDOMUpdates = false
         title.value = 'hello'
 
-        head.updateDOM(dom.window.document)
+        head.updateDOM(dom.window.document, true)
 
         expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot(
           '"<title>hello</title>"',

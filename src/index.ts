@@ -2,7 +2,7 @@ import type {
   App,
 } from 'vue'
 import {
-  inject,
+  inject, nextTick,
   onBeforeUnmount,
   watchEffect,
 } from 'vue'
@@ -12,14 +12,14 @@ import {
 } from './constants'
 import { resolveHeadEntry, sortTags, tagDedupeKey } from './utils'
 import type {
-  HeadAttrs,
+  DomUpdateCtx,
   HeadEntry, HeadEntryOptions,
   HeadObjectPlain, HeadTag, HookBeforeDomUpdate,
   HookTagsResolved,
   TagKeys, UseHeadInput,
   UseHeadRawInput,
 } from './types'
-import { setAttrs, updateElements } from './dom'
+import { updateDOM } from './dom/update-dom'
 
 export * from './types'
 
@@ -32,7 +32,7 @@ export interface HeadClient<T extends MergeHead = {}> {
 
   removeHeadObjs: (objs: UseHeadInput<T>) => void
 
-  updateDOM: (document?: Document) => void
+  updateDOM: (document?: Document, force?: boolean) => void
 
   /**
    * Array of user provided functions to hook into before the DOM is updated.
@@ -146,6 +146,9 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
   if (initHeadObject)
     allHeadObjs.push({ input: initHeadObject })
 
+  let domUpdateTick: Promise<void> | null = null
+  let domCtx: DomUpdateCtx
+
   const head: HeadClient<T> = {
     install(app) {
       app.config.globalProperties.$head = head
@@ -223,54 +226,53 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
       allHeadObjs = allHeadObjs.filter(_objs => _objs.input !== objs)
     },
 
-    updateDOM(document = window.document) {
-      let title: string | undefined
-      const htmlAttrs: HeadAttrs = {}
-      const bodyAttrs: HeadAttrs = {}
-
-      const actualTags: Record<string, HeadTag[]> = {}
+    updateDOM: (document?: Document, force?: boolean) => {
+      // within the debounced dom update we need to compute all the tags so that watchEffects still works
+      domCtx = {
+        title: undefined,
+        htmlAttrs: {},
+        bodyAttrs: {},
+        actualTags: {},
+      }
 
       // head sorting here is not guaranteed to be honoured
       for (const tag of head.headTags.sort(sortTags)) {
         if (tag.tag === 'title') {
-          title = tag.props.textContent
+          domCtx.title = tag.props.textContent
           continue
         }
         if (tag.tag === 'htmlAttrs') {
-          Object.assign(htmlAttrs, tag.props)
+          Object.assign(domCtx.htmlAttrs, tag.props)
           continue
         }
         if (tag.tag === 'bodyAttrs') {
-          Object.assign(bodyAttrs, tag.props)
+          Object.assign(domCtx.bodyAttrs, tag.props)
           continue
         }
 
-        actualTags[tag.tag] = actualTags[tag.tag] || []
-        actualTags[tag.tag].push(tag)
+        domCtx.actualTags[tag.tag] = domCtx.actualTags[tag.tag] || []
+        domCtx.actualTags[tag.tag].push(tag)
       }
-
-      // allow integration to disable dom update and / or modify it
-      if (head.hookBeforeDomUpdate) {
-        for (const k in head.hookBeforeDomUpdate) {
-          const res = head.hookBeforeDomUpdate[k](actualTags)
-          if (res === false)
-            return
+      const doDomUpdate = () => {
+        // allow integration to disable dom update and / or modify it
+        if (head.hookBeforeDomUpdate) {
+          for (const k in head.hookBeforeDomUpdate) {
+            const res = head.hookBeforeDomUpdate[k](domCtx.actualTags)
+            if (res === false)
+              return
+          }
         }
+        updateDOM({ domCtx, document, previousTags })
+        domUpdateTick = null
       }
-
-      if (title !== undefined)
-        document.title = title
-
-      setAttrs(document.documentElement, htmlAttrs)
-      setAttrs(document.body, bodyAttrs)
-      const tags = new Set([...Object.keys(actualTags), ...previousTags])
-      for (const tag of tags)
-        updateElements(document, tag, actualTags[tag] || [])
-
-      previousTags.clear()
-      Object.keys(actualTags).forEach(i => previousTags.add(i))
+      if (force) {
+        doDomUpdate()
+        return
+      }
+      domUpdateTick = domUpdateTick || nextTick(() => doDomUpdate())
     },
   }
+
   return head
 }
 
