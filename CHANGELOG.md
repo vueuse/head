@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 0.9.2
+
+- chore: bump zhead schema
+
 ## 0.9.1
 
 - chore(doc): fix typo
