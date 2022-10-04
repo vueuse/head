@@ -1,3 +1,33 @@
+export const escapeHtml = (s: string) =>
+  s.replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+
+export const escapeJS = (s: string) =>
+  s.replace(/["'\\\n\r\u2028\u2029]/g, (character) => {
+    // Escape all characters not included in SingleStringCharacters and
+    // DoubleStringCharacters on
+    // http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.4
+    switch (character) {
+      case '"':
+      case '\'':
+      case '\\':
+        return `\\${character}`
+      // Four possible LineTerminator characters need to be escaped:
+      case '\n':
+        return '\\n'
+      case '\r':
+        return '\\r'
+      case '\u2028':
+        return '\\u2028'
+      case '\u2029':
+        return '\\u2029'
+    }
+    return character
+  })
+
 /**
  * Attribute names must consist of one or more characters other than controls, U+0020 SPACE, U+0022 ("), U+0027 ('),
  * U+003E (>), U+002F (/), U+003D (=), and noncharacters.
@@ -19,13 +49,13 @@ export const stringifyAttrName = (str: string) =>
  * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2
  */
 export const stringifyAttrValue = (str: string) =>
-  str.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  escapeJS(str.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'))
 
-export const stringifyAttrs = (attributes: Record<string, any>) => {
+export const stringifyAttrs = (attributes: Record<string, any>, options: { raw?: boolean } = {}) => {
   const handledAttributes = []
 
   for (const [key, value] of Object.entries(attributes)) {
-    if (key === 'children' || key === 'key')
+    if (key === 'children' || key === 'innerHTML' || key === 'textContent' || key === 'key')
       continue
 
     if (value === false || value == null)
@@ -33,8 +63,23 @@ export const stringifyAttrs = (attributes: Record<string, any>) => {
 
     let attribute = stringifyAttrName(key)
 
-    if (value !== true)
-      attribute += `="${stringifyAttrValue(String(value))}"`
+    if (attribute.startsWith('on')) {
+      console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to set event listeners.', attribute)
+      continue
+    }
+
+    if (value !== true) {
+      const val = String(value)
+      if (options.raw) {
+        attribute += `="${val}"`
+      }
+      else {
+        if (attribute === 'href' || attribute === 'src')
+          attribute += `="${stringifyAttrValue(encodeURI(val))}"`
+        else
+          attribute += `="${stringifyAttrValue(val)}"`
+      }
+    }
 
     handledAttributes.push(attribute)
   }
