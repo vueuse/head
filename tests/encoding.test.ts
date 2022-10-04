@@ -63,7 +63,7 @@ describe('encoding', () => {
     head.addHeadObjs(computed(() => externalApiHeadData))
     const { headTags } = renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot(
-      '"<script>console.alert(\\"xss\\")</script><meta name=\\"head:count\\" content=\\"1\\">"',
+      '"<script>console.alert(&quot;xss&quot;)</script><meta name=\\"head:count\\" content=\\"1\\">"',
     )
   })
 })
