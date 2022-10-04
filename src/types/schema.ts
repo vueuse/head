@@ -86,7 +86,7 @@ export type UseHeadRawInput = MaybeComputedRef<ReactiveHead<RawHeadAugmentation 
 
 export interface HeadEntryOptions { raw?: boolean }
 
-export interface HeadEntry<T extends MergeHead = {}> { options?: HeadEntryOptions; input: UseHeadInput<T> }
+export interface HeadEntry<T extends MergeHead = {}> { options?: HeadEntryOptions; input: UseHeadInput<T>; id: number }
 export interface ResolvedHeadEntry<T extends MergeHead = {}> { options?: HeadEntryOptions; input: PlainHead<T & VueUseHeadSchema> }
 
 export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>

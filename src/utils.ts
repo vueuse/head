@@ -31,6 +31,8 @@ export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   return tagWeight(aTag) - tagWeight(bTag)
 }
 
+export const hash = (s: string) => s.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a }, 0)
+
 export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
   // only meta, base and script tags will be deduped
   if (!['meta', 'base', 'script', 'link', 'title'].includes(tag.tag))
