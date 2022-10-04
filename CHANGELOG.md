@@ -2,6 +2,12 @@
 
 No unreleased changes.
 
+## 0.9.1
+
+- chore(doc): fix typo
+- Merge branch 'main' of github.com:vueuse/head into main
+- feat: debounce dom update (#120)
+
 ## 0.9.0
 
 - fix: return remove fn from addHeadObj, fixes #48
