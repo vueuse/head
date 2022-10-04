@@ -2,6 +2,12 @@
 
 No unreleased changes.
 
+## 0.9.4
+
+- chore: make optional id
+- fix: safer removal of objects using hash
+- fix: dedupe title
+
 ## 0.9.3
 
 - fix: remove head objects at right index
