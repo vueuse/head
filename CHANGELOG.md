@@ -2,6 +2,14 @@
 
 No unreleased changes.
 
+## 0.9.6
+
+- Merge branch 'main' of github.com:vueuse/head into main
+- fix(xss) drop non-raw `on` handles and `innerHTML` (#124)
+- Merge branch 'main' of github.com:vueuse/head into main
+- fix: warn script children usage (#123)
+- refactor: smaller hook fns
+
 ## 0.9.5
 
 - Merge branch 'main' of github.com:vueuse/head into main
