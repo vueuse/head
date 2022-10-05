@@ -10,7 +10,7 @@ import type { MergeHead } from '@zhead/schema'
 import {
   PROVIDE_KEY,
 } from './constants'
-import { hash, resolveHeadEntry, sortTags, tagDedupeKey } from './utils'
+import { resolveHeadEntry, sortTags, tagDedupeKey } from './utils'
 import type {
   DomUpdateCtx,
   HeadEntry, HeadEntryOptions,
@@ -139,6 +139,8 @@ const headObjToTags = (obj: HeadObjectPlain) => {
 export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInput<T>) => {
   let allHeadObjs: HeadEntry<T>[] = []
   const previousTags = new Set<string>()
+  // counter for keeping unique ids of head object entries
+  let headObjId = 0
 
   const hookBeforeDomUpdate: HookBeforeDomUpdate = []
   const hookTagsResolved: HookTagsResolved = []
@@ -216,10 +218,8 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
     },
 
     addHeadObjs(objs, options?) {
-      const entry: HeadEntry = { input: objs, options, id: -1 }
-      const idx = allHeadObjs.push(entry)
-      // need to create a unique hash to safely remove the function, we can't rely on indexes here
-      entry.id = hash(`${idx}:${objs.toString()}`)
+      const entry: HeadEntry = { input: objs, options, id: headObjId++ }
+      allHeadObjs.push(entry)
       return () => {
         // remove ctx
         allHeadObjs = allHeadObjs.filter(_objs => _objs.id !== entry.id)
