@@ -91,7 +91,7 @@ describe('encoding', () => {
     )
   })
 
-  it.only('csr xss', () => {
+  it('csr xss', () => {
     const externalApiHeadData = {
       script: [
         {
@@ -109,7 +109,7 @@ describe('encoding', () => {
     head.updateDOM(dom.window.document, true)
 
     expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot(
-      '"<script>console.alert(\\"xss\\")</script><meta name=\\"head:count\\" content=\\"1\\">"',
+      '"<script></script><meta name=\\"head:count\\" content=\\"1\\">"',
     )
   })
 })

@@ -203,7 +203,12 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
                 delete tag.props[k]
               }
             }
+            if (tag.props.innerHTML) {
+              console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to use `innerHTML`', tag)
+              delete tag.props.innerHTML
+            }
           }
+
           // Remove tags with the same key
           const dedupeKey = tagDedupeKey(tag)
           if (dedupeKey)

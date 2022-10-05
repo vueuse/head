@@ -25,12 +25,6 @@ export const tagToString = (tag: HeadTag) => {
 
   let innerContent = ''
 
-  if (tag.props.innerHTML) {
-    if (tag._options?.raw)
-      innerContent = tag.props.innerHTML
-    else
-      console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to set innerHTML', tag.props.innerHTML)
-  }
   if (!innerContent && tag.props.textContent)
     innerContent = escapeJS(escapeHtml(tag.props.textContent))
 
