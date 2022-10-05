@@ -12,8 +12,8 @@ specifiers:
   '@vue/compiler-sfc': ^3.2.40
   '@vue/server-renderer': ^3.2.40
   '@vueuse/shared': ^9.3.0
-  '@zhead/schema': ^0.8.3
-  '@zhead/schema-vue': ^0.8.3
+  '@zhead/schema': ^0.8.5
+  '@zhead/schema-vue': ^0.8.5
   cheerio: 1.0.0-rc.12
   eslint: ^8.24.0
   execa: ^6.1.0
@@ -35,8 +35,8 @@ specifiers:
 
 dependencies:
   '@vueuse/shared': 9.3.0_vue@3.2.40
-  '@zhead/schema': 0.8.3
-  '@zhead/schema-vue': 0.8.3_vue@3.2.40
+  '@zhead/schema': 0.8.5
+  '@zhead/schema-vue': 0.8.5_vue@3.2.40
 
 devDependencies:
   '@antfu/eslint-config': 0.27.0_ypn2ylkkyfa5i233caldtndbqa
@@ -1332,27 +1332,27 @@ packages:
       - vue
     dev: false
 
-  /@zhead/schema-raw/0.8.3:
-    resolution: {integrity: sha512-cJEJwJh4+5fkefLRSdj0+83oS2M2BrrTI5JXNuS8wEsBxeBN9uVw26JKjKEClk/Gmy4/EX8cL/vM+m3GGSMhkw==}
+  /@zhead/schema-raw/0.8.5:
+    resolution: {integrity: sha512-Aq+9mksf5zbtj7HYluT6PVyfpQ6z7mja9MzjFxg76Vt+Q9i0oL1XN6ZYaCXImWRafwbyAxjFQ5aUCVyFn79OpA==}
     dependencies:
-      '@zhead/schema': 0.8.3
+      '@zhead/schema': 0.8.5
     dev: false
 
-  /@zhead/schema-vue/0.8.3_vue@3.2.40:
-    resolution: {integrity: sha512-fwi73V+zah2YAMgfPS8WgV9HBWlJ1iSKElHvx8X+nf2mtAop/4v0QYyA+jgHXkQ0pVYbVHKVP5lDTArDmzZBmg==}
+  /@zhead/schema-vue/0.8.5_vue@3.2.40:
+    resolution: {integrity: sha512-6aXjYy3fZVeYBLrHcJQqzqwzC/2tafRO5UxZEgBHnryRnzeLNZV6nTptDvIPWiJObMoJTK21vbg3gkfLNQg84g==}
     peerDependencies:
       vue: '>=2.7 || >=3'
     dependencies:
       '@vueuse/shared': 9.3.0_vue@3.2.40
-      '@zhead/schema': 0.8.3
-      '@zhead/schema-raw': 0.8.3
+      '@zhead/schema': 0.8.5
+      '@zhead/schema-raw': 0.8.5
       vue: 3.2.40
     transitivePeerDependencies:
       - '@vue/composition-api'
     dev: false
 
-  /@zhead/schema/0.8.3:
-    resolution: {integrity: sha512-60/3M2+P+8x2ipa7TiVrJW4kIMp+mVyLM12HqPPbvsgWZ7Qj4Qy+jItZPQQhN8UbqwK/ecpmlRdmwTAZRFBdzg==}
+  /@zhead/schema/0.8.5:
+    resolution: {integrity: sha512-1S3Otr2zpl1zwP72dNseVXQNG9tnTQ6hHUEUYwINvBjRj6bHcUwdE+Itc9OLxnGAJT/7p8P7GHGo5sshXJNJsA==}
     dev: false
 
   /abab/2.0.6:
