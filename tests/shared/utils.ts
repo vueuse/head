@@ -1,13 +1,12 @@
 import { createSSRApp } from 'vue'
 import { renderToString } from '@vue/server-renderer'
-import type { UseHeadInput } from '../../src'
-import { createHead, renderHeadToString, useHead } from '../../src'
+import { createHead, renderHeadToString } from '../../src'
 
-export async function ssrRenderHeadToString(input: UseHeadInput) {
+export async function ssrRenderHeadToString(fn: () => void) {
   const head = createHead()
   const app = createSSRApp({
     setup() {
-      useHead(input)
+      fn()
       return () => '<div>hi</div>'
     },
   })

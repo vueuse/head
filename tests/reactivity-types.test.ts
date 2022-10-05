@@ -8,7 +8,7 @@ describe('reactivity', () => {
   test('basic', async () => {
     const titleTemplate = ref('%s - My site')
 
-    const headResult = await ssrRenderHeadToString({
+    const headResult = await ssrRenderHeadToString(() => useHead({
       title: 'hello',
       titleTemplate,
       htmlAttrs: {
@@ -55,7 +55,7 @@ describe('reactivity', () => {
           src: 'foo.js',
         },
       ],
-    })
+    }))
 
     expect(headResult).toMatchInlineSnapshot(`
       {
@@ -148,9 +148,9 @@ describe('reactivity', () => {
   })
 
   test('computed getter entry', async () => {
-    const headResult = await ssrRenderHeadToString(() => ({
+    const headResult = await ssrRenderHeadToString(() => useHead(() => ({
       title: 'test',
-    }))
+    })))
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<title>test</title><meta name=\\"head:count\\" content=\\"0\\">"',
     )
@@ -182,42 +182,44 @@ describe('reactivity', () => {
         },
       ],
     }
-    const headResult = await ssrRenderHeadToString(input)
+    const headResult = await ssrRenderHeadToString(() => useHead(input))
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<title>my title</title><script src=\\"foo.js\\"></script><meta name=\\"test\\" content=\\"test\\"><meta name=\\"some-flag-test\\" content=\\"test\\"><meta property=\\"og:fake-prop\\" content=\\"test\\"><meta name=\\"head:count\\" content=\\"4\\">"',
     )
     test.value = 'test2'
-    const headResult2 = await ssrRenderHeadToString(input)
+    const headResult2 = await ssrRenderHeadToString(() => useHead(input))
     expect(headResult2.headTags).toMatchInlineSnapshot(
       '"<title>my title</title><script src=\\"foo.js\\"></script><meta name=\\"test2\\" content=\\"test2\\"><meta name=\\"some-flag-test2\\" content=\\"test\\"><meta property=\\"og:fake-prop\\" content=\\"test2\\"><meta name=\\"head:count\\" content=\\"4\\">"',
     )
   })
 
   test('malformed', async () => {
-    const headResult = await ssrRenderHeadToString({
-      title() {
-        return 'my title'
+    const headResult = await ssrRenderHeadToString(() =>
+      useHead({
+        title() {
+          return 'my title'
+        },
+        meta: [
+          {
+            // @ts-expect-error number is not valid for name
+            'name': 123,
+            'data-unknown-attr': 'test',
+            // @ts-expect-error meta cannot have children
+            'children': 'test',
+          },
+          {
+            name: 'some-flag',
+            // @ts-expect-error boolean is not valid for name
+            content: true,
+          },
+          {
+            property: 'og:fake-prop',
+            // @ts-expect-error arrays not allowed
+            content: ['test1', 'test2'],
+          },
+        ],
       },
-      meta: [
-        {
-          // @ts-expect-error number is not valid for name
-          'name': 123,
-          'data-unknown-attr': 'test',
-          // @ts-expect-error meta cannot have children
-          'children': 'test',
-        },
-        {
-          name: 'some-flag',
-          // @ts-expect-error boolean is not valid for name
-          content: true,
-        },
-        {
-          property: 'og:fake-prop',
-          // @ts-expect-error arrays not allowed
-          content: ['test1', 'test2'],
-        },
-      ],
-    })
+      ))
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<title>my title</title><meta name=\\"123\\" data-unknown-attr=\\"test\\"><meta name=\\"some-flag\\" content><meta property=\\"og:fake-prop\\" content=\\"test1,test2\\"><meta name=\\"head:count\\" content=\\"3\\">"',
     )

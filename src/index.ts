@@ -209,11 +209,7 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
       // ensure their original positions are kept
       const tags = deduped.sort((a, b) => a._position! - b._position!)
 
-      if (head.hookTagsResolved) {
-        for (const k in head.hookTagsResolved)
-          head.hookTagsResolved[k](tags)
-      }
-
+      head.hookTagsResolved.forEach(fn => fn(tags))
       return tags
     },
 
@@ -259,12 +255,9 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
       }
       const doDomUpdate = () => {
         // allow integration to disable dom update and / or modify it
-        if (head.hookBeforeDomUpdate) {
-          for (const k in head.hookBeforeDomUpdate) {
-            const res = head.hookBeforeDomUpdate[k](domCtx.actualTags)
-            if (res === false)
-              return
-          }
+        for (const k in head.hookBeforeDomUpdate) {
+          if (head.hookBeforeDomUpdate[k](domCtx.actualTags) === false)
+            return
         }
         updateDOM({ domCtx, document, previousTags })
         domUpdateTick = null

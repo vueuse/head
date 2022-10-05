@@ -1,4 +1,4 @@
-import { computed, createSSRApp, defineComponent, ref } from 'vue'
+import { createSSRApp, defineComponent, ref } from 'vue'
 import {
   RouterLink,
   RouterView,
@@ -6,7 +6,7 @@ import {
   createRouter,
   createWebHistory,
 } from 'vue-router'
-import { createHead, useHead } from '../../src'
+import { createHead, useHead, useHeadRaw } from '../../src'
 import Contact from './Contact.vue'
 
 export const createApp = () => {
@@ -15,8 +15,10 @@ export const createApp = () => {
       const count = ref(0)
       useHead({
         title: (() => `count: ${count.value}`),
-        script: [{ children: 'console.log("a")', key: 'a' }],
         link: [{ href: '/foo', rel: 'stylesheet' }],
+      })
+      useHeadRaw({
+        script: [{ children: 'console.log("a")', key: 'a' }],
       })
       return () => (
         <button
@@ -67,6 +69,9 @@ export const createApp = () => {
             renderPriority: 1,
           },
         ],
+      })
+
+      useHeadRaw({
         script: [
           {
             children: 'console.log(\'hi\')',
