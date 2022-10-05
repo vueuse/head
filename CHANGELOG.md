@@ -2,6 +2,12 @@
 
 No unreleased changes.
 
+## 0.9.5
+
+- Merge branch 'main' of github.com:vueuse/head into main
+- chore: bump zhead
+- fix: simpler logic for removing added head objs (#122)
+
 ## 0.9.4
 
 - chore: make optional id
