@@ -65,11 +65,6 @@ export const stringifyAttrs = (attributes: Record<string, any>, options: HeadEnt
 
     let attribute = stringifyAttrName(key)
 
-    if (!options.raw && attribute.startsWith('on')) {
-      console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to set event listeners. See https://github.com/vueuse/head/pull/118', attribute)
-      continue
-    }
-
     if (value !== true) {
       const val = String(value)
       if (options.raw) {
