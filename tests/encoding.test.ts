@@ -1,8 +1,9 @@
 import { computed } from 'vue'
+import { JSDOM } from 'jsdom'
 import { createHead, renderHeadToString } from '../src'
 
 describe('encoding', () => {
-  it('encodes textContent', () => {
+  it('ssr encodes textContent', () => {
     const head = createHead()
     head.addHeadObjs(
       computed(() => ({
@@ -11,20 +12,21 @@ describe('encoding', () => {
         },
         script: [{
           src: 'javascript:console.log(\'xss\');',
+          innerHTML: 'alert(2)',
         }],
         noscript: [
           {
-            textContent: '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX" height="0" width="0" style="display:none;visibility:hidden"></iframe>',
+            innerHTML: '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX" height="0" width="0" style="display:none;visibility:hidden"></iframe>',
           },
         ],
       })),
     )
     const { htmlAttrs, headTags } = renderHeadToString(head)
-    expect(headTags).toMatchInlineSnapshot('"<script src=\\"javascript:console.log(\\\\\'xss\\\\\');\\"></script><noscript>&lt;iframe src=&quot;https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX&quot; height=&quot;0&quot; width=&quot;0&quot; style=&quot;display:none;visibility:hidden&quot;&gt;&lt;/iframe&gt;</noscript><meta name=\\"head:count\\" content=\\"2\\">"')
+    expect(headTags).toMatchInlineSnapshot('"<script src=\\"javascript:console.log(\\\\\'xss\\\\\');\\"></script><noscript></noscript><meta name=\\"head:count\\" content=\\"2\\">"')
     expect(htmlAttrs).toMatchInlineSnapshot('" data-head-attrs=\\"\\""')
   })
 
-  it('jailbreak', async () => {
+  it('ssr jailbreak', async () => {
     const head = createHead()
     head.addHeadObjs(
       computed(() => ({
@@ -43,7 +45,7 @@ describe('encoding', () => {
     )
   })
 
-  it('google maps', async () => {
+  it('ssr google maps', async () => {
     const head = createHead()
     head.addHeadObjs(
       // @ts-expect-error computed issue
@@ -73,7 +75,7 @@ describe('encoding', () => {
   })
 
   // Note: This should be fixed in a separate PR, possibly don't allow scripts without using useHeadRaw
-  it('xss', async () => {
+  it('ssr xss', async () => {
     const externalApiHeadData = {
       script: [
         {
@@ -86,6 +88,28 @@ describe('encoding', () => {
     const { headTags } = renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot(
       '"<script>console.alert(&quot;xss&quot;)</script><meta name=\\"head:count\\" content=\\"1\\">"',
+    )
+  })
+
+  it('csr xss', () => {
+    const externalApiHeadData = {
+      script: [
+        {
+          innerHTML: 'console.alert("xss")',
+        },
+      ],
+    }
+    const head = createHead()
+    head.addHeadObjs(externalApiHeadData)
+
+    const dom = new JSDOM(
+      '<!DOCTYPE html><html><head></head><body></body></html>',
+    )
+
+    head.updateDOM(dom.window.document, true)
+
+    expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot(
+      '"<script></script><meta name=\\"head:count\\" content=\\"1\\">"',
     )
   })
 })

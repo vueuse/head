@@ -109,14 +109,14 @@ describe('vue ssr', () => {
       useHeadRaw({
         script: [
           {
-            children: 'console.log(\'hi\')',
+            innerHTML: 'console.log(\'hi\')',
           },
         ],
       })
     })
 
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<script>console.log(&#39;hi&#39;)</script><meta name=\\"head:count\\" content=\\"1\\">"',
+      '"<script>console.log(\'hi\')</script><meta name=\\"head:count\\" content=\\"1\\">"',
     )
   })
 
@@ -125,17 +125,17 @@ describe('vue ssr', () => {
       script: [
         {
           key: 'my-script',
-          children: 'console.log(\'A\')',
+          innerHTML: 'console.log(\'A\')',
         },
         {
           key: 'my-script',
-          children: 'console.log(\'B\')',
+          innerHTML: 'console.log(\'B\')',
         },
       ],
     }))
 
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<script>console.log(&#39;B&#39;)</script><meta name=\\"head:count\\" content=\\"1\\">"',
+      '"<script>console.log(\'B\')</script><meta name=\\"head:count\\" content=\\"1\\">"',
     )
   })
 })

@@ -15,7 +15,7 @@ describe('use head raw', () => {
           },
           script: [
             {
-              children: 'console.log(2)',
+              innerHTML: 'console.log(2)',
               autofocus: true,
             },
           ],
