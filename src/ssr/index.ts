@@ -25,6 +25,9 @@ export const tagToString = (tag: HeadTag) => {
 
   let innerContent = ''
 
+  if (tag._options?.raw && tag.props.innerHTML)
+    innerContent = tag.props.innerHTML
+
   if (!innerContent && tag.props.textContent)
     innerContent = escapeJS(escapeHtml(tag.props.textContent))
 
