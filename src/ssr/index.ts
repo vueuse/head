@@ -36,6 +36,12 @@ export const tagToString = (tag: HeadTag) => {
 
   // children is deprecated
   if (!innerContent && tag.props.children) {
+    if (tag.tag === 'script') {
+      if (tag._options?.raw)
+        console.warn('[@vueuse/head] Warning, you must use `innerHTML` with `useHeadRaw` instead of `children` for script content.', tag)
+      else
+        console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` with `innerHTML` for script content. See https://github.com/vueuse/head/pull/118', tag)
+    }
     /*
      * DOM updates is using textContent which doesn't allow HTML or JS already, so SSR needs to match
      *

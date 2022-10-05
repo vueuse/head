@@ -148,7 +148,7 @@ useHead({
 To render tags at the end of the `<body>`, set `body: true` in a HeadAttrs Object.
 
 ```ts
-useHead({
+useHeadRaw({
   script: [
     {
       children: `console.log('Hello world!')`,
