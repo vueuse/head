@@ -66,10 +66,6 @@ export const renderHeadToString = (head: HeadClient): HTMLResult => {
     else if (tag.tag === 'htmlAttrs' || tag.tag === 'bodyAttrs') {
       for (const k in tag.props) {
         const keyName = stringifyAttrName(k)
-        if (!tag._options?.raw && keyName.startsWith('on')) {
-          console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to set event listeners. See https://github.com/vueuse/head/pull/118', keyName)
-          continue
-        }
         // always encode name to avoid html errors
         attrs[tag.tag][keyName] = tag._options?.raw ? tag.props[keyName] : tag.props[stringifyAttrValue(keyName)]
       }

@@ -1,8 +1,9 @@
 import { computed } from 'vue'
+import { JSDOM } from 'jsdom'
 import { createHead, renderHeadToString } from '../src'
 
 describe('encoding', () => {
-  it('encodes textContent', () => {
+  it('ssr encodes textContent', () => {
     const head = createHead()
     head.addHeadObjs(
       computed(() => ({
@@ -11,6 +12,7 @@ describe('encoding', () => {
         },
         script: [{
           src: 'javascript:console.log(\'xss\');',
+          innerHTML: 'alert(2)',
         }],
         noscript: [
           {
@@ -24,7 +26,7 @@ describe('encoding', () => {
     expect(htmlAttrs).toMatchInlineSnapshot('" data-head-attrs=\\"\\""')
   })
 
-  it('jailbreak', async () => {
+  it('ssr jailbreak', async () => {
     const head = createHead()
     head.addHeadObjs(
       computed(() => ({
@@ -43,7 +45,7 @@ describe('encoding', () => {
     )
   })
 
-  it('google maps', async () => {
+  it('ssr google maps', async () => {
     const head = createHead()
     head.addHeadObjs(
       // @ts-expect-error computed issue
@@ -73,7 +75,7 @@ describe('encoding', () => {
   })
 
   // Note: This should be fixed in a separate PR, possibly don't allow scripts without using useHeadRaw
-  it('xss', async () => {
+  it('ssr xss', async () => {
     const externalApiHeadData = {
       script: [
         {
@@ -86,6 +88,28 @@ describe('encoding', () => {
     const { headTags } = renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot(
       '"<script>console.alert(&quot;xss&quot;)</script><meta name=\\"head:count\\" content=\\"1\\">"',
+    )
+  })
+
+  it.only('csr xss', () => {
+    const externalApiHeadData = {
+      script: [
+        {
+          innerHTML: 'console.alert("xss")',
+        },
+      ],
+    }
+    const head = createHead()
+    head.addHeadObjs(externalApiHeadData)
+
+    const dom = new JSDOM(
+      '<!DOCTYPE html><html><head></head><body></body></html>',
+    )
+
+    head.updateDOM(dom.window.document, true)
+
+    expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot(
+      '"<script>console.alert(\\"xss\\")</script><meta name=\\"head:count\\" content=\\"1\\">"',
     )
   })
 })

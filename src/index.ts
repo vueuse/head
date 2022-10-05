@@ -195,6 +195,15 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
               tag.props.textContent,
             )
           }
+          // validate XSS vectors
+          if (!tag._options?.raw) {
+            for (const k in tag.props) {
+              if (k.startsWith('on')) {
+                console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to set event listeners. See https://github.com/vueuse/head/pull/118', tag)
+                delete tag.props[k]
+              }
+            }
+          }
           // Remove tags with the same key
           const dedupeKey = tagDedupeKey(tag)
           if (dedupeKey)
@@ -241,12 +250,8 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
           domCtx.title = tag.props.textContent
           continue
         }
-        if (tag.tag === 'htmlAttrs') {
-          Object.assign(domCtx.htmlAttrs, tag.props)
-          continue
-        }
-        if (tag.tag === 'bodyAttrs') {
-          Object.assign(domCtx.bodyAttrs, tag.props)
+        if (tag.tag === 'htmlAttrs' || tag.tag === 'bodyAttrs') {
+          Object.assign(domCtx[tag.tag], tag.props)
           continue
         }
 
