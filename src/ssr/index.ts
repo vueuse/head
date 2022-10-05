@@ -31,21 +31,13 @@ export const tagToString = (tag: HeadTag) => {
   if (!innerContent && tag.props.textContent)
     innerContent = escapeJS(escapeHtml(tag.props.textContent))
 
-  // children is deprecated
-  if (!innerContent && tag.props.children) {
-    if (tag.tag === 'script') {
-      if (tag._options?.raw)
-        console.warn('[@vueuse/head] Warning, you must use `innerHTML` with `useHeadRaw` instead of `children` for script content.', tag)
-      else
-        console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` with `innerHTML` for script content. See https://github.com/vueuse/head/pull/118', tag)
-    }
+  if (!innerContent && tag.props.children)
     /*
      * DOM updates is using textContent which doesn't allow HTML or JS already, so SSR needs to match
      *
      * @see https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html#rule-1-html-escape-then-javascript-escape-before-inserting-untrusted-data-into-html-subcontext-within-the-execution-context
      */
     innerContent = escapeJS(escapeHtml(tag.props.children))
-  }
 
   return `<${tag.tag}${attrs}${
     isBodyTag ? ` ${BODY_TAG_ATTR_NAME}="true"` : ''
