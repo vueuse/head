@@ -1,12 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { createSSRApp, h, ref } from 'vue'
 import { renderToString } from '@vue/server-renderer'
-import { Head, createHead, renderHeadToString, useHead } from '../src'
+import { Head, createHead, renderHeadToString, useHead, useHeadRaw } from '../src'
 import { ssrRenderHeadToString } from './shared/utils'
 
 describe('vue ssr', () => {
   test('server', async () => {
-    const headResult = await ssrRenderHeadToString({
+    const headResult = await ssrRenderHeadToString(() => useHead({
       title: 'hello',
       htmlAttrs: {
         lang: 'zh',
@@ -36,7 +36,7 @@ describe('vue ssr', () => {
           src: 'foo.js',
         },
       ],
-    })
+    }))
 
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<title>hello</title><meta name=\\"description\\" content=\\"desc 2\\"><meta property=\\"og:locale:alternate\\" content=\\"fr\\"><meta property=\\"og:locale:alternate\\" content=\\"zh\\"><script src=\\"foo.js\\"></script><meta name=\\"head:count\\" content=\\"4\\">"',
@@ -105,12 +105,14 @@ describe('vue ssr', () => {
   })
 
   test('children', async () => {
-    const headResult = await ssrRenderHeadToString({
-      script: [
-        {
-          children: 'console.log(\'hi\')',
-        },
-      ],
+    const headResult = await ssrRenderHeadToString(() => {
+      useHeadRaw({
+        script: [
+          {
+            children: 'console.log(\'hi\')',
+          },
+        ],
+      })
     })
 
     expect(headResult.headTags).toMatchInlineSnapshot(
@@ -119,7 +121,7 @@ describe('vue ssr', () => {
   })
 
   test('script key', async () => {
-    const headResult = await ssrRenderHeadToString({
+    const headResult = await ssrRenderHeadToString(() => useHeadRaw({
       script: [
         {
           key: 'my-script',
@@ -130,7 +132,7 @@ describe('vue ssr', () => {
           children: 'console.log(\'B\')',
         },
       ],
-    })
+    }))
 
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<script>console.log(&#39;B&#39;)</script><meta name=\\"head:count\\" content=\\"1\\">"',
