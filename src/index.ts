@@ -30,6 +30,9 @@ export interface HeadClient<T extends MergeHead = {}> {
 
   addHeadObjs: (objs: UseHeadInput<T>, options?: HeadEntryOptions) => () => void
 
+  /**
+   * @deprecated Use the return function from `addHeadObjs`
+   */
   removeHeadObjs: (objs: UseHeadInput<T>) => void
 
   updateDOM: (document?: Document, force?: boolean) => void
@@ -264,13 +267,14 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: UseHeadInp
         domCtx.actualTags[tag.tag].push(tag)
       }
       const doDomUpdate = () => {
+        // call first in case the dom update hook returns
+        domUpdateTick = null
         // allow integration to disable dom update and / or modify it
         for (const k in head.hookBeforeDomUpdate) {
           if (head.hookBeforeDomUpdate[k](domCtx.actualTags) === false)
             return
         }
         updateDOM({ domCtx, document, previousTags })
-        domUpdateTick = null
       }
       if (force) {
         doDomUpdate()
