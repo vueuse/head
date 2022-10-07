@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 0.9.7
+
+- fix: ensure `hookBeforeDomUpdate` doesn't block dom update
+
 ## 0.9.6
 
 - Merge branch 'main' of github.com:vueuse/head into main
