@@ -35,7 +35,7 @@ describe('toggle dom render', () => {
   test('vue', async () => {
     const head = createHead()
     const app = createSSRApp({
-      async setup() {
+      setup() {
         let pauseDOMUpdates = true
         head.hookBeforeDomUpdate.push(() => !pauseDOMUpdates)
         const title = ref('')
@@ -46,15 +46,14 @@ describe('toggle dom render', () => {
           '<!DOCTYPE html><html><head></head><body></body></html>',
         )
 
-        // needed to avoid the tick issue
-        await head.updateDOM(dom.window.document, true)
+        // needed to avoid the tick issuehead.updateDOM(dom.window.document, true)
 
         expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot('""')
 
         pauseDOMUpdates = false
         title.value = 'hello'
 
-        await head.updateDOM(dom.window.document, true)
+        head.updateDOM(dom.window.document, true)
 
         expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot(
           '"<title>hello</title>"',
