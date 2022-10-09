@@ -1,7 +1,7 @@
 import { computed, createSSRApp, ref } from 'vue'
 import { renderToString } from '@vue/server-renderer'
 import { createHead, renderHeadToString, useHead } from '../src'
-import type { HeadObject, HeadObjectPlain } from '../src/types'
+import type { HeadObjectPlain } from '../src/types'
 import { ssrRenderHeadToString } from './shared/utils'
 
 describe('reactivity', () => {
@@ -73,13 +73,9 @@ describe('reactivity', () => {
     const app = createSSRApp({
       setup() {
         const title = ref('')
-        useHead(
-          computed<HeadObject>(() => {
-            return {
-              title: title.value,
-            }
-          }),
-        )
+        useHead({
+          title: title.value,
+        })
         title.value = 'hello'
         return () => '<div>hi</div>'
       },

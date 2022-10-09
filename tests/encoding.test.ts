@@ -1,12 +1,11 @@
-import { computed } from 'vue'
 import { JSDOM } from 'jsdom'
 import { createHead, renderHeadToString } from '../src'
 
 describe('encoding', () => {
   it('ssr encodes textContent', () => {
     const head = createHead()
-    head.addHeadObjs(
-      computed(() => ({
+    head.setupHeadEntry({
+      resolvedInput: {
         htmlAttrs: {
           onload: 'console.log(\'executed\')',
         },
@@ -19,8 +18,8 @@ describe('encoding', () => {
             innerHTML: '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX" height="0" width="0" style="display:none;visibility:hidden"></iframe>',
           },
         ],
-      })),
-    )
+      },
+    })
     const { htmlAttrs, headTags } = renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot('"<script src=\\"javascript:console.log(\\\\\'xss\\\\\');\\"></script><noscript></noscript><meta name=\\"head:count\\" content=\\"2\\">"')
     expect(htmlAttrs).toMatchInlineSnapshot('" data-head-attrs=\\"\\""')
@@ -28,15 +27,16 @@ describe('encoding', () => {
 
   it('ssr jailbreak', async () => {
     const head = createHead()
-    head.addHeadObjs(
-      computed(() => ({
+    head.setupHeadEntry({
+      resolvedInput: {
         meta: [
           {
             '> console.alert("test")':
-              '<style>body { background: red; }</style>',
+                '<style>body { background: red; }</style>',
           },
         ],
-      })),
+      },
+    },
     )
     const { headTags } = renderHeadToString(head)
     // valid html (except for the tag name)
@@ -47,9 +47,8 @@ describe('encoding', () => {
 
   it('ssr google maps', async () => {
     const head = createHead()
-    head.addHeadObjs(
-      // @ts-expect-error computed issue
-      computed(() => ({
+    head.setupHeadEntry({
+      resolvedInput: {
         script: [
           {
             src: 'https://polyfill.io/v3/polyfill.min.js?features=default',
@@ -61,8 +60,8 @@ describe('encoding', () => {
             'body': true,
           },
         ],
-      })),
-    )
+      },
+    })
     const { headTags, bodyTags } = renderHeadToString(head)
     // valid html
     expect(headTags).toMatchInlineSnapshot(
@@ -77,14 +76,16 @@ describe('encoding', () => {
   // Note: This should be fixed in a separate PR, possibly don't allow scripts without using useHeadRaw
   it('ssr xss', async () => {
     const externalApiHeadData = {
-      script: [
-        {
-          children: 'console.alert("xss")',
-        },
-      ],
+      resolvedInput: {
+        script: [
+          {
+            children: 'console.alert("xss")',
+          },
+        ],
+      },
     }
     const head = createHead()
-    head.addHeadObjs(computed(() => externalApiHeadData))
+    head.setupHeadEntry(externalApiHeadData)
     const { headTags } = renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot(
       '"<script>console.alert(&quot;xss&quot;)</script><meta name=\\"head:count\\" content=\\"1\\">"',
@@ -93,14 +94,16 @@ describe('encoding', () => {
 
   it('csr xss', () => {
     const externalApiHeadData = {
-      script: [
-        {
-          innerHTML: 'console.alert("xss")',
-        },
-      ],
+      resolvedInput: {
+        script: [
+          {
+            innerHTML: 'console.alert("xss")',
+          },
+        ],
+      },
     }
     const head = createHead()
-    head.addHeadObjs(externalApiHeadData)
+    head.setupHeadEntry(externalApiHeadData)
 
     const dom = new JSDOM(
       '<!DOCTYPE html><html><head></head><body></body></html>',

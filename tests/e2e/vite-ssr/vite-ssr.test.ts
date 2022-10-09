@@ -55,6 +55,7 @@ describe('e2e: vite ssr', async () => {
         // @ts-expect-error untyped
         return window.head
       })
+      console.log(head.headTags)
       return head.headTags
     }
     expect(

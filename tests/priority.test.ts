@@ -3,63 +3,71 @@ import { createHead, renderHeadToString } from '../src'
 describe('tag priority', () => {
   test('charset first', async () => {
     const head = createHead()
-    head.addHeadObjs(() => ({
-      script: [
-        {
-          src: '/my-important-script.js',
-        },
-      ],
-      meta: [
-        {
-          name: 'something-else',
-          content: 'test',
-        },
-        {
-          name: 'description',
-          content: 'desc',
-        },
-      ],
-    }))
-    head.addHeadObjs(() => ({
-      meta: [
-        {
-          charset: 'utf-8',
-        },
-      ],
-    }))
+    head.setupHeadEntry({
+      resolvedInput: {
+        script: [
+          {
+            src: '/my-important-script.js',
+          },
+        ],
+        meta: [
+          {
+            name: 'something-else',
+            content: 'test',
+          },
+          {
+            name: 'description',
+            content: 'desc',
+          },
+        ],
+      },
+    })
+    head.setupHeadEntry({
+      resolvedInput: {
+        meta: [
+          {
+            charset: 'utf-8',
+          },
+        ],
+      },
+    })
     const { headTags } = renderHeadToString(head)
     expect(headTags.startsWith('<meta charset="utf-8">')).toBeTruthy()
   })
 
   test('base early', async () => {
     const head = createHead()
-    head.addHeadObjs(() => ({
-      script: [
-        {
-          src: '/my-important-script.js',
-        },
-      ],
-      meta: [
-        {
-          name: 'something-else',
-          content: 'test',
-        },
-        {
-          name: 'description',
-          content: 'desc',
-        },
-      ],
-    }))
-    head.addHeadObjs(() => ({
-      meta: [
-        {
-          charset: 'utf-8',
-        },
-      ],
-      base: {
-        href: '/base',
+    head.setupHeadEntry({
+      resolvedInput: {
+        script: [
+          {
+            src: '/my-important-script.js',
+          },
+        ],
+        meta: [
+          {
+            name: 'something-else',
+            content: 'test',
+          },
+          {
+            name: 'description',
+            content: 'desc',
+          },
+        ],
       },
-    }))
+    })
+    head.setupHeadEntry({
+      resolvedInput: {
+        meta: [
+          {
+            charset: 'utf-8',
+          },
+        ],
+        base: {
+          href: '/base',
+        },
+      },
+    })
     const { headTags } = renderHeadToString(head)
     expect(
       headTags.startsWith('<meta charset="utf-8"><base href="/base">'),
@@ -68,31 +76,35 @@ describe('tag priority', () => {
 
   test('CSP early', async () => {
     const head = createHead()
-    head.addHeadObjs(() => ({
-      script: [
-        {
-          src: '/my-important-script.js',
-        },
-      ],
-      meta: [
-        {
-          name: 'something-else',
-          content: 'test',
-        },
-        {
-          name: 'description',
-          content: 'desc',
-        },
-      ],
-    }))
-    head.addHeadObjs(() => ({
-      meta: [
-        {
-          'http-equiv': 'content-security-policy',
-          'content': 'test',
-        },
-      ],
-    }))
+    head.setupHeadEntry({
+      resolvedInput: {
+        script: [
+          {
+            src: '/my-important-script.js',
+          },
+        ],
+        meta: [
+          {
+            name: 'something-else',
+            content: 'test',
+          },
+          {
+            name: 'description',
+            content: 'desc',
+          },
+        ],
+      },
+    })
+    head.setupHeadEntry({
+      resolvedInput: {
+        meta: [
+          {
+            'http-equiv': 'content-security-policy',
+            'content': 'test',
+          },
+        ],
+      },
+    })
     const { headTags } = renderHeadToString(head)
     expect(
       headTags.startsWith(
@@ -103,20 +115,24 @@ describe('tag priority', () => {
 
   test('manual priority', async () => {
     const head = createHead()
-    head.addHeadObjs({
-      script: [
-        {
-          src: '/not-important-script.js',
-        },
-      ],
+    head.setupHeadEntry({
+      resolvedInput: {
+        script: [
+          {
+            src: '/not-important-script.js',
+          },
+        ],
+      },
     })
-    head.addHeadObjs({
-      script: [
-        {
-          src: '/very-important-script.js',
-          renderPriority: 1,
-        },
-      ],
+    head.setupHeadEntry({
+      resolvedInput: {
+        script: [
+          {
+            src: '/very-important-script.js',
+            renderPriority: 1,
+          },
+        ],
+      },
     })
     const { headTags } = renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot(

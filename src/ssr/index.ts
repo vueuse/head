@@ -1,7 +1,8 @@
+import type { MergeHead } from '@zhead/schema'
 import type { HTMLResult, HeadAttrs, HeadTag } from '../types'
 import { BODY_TAG_ATTR_NAME, HEAD_ATTRS_KEY, HEAD_COUNT_KEY, SELF_CLOSING_TAGS } from '../constants'
 import type { HeadClient } from '../index'
-import { escapeHtml, escapeJS, sortTags, stringifyAttrName, stringifyAttrValue } from '../index'
+import { escapeHtml, escapeJS, stringifyAttrName, stringifyAttrValue } from '../index'
 import { stringifyAttrs } from './stringify-attrs'
 
 export * from './stringify-attrs'
@@ -44,19 +45,18 @@ export const tagToString = (tag: HeadTag) => {
   }>${innerContent}</${tag.tag}>`
 }
 
-export const renderHeadToString = (head: HeadClient): HTMLResult => {
+export const renderHeadToString = <T extends MergeHead = {}>(head: HeadClient<T>): HTMLResult => {
   const tags: string[] = []
   const bodyTags: string[] = []
   let titleTag = ''
   const attrs: { htmlAttrs: HeadAttrs; bodyAttrs: HeadAttrs } = { htmlAttrs: {}, bodyAttrs: {} }
 
-  for (const tag of head.headTags.sort(sortTags)) {
+  for (const tag of head.headTags) {
     if (tag.tag === 'title') { titleTag = tagToString(tag) }
     else if (tag.tag === 'htmlAttrs' || tag.tag === 'bodyAttrs') {
       for (const k in tag.props) {
-        const keyName = stringifyAttrName(k)
         // always encode name to avoid html errors
-        attrs[tag.tag][keyName] = tag._options?.raw ? tag.props[keyName] : tag.props[stringifyAttrValue(keyName)]
+        attrs[tag.tag][stringifyAttrName(k)] = stringifyAttrValue(tag.props[k])
       }
     }
     else if (tag.props.body) { bodyTags.push(tagToString(tag)) }

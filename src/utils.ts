@@ -1,8 +1,7 @@
-import type { MaybeComputedRef } from '@vueuse/shared'
 import { resolveUnref } from '@vueuse/shared'
 import { unref } from 'vue'
 import type { MergeHead } from '@zhead/schema'
-import type { HeadEntry, HeadTag, ResolvedHeadEntry } from './types'
+import type { HeadTag, ResolvedUseHeadInput, UseHeadInput } from './types'
 
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   const tagWeight = (tag: HeadTag) => {
@@ -66,13 +65,17 @@ export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
   return false
 }
 
-function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>): any {
+export function resolveUnrefHeadInput<T extends MergeHead = {}>(ref: UseHeadInput<T>): ResolvedUseHeadInput<T> {
   const root = resolveUnref(ref)
-  if (!ref || !root)
+  if (!ref || !root) {
+    // @ts-expect-error recursion untyped
     return root
+  }
 
-  if (Array.isArray(root))
-    return root.map(resolveUnrefDeeply)
+  if (Array.isArray(root)) {
+    // @ts-expect-error recursion untyped
+    return root.map(resolveUnrefHeadInput)
+  }
 
   if (typeof root === 'object') {
     return Object.fromEntries(
@@ -83,17 +86,10 @@ function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>): any {
 
         return [
           key,
-          resolveUnrefDeeply(value),
+          resolveUnrefHeadInput(value),
         ]
       }),
     )
   }
   return root
-}
-
-export function resolveHeadEntry<T extends MergeHead = {}>(obj: HeadEntry<T>): ResolvedHeadEntry {
-  return {
-    ...obj,
-    input: resolveUnrefDeeply(obj.input),
-  }
 }

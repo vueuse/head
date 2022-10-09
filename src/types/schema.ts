@@ -50,8 +50,6 @@ export interface HasRenderPriority {
    * * 0 <meta http-equiv="content-security-policy" ...>
    *
    * All other tags have a default priority of 10: <meta>, <script>, <link>, <style>, etc
-   *
-   * @warn Experimental feature. Only available when rendering SSR
    */
   renderPriority?: number
 }
@@ -82,11 +80,11 @@ export interface VueUseHeadSchema extends MergeHead {
 export type HeadObjectPlain<T extends MergeHead = {}> = PlainHead<T & VueUseHeadSchema>
 export type HeadObject<T extends MergeHead = {}> = ReactiveHead<T & VueUseHeadSchema>
 export type UseHeadInput<T extends MergeHead = {}> = MaybeComputedRef<HeadObject<T>>
+export type ResolvedUseHeadInput<T extends MergeHead = {}> = PlainHead<T & VueUseHeadSchema>
 export type UseHeadRawInput = MaybeComputedRef<ReactiveHead<RawHeadAugmentation & VueUseHeadSchema>>
 
 export interface HeadEntryOptions { raw?: boolean }
-
-export interface HeadEntry<T extends MergeHead = {}> { options?: HeadEntryOptions; input: UseHeadInput<T>; id?: number }
-export interface ResolvedHeadEntry<T extends MergeHead = {}> { options?: HeadEntryOptions; input: PlainHead<T & VueUseHeadSchema> }
+export interface HeadEntry<T extends MergeHead = {}> { options: HeadEntryOptions; resolvedInput: ResolvedUseHeadInput<T>; input: UseHeadInput<T>; id: number }
+export interface HeadEntryInput<T extends MergeHead = {}> { options?: HeadEntryOptions; resolvedInput?: ResolvedUseHeadInput<T>; input?: UseHeadInput<T>; id?: number }
 
 export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>

@@ -1,13 +1,10 @@
+import type { HeadEntryOptions } from '@vueuse/head'
 import { createHead, renderHeadToString } from '@vueuse/head'
-import type { ComputedGetter } from 'vue'
 import {
-  computed,
-  getCurrentInstance,
+  getCurrentInstance, isRef,
   onBeforeUnmount,
-  ref,
   watchEffect,
 } from 'vue'
-import defu from 'defu'
 import type { MetaObject } from '.'
 import { defineNuxtPlugin } from '#app'
 
@@ -18,59 +15,48 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   nuxtApp.vueApp.use(head)
 
-  const headReady = ref(false)
   nuxtApp.hooks.hookOnce('app:mounted', () => {
     watchEffect(() => {
       head.updateDOM()
     })
-    headReady.value = true
   })
 
-  if (process.client) {
-    let pauseDOMUpdates = false
-    head.hookBeforeDomUpdate.push(() => !pauseDOMUpdates)
+  nuxtApp._useHead = (_meta: MetaObject, options: HeadEntryOptions) => {
+    const removeSideEffectFns = []
 
-    nuxtApp.hooks.hookOnce('page:finish', () => {
-      pauseDOMUpdates = false
-      // start pausing DOM updates when route changes (trigger immediately)
-      useRouter().beforeEach(() => {
-        pauseDOMUpdates = true
-      })
+    // only support shortcuts if it's a plain object (avoids ref packing / unpacking)
+    if (!isRef(_meta) && typeof _meta === 'object') {
+      const shortcutMeta = []
+      if (_meta.charset) {
+        shortcutMeta.push({
+          charset: _meta.charset,
+        })
+      }
+      if (_meta.viewport) {
+        shortcutMeta.push({
+          name: 'viewport',
+          content: _meta.viewport,
+        })
+      }
+      if (shortcutMeta.length) {
+        removeSideEffectFns.push(head.setupHeadEntry({
+          meta: shortcutMeta,
+        }))
+      }
+    }
 
-      // watch for new route before unpausing dom updates (triggered after suspense resolved)
-      watch(useRoute(), () => {
-        pauseDOMUpdates = false
-        head.updateDOM()
-      })
-    })
-  }
-
-  nuxtApp._useHead = (_meta: MetaObject | ComputedGetter<MetaObject>) => {
-    const meta = ref<MetaObject>(_meta)
-    const headObj = computed(() => {
-      const overrides: MetaObject = { meta: [] }
-      if (meta.value.charset)
-        overrides.meta!.push({ key: 'charset', charset: meta.value.charset })
-
-      if (meta.value.viewport)
-        overrides.meta!.push({ name: 'viewport', content: meta.value.viewport })
-
-      return defu(overrides, meta.value)
-    })
-    const removeHeadObjs = head.addHeadObjs(headObj as any)
+    const cleanUp = head.setupReactiveHeadEntry(_meta, options)
 
     if (process.server)
       return
-
-    if (headReady.value)
-      watchEffect(() => { head.updateDOM() })
 
     const vm = getCurrentInstance()
     if (!vm)
       return
 
     onBeforeUnmount(() => {
-      removeHeadObjs()
+      cleanUp()
+      removeSideEffectFns.forEach(fn => fn())
       head.updateDOM()
     })
   }
@@ -84,5 +70,27 @@ export default defineNuxtPlugin((nuxtApp) => {
         bodyScripts: meta.bodyTags,
       }
     }
+  }
+  else {
+    let pauseDOMUpdates = false
+    // head.hookBeforeDomUpdate.push(() => {
+    //   console.log('paus edom', pauseDOMUpdates)
+    //   return !pauseDOMUpdates
+    // })
+    nuxtApp.hooks.hookOnce('app:mounted', () => {
+      pauseDOMUpdates = false
+      head.updateDOM()
+      console.log('mounted', pauseDOMUpdates)
+
+      // start pausing DOM updates when route changes (trigger immediately)
+      useRouter().beforeEach(() => {
+        pauseDOMUpdates = true
+      })
+      // watch for new route before unpausing dom updates (triggered after suspense resolved)
+      useRouter().afterEach(() => {
+        pauseDOMUpdates = false
+        head.updateDOM()
+      })
+    })
   }
 })
