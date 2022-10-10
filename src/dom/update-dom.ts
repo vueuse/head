@@ -18,22 +18,23 @@ export const updateDOM = async ({ head, document, previousTags }: { head: HeadCl
 
   // head sorting here is not guaranteed to be honoured
   for (const tag of headTags) {
-    if (tag.tag === 'title') {
-      domCtx.title = tag.props.textContent
-      continue
+    switch (tag.tag) {
+      case 'title':
+        domCtx.title = tag.props.textContent
+        break
+      case 'htmlAttrs':
+      case 'bodyAttrs':
+        Object.assign(domCtx[tag.tag], tag.props)
+        break
+      default:
+        domCtx.tags[tag.tag] = domCtx.tags[tag.tag] || []
+        domCtx.tags[tag.tag].push(tag)
     }
-    if (tag.tag === 'htmlAttrs' || tag.tag === 'bodyAttrs') {
-      Object.assign(domCtx[tag.tag], tag.props)
-      continue
-    }
-
-    domCtx.tags[tag.tag] = domCtx.tags[tag.tag] || []
-    domCtx.tags[tag.tag].push(tag)
   }
 
   // allow integration to disable dom update and / or modify it
   for (const k in head.hookBeforeDomUpdate) {
-    if (head.hookBeforeDomUpdate[k](domCtx.tags) === false)
+    if (await head.hookBeforeDomUpdate[k](domCtx) === false)
       return
   }
 
