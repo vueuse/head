@@ -68,8 +68,10 @@ describe('basic', () => {
     expect(resolveHeadEntriesToTags(head.headEntries)).toMatchInlineSnapshot(`
       [
         {
-          "_options": {},
-          "_position": 0,
+          "_runtime": {
+            "entryId": 0,
+            "position": 0,
+          },
           "props": {
             "class": "bg-yellow-500",
             "style": "background: yellow",

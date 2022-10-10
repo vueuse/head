@@ -12,31 +12,25 @@ export * from './schema'
 
 export interface HeadAttrs { [k: string]: any }
 
-export type HookBeforeDomUpdate = ((ctx: DomUpdateCtx) => Promise<void | boolean> | void | boolean)[]
+export type HookBeforeDomUpdate = ((tags: HeadTag[]) => Promise<void | boolean> | void | boolean)[]
 export type HookTagsResolved = ((tags: HeadTag[]) => Promise<void> | void)[]
+
+export type HeadTagRuntime = HeadEntryOptions & HandlesDuplicates &
+HasRenderPriority &
+RendersToBody &
+HasTextContent & { position: number; entryId: number }
 
 export interface HeadTag {
   tag: TagKeys
-  props: HandlesDuplicates &
-  HasRenderPriority &
-  RendersToBody &
-  HasTextContent & {
+  props: {
     [k: string]: any
   }
-  _options?: HeadEntryOptions
-  _position?: number
+  _runtime: HeadTagRuntime
 }
 
 export interface HeadObjectApi<T extends MergeHead = {}> {
   update: (resolvedInput: ResolvedUseHeadInput<T>) => void
   remove: () => void
-}
-
-export interface DomUpdateCtx {
-  title: string | undefined
-  htmlAttrs: HeadAttrs
-  bodyAttrs: HeadAttrs
-  tags: Record<string, HeadTag[]>
 }
 
 export interface HTMLResult {
