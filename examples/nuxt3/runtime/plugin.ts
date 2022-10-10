@@ -87,4 +87,26 @@ export default defineNuxtPlugin((nuxtApp) => {
       }
     }
   }
+  else {
+    let pauseDOMUpdates = false
+    // head.hookBeforeDomUpdate.push(() => {
+    //   console.log('paus edom', pauseDOMUpdates)
+    //   return !pauseDOMUpdates
+    // })
+    nuxtApp.hooks.hookOnce('app:mounted', () => {
+      pauseDOMUpdates = false
+      head.updateDOM()
+      console.log('mounted', pauseDOMUpdates)
+
+      // start pausing DOM updates when route changes (trigger immediately)
+      useRouter().beforeEach(() => {
+        pauseDOMUpdates = true
+      })
+      // watch for new route before unpausing dom updates (triggered after suspense resolved)
+      useRouter().afterEach(() => {
+        pauseDOMUpdates = false
+        head.updateDOM()
+      })
+    })
+  }
 })
