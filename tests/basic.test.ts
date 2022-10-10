@@ -1,6 +1,5 @@
 import { ref } from 'vue'
-import { resolveHeadEntriesToTags } from '@vueuse/head'
-import { createHead } from '../src'
+import { createHead, resolveHeadEntriesToTags } from '../src'
 
 describe('basic', () => {
   test('removing head works', async () => {
