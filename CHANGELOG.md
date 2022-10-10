@@ -2,6 +2,12 @@
 
 No unreleased changes.
 
+## 1.0.0-rc.3
+
+- fix(ci): remove broken --pre
+- Merge branch 'v1' of github.com:vueuse/head into v1
+- fix: ensure empty attrs reset attrs (#130)
+
 ## 1.0.0-rc.2
 
 - fix(ci): release on rc
