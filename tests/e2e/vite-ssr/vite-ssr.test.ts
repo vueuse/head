@@ -2,7 +2,7 @@ import type { ExecaChildProcess } from 'execa'
 import type { Browser } from 'playwright'
 import type { HeadClient } from '../../../src'
 import { createBrowser, startServer } from './utils'
-import {resolveHeadEntriesToTags} from "../../../src";
+import {resolveHeadEntries, resolveHeadEntriesToTags} from "../../../src";
 
 describe('e2e: vite ssr', async () => {
   let serverProcess: ExecaChildProcess
@@ -56,7 +56,8 @@ describe('e2e: vite ssr', async () => {
         // @ts-expect-error untyped
         return window.head
       })
-      return resolveHeadEntriesToTags(head.headEntries)
+      const resolved = resolveHeadEntries(head.entries)
+      return resolveHeadEntriesToTags(resolved)
     }
     expect(
       (await getHeadTags()).find(t => t.tag === 'title')!._runtime.textContent,

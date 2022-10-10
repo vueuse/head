@@ -18,8 +18,8 @@ describe('basic', () => {
     })
     remove()
 
-    expect(head.headEntries.length).toBe(1)
-    expect(head.headEntries).toMatchInlineSnapshot(`
+    expect(head.entries.length).toBe(1)
+    expect(head.entries).toMatchInlineSnapshot(`
       [
         {
           "id": 0,
@@ -49,7 +49,7 @@ describe('basic', () => {
         },
       }),
     )
-    expect(head.headEntries).toMatchInlineSnapshot(`
+    expect(head.entries).toMatchInlineSnapshot(`
       [
         {
           "id": 0,
@@ -65,7 +65,7 @@ describe('basic', () => {
       ]
     `)
 
-    expect(resolveHeadEntriesToTags(head.headEntries)).toMatchInlineSnapshot(`
+    expect(resolveHeadEntriesToTags(head.entries)).toMatchInlineSnapshot(`
       [
         {
           "_runtime": {

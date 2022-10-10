@@ -44,7 +44,8 @@
   "dependencies": {
     "@vueuse/shared": "^9.3.0",
     "@zhead/schema": "^0.8.5",
-    "@zhead/schema-vue": "^0.8.5"
+    "@zhead/schema-vue": "^0.8.5",
+    "hookable": "^5.3.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.27.0",

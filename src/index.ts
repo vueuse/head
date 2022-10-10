@@ -7,15 +7,17 @@ import {
   watchEffect,
 } from 'vue'
 import type { MergeHead } from '@zhead/schema'
+import type { Hookable } from 'hookable'
+import { createHooks } from 'hookable'
 import {
   PROVIDE_KEY,
 } from './constants'
 import { resolveUnrefHeadInput } from './utils'
 import type {
   HeadEntry,
-  HeadEntryOptions, HeadObjectApi,
-  HookBeforeDomUpdate, HookTagsResolved,
-  ResolvedUseHeadInput, UseHeadInput, UseHeadRawInput,
+  HeadEntryOptions, HeadHooks,
+  HeadObjectApi, ResolvedUseHeadInput, UseHeadInput,
+  UseHeadRawInput,
 } from './types'
 import { updateDOM } from './dom/update-dom'
 
@@ -24,26 +26,14 @@ export * from './types'
 export interface HeadClient<T extends MergeHead = {}> {
   install: (app: App) => void
 
-  headEntries: HeadEntry<T>[]
+  entries: HeadEntry<T>[]
 
   addEntry: (entry: UseHeadInput<T>, options?: HeadEntryOptions) => HeadObjectApi<T>
   addReactiveEntry: (objs: UseHeadInput<T>, options?: HeadEntryOptions) => () => void
 
   updateDOM: (document?: Document, force?: boolean) => void
 
-  /**
-   * Array of user provided functions to hook into before the DOM is updated.
-   *
-   * When returning false from this function, it will block DOM updates, this can be useful when stopping dom updates
-   * between page transitions.
-   *
-   * You are able to modify the payload of hook using this.
-   */
-  hookBeforeDomUpdate: HookBeforeDomUpdate
-  /**
-   * Array of user provided functions to hook into after the tags have been resolved (deduped and sorted).
-   */
-  hookTagsResolved: HookTagsResolved
+  hooks: Hookable<HeadHooks>
 }
 
 export const IS_BROWSER = typeof window !== 'undefined'
@@ -68,10 +58,9 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: ResolvedUs
 
   const previousTags = new Set<string>()
 
-  const hookBeforeDomUpdate: HookBeforeDomUpdate = []
-  const hookTagsResolved: HookTagsResolved = []
-
   let domUpdateTick: Promise<void> | null = null
+
+  const hooks = createHooks<HeadHooks>()
 
   const head: HeadClient<T> = {
     install(app) {
@@ -79,10 +68,11 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: ResolvedUs
       app.provide(PROVIDE_KEY, head)
     },
 
-    hookBeforeDomUpdate,
-    hookTagsResolved,
+    get hooks() {
+      return hooks
+    },
 
-    get headEntries() {
+    get entries() {
       return entries
     },
 

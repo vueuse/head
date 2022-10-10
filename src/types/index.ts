@@ -2,7 +2,7 @@ import type { MergeHead } from '@zhead/schema'
 import type {
   HandlesDuplicates,
   HasRenderPriority,
-  HasTextContent,
+  HasTextContent, HeadEntry,
   HeadEntryOptions,
   RendersToBody, ResolvedUseHeadInput,
   TagKeys,
@@ -12,8 +12,13 @@ export * from './schema'
 
 export interface HeadAttrs { [k: string]: any }
 
-export type HookBeforeDomUpdate = ((tags: HeadTag[]) => Promise<void | boolean> | void | boolean)[]
-export type HookTagsResolved = ((tags: HeadTag[]) => Promise<void> | void)[]
+type Hook = Promise<void> | void
+
+export interface HeadHooks {
+  'before:dom': (ctx: { render: boolean; previousTags: Set<string> }) => Hook
+  'resolved:entries': (entries: HeadEntry[]) => Hook
+  'resolved:tags': (tags: HeadTag[]) => Hook
+}
 
 export type HeadTagRuntime = HeadEntryOptions & HandlesDuplicates &
 HasRenderPriority &

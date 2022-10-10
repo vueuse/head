@@ -84,7 +84,7 @@ describe('encoding', () => {
     )
   })
 
-  it('csr xss', () => {
+  it('csr xss', async () => {
     const externalApiHeadData = {
       script: [
         {
@@ -99,10 +99,10 @@ describe('encoding', () => {
       '<!DOCTYPE html><html><head></head><body></body></html>',
     )
 
-    head.updateDOM(dom.window.document, true)
+    await head.updateDOM(dom.window.document, true)
 
     expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot(
-      '"<script></script><meta name=\\"head:count\\" content=\\"1\\">"',
+      '"<meta name=\\"head:count\\" content=\\"0\\">"',
     )
   })
 })

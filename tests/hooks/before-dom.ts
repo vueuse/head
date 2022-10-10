@@ -1,7 +1,7 @@
 import { createSSRApp, ref } from 'vue'
 import { JSDOM } from 'jsdom'
 import { renderToString } from '@vue/server-renderer'
-import { createHead, useHead } from '../src'
+import { createHead, useHead } from '../../src'
 
 describe('toggle dom render', () => {
   test('basic', async () => {
@@ -11,7 +11,9 @@ describe('toggle dom render', () => {
     })
 
     let pauseDOMUpdates = true
-    head.hookBeforeDomUpdate.push(() => !pauseDOMUpdates)
+    head.hooks.hook('before:dom', (ctx) => {
+      ctx.render = !pauseDOMUpdates
+    })
 
     const dom = new JSDOM(
       '<!DOCTYPE html><html><head></head><body></body></html>',
@@ -26,7 +28,7 @@ describe('toggle dom render', () => {
     await head.updateDOM(dom.window.document, true)
 
     expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot(
-      '"<title>test</title>"',
+      '"<title>test</title><meta name=\\"head:count\\" content=\\"0\\">"',
     )
   })
 
@@ -35,7 +37,9 @@ describe('toggle dom render', () => {
     const app = createSSRApp({
       async setup() {
         let pauseDOMUpdates = true
-        head.hookBeforeDomUpdate.push(() => !pauseDOMUpdates)
+        head.hooks.hook('before:dom', (ctx) => {
+          ctx.render = !pauseDOMUpdates
+        })
         const title = ref('')
         useHead({
           title,
@@ -54,7 +58,7 @@ describe('toggle dom render', () => {
         await head.updateDOM(dom.window.document, true)
 
         expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot(
-          '"<title>hello</title>"',
+          '"<title>hello</title><meta name=\\"head:count\\" content=\\"0\\">"',
         )
 
         return () => '<div>hi</div>'
