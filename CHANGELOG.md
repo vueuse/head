@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 0.9.8
+
+- chore: bump deps
+
 ## 0.9.7
 
 - fix: ensure `hookBeforeDomUpdate` doesn't block dom update
