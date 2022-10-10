@@ -44,8 +44,8 @@ export const updateElements = (
     head.append(headCountEl)
   }
   let newElements = tags.map(tag => ({
-    element: createElement(tag.tag, tag.props, document),
-    body: tag.props.body ?? false,
+    element: createElement(tag, document),
+    body: tag._runtime.body ?? false,
   }))
 
   newElements = newElements.filter((newEl) => {

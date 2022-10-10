@@ -29,6 +29,12 @@ export interface RendersToBody {
 
 export interface HasTextContent {
   /**
+   * Text content of the tag.
+   *
+   * @deprecated This can only be used with `useHeadRaw`.
+   */
+  innerHTML?: string
+  /**
    * Sets the textContent of an element.
    *
    * @deprecated Use `textContent` instead.
@@ -85,6 +91,12 @@ export type ResolvedUseHeadInput<T extends MergeHead = {}> = PlainHead<T & VueUs
 export type UseHeadRawInput = MaybeComputedRef<ReactiveHead<RawHeadAugmentation & VueUseHeadSchema>>
 
 export interface HeadEntryOptions { raw?: boolean; resolved?: boolean }
-export interface HeadEntry<T extends MergeHead = {}> { options: HeadEntryOptions; tags: HeadTag[]; input: ResolvedUseHeadInput<T>; resolved: boolean; id: number }
+export interface HeadEntry<T extends MergeHead = {}> {
+  options: HeadEntryOptions
+  tags: HeadTag[]
+  input: ResolvedUseHeadInput<T>
+  resolved: boolean
+  id: number
+}
 
 export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>

@@ -117,7 +117,7 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: ResolvedUs
       // within the debounced dom update we need to compute all the tags so that watchEffects still works
       const doDomUpdate = () => {
         domUpdateTick = null
-        return updateDOM({ head, document, previousTags })
+        return updateDOM(head, previousTags, document)
       }
 
       if (force)

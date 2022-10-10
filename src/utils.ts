@@ -1,13 +1,13 @@
 import { resolveUnref } from '@vueuse/shared'
 import { unref } from 'vue'
 import type { MergeHead } from '@zhead/schema'
-import type { HeadEntry, HeadObjectPlain, HeadTag, ResolvedUseHeadInput, UseHeadInput } from './types'
+import type { HeadEntry, HeadObjectPlain, HeadTag, ResolvedUseHeadInput, TagKeys, UseHeadInput } from './types'
 import { resolveHeadEntry } from './ssr'
 
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   const tagWeight = (tag: HeadTag) => {
-    if (tag.props.renderPriority)
-      return tag.props.renderPriority
+    if (tag._runtime.renderPriority)
+      return tag._runtime.renderPriority
 
     switch (tag.tag) {
       // This element must come before other elements with attribute values of URLs
@@ -30,7 +30,7 @@ export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
 }
 
 export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
-  const { props, tag: tagName } = tag
+  const { props, tag: tagName, _runtime } = tag
   // must only be a single base so we always dedupe
   if (tagName === 'base' || tagName === 'title')
     return tagName
@@ -43,17 +43,19 @@ export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
   if (props.charset)
     return 'charset'
 
-  const name = ['key', 'id']
+  if (_runtime.key)
+    return `${tagName}:${_runtime.key}`
+
+  const name = ['id']
   if (tagName === 'meta')
     name.push(...['name', 'property', 'http-equiv'])
-
   for (const n of name) {
     if (typeof props[n] !== 'undefined') {
       // for example: meta-name-description
-      return `${tagName}-${n}-${props[n]}`
+      return `${tagName}:${n}:${props[n]}`
     }
   }
-  return tag._position!
+  return tag._runtime.position!
 }
 
 export function resolveUnrefHeadInput<T extends MergeHead = {}>(ref: UseHeadInput<T>): ResolvedUseHeadInput<T> {
@@ -85,20 +87,35 @@ export function resolveUnrefHeadInput<T extends MergeHead = {}>(ref: UseHeadInpu
   return root
 }
 
-const resolveTag = (tag: HeadTag, e: HeadEntry): HeadTag => {
-  const legacyDedupeKeys = ['hid', 'vmid']
-  legacyDedupeKeys.forEach((key) => {
-    if (tag.props[key]) {
-      tag.props.key = tag.props[key]
-      delete tag.props[key]
+const resolveTag = (name: TagKeys, input: Record<string, any>, e: HeadEntry): HeadTag => {
+  const tag: HeadTag = {
+    tag: name,
+    props: [],
+    _runtime: {
+      entryId: e.id,
+      position: 0,
+    },
+  }
+  ;['hid', 'vmid'].forEach((key) => {
+    if (input[key]) {
+      tag._runtime.key = input[key]
+      delete input[key]
     }
   })
-  // avoid untrusted data providing their own options key (fixes XSS)
-  if (tag._options)
-    delete tag._options
   // tag inherits options from useHead registration
-  if (e.options)
-    tag._options = e.options
+  tag._runtime = {
+    ...tag._runtime,
+    ...e.options,
+  }
+  ;['body', 'renderPriority', 'key', 'children', 'innerHTML', 'textContent']
+    .forEach((key) => {
+      if (typeof input[key] !== 'undefined') {
+        // @ts-expect-error untyped
+        tag._runtime[key] = input[key]
+        delete input[key]
+      }
+    })
+  tag.props = input
   return tag
 }
 
@@ -109,7 +126,7 @@ export const headInputToTags = (e: HeadEntry) => {
       return (Array.isArray(value) ? value : [value]).map((props) => {
         switch (key) {
           case 'title':
-            return resolveTag({ tag: key, props: { textContent: props } }, e)
+            return resolveTag(key, { textContent: props }, e)
           case 'base':
           case 'meta':
           case 'link':
@@ -119,7 +136,7 @@ export const headInputToTags = (e: HeadEntry) => {
           case 'htmlAttrs':
           case 'bodyAttrs':
             // unref item to support ref array entries
-            return resolveTag({ tag: key, props }, e)
+            return resolveTag(key, props, e)
           default:
             return false
         }
@@ -157,17 +174,17 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
       // used to restore the order after deduping
       // a large number is needed otherwise the position will potentially duplicate (this support 10k tags)
       // ideally we'd use the total tag count but this is too hard to calculate with the current reactivity
-      tag._position = entryIndex * 10000 + tagIdx
+      tag._runtime.position = entryIndex * 10000 + tagIdx
 
       // resolve titles
       if (titleTemplate && tag.tag === 'title') {
-        tag.props.textContent = renderTitleTemplate(
+        tag._runtime.textContent = renderTitleTemplate(
           titleTemplate,
-          tag.props.textContent,
+          tag._runtime.textContent,
         )
       }
       // validate XSS vectors for non-raw input
-      if (!tag._options?.raw) {
+      if (!tag._runtime?.raw) {
         for (const k in tag.props) {
           if (k.startsWith('on') || k === 'innerHTML')
             delete tag.props[k]
@@ -180,6 +197,6 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
   })
 
   return Object.values(deduping)
-    .sort((a, b) => a._position! - b._position!)
+    .sort((a, b) => a._runtime.position - b._runtime.position)
     .sort(sortTags)
 }

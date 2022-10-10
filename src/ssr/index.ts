@@ -15,41 +15,28 @@ import { stringifyAttrs } from './stringify-attrs'
 export * from './stringify-attrs'
 
 export const tagToString = (tag: HeadTag) => {
-  let isBodyTag = false
-  if (tag.props.body) {
-    isBodyTag = true
-    // avoid rendering body attr
-    delete tag.props.body
-  }
-  if (tag.props.renderPriority)
-    delete tag.props.renderPriority
-
-  const attrs = stringifyAttrs(tag.props, tag._options)
-  if (SELF_CLOSING_TAGS.includes(tag.tag)) {
-    return `<${tag.tag}${attrs}${
-      isBodyTag ? ' ' + ` ${BODY_TAG_ATTR_NAME}="true"` : ''
-    }>`
-  }
+  const body = tag._runtime.body ? ` ${BODY_TAG_ATTR_NAME}="true"` : ''
+  const attrs = stringifyAttrs(tag.props, tag._runtime)
+  if (SELF_CLOSING_TAGS.includes(tag.tag))
+    return `<${tag.tag}${attrs}${body}>`
 
   let innerContent = ''
 
-  if (tag._options?.raw && tag.props.innerHTML)
-    innerContent = tag.props.innerHTML
+  if (tag._runtime?.raw && tag._runtime.innerHTML)
+    innerContent = tag._runtime.innerHTML
 
-  if (!innerContent && tag.props.textContent)
-    innerContent = escapeJS(escapeHtml(tag.props.textContent))
+  if (!innerContent && tag._runtime.textContent)
+    innerContent = escapeJS(escapeHtml(tag._runtime.textContent))
 
-  if (!innerContent && tag.props.children)
+  if (!innerContent && tag._runtime.children)
     /*
      * DOM updates is using textContent which doesn't allow HTML or JS already, so SSR needs to match
      *
      * @see https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html#rule-1-html-escape-then-javascript-escape-before-inserting-untrusted-data-into-html-subcontext-within-the-execution-context
      */
-    innerContent = escapeJS(escapeHtml(tag.props.children))
+    innerContent = escapeJS(escapeHtml(tag._runtime.children))
 
-  return `<${tag.tag}${attrs}${
-    isBodyTag ? ` ${BODY_TAG_ATTR_NAME}="true"` : ''
-  }>${innerContent}</${tag.tag}>`
+  return `<${tag.tag}${attrs}${body}>${innerContent}</${tag.tag}>`
 }
 
 export const resolveHeadEntry = (entries: HeadEntry[], force?: boolean) => {
@@ -62,9 +49,9 @@ export const resolveHeadEntry = (entries: HeadEntry[], force?: boolean) => {
 }
 
 export const renderHeadToString = async <T extends MergeHead = {}>(head: HeadClient<T>): Promise<HTMLResult> => {
-  const tags: string[] = []
-  const bodyTags: string[] = []
-  let titleTag = ''
+  const headHtml: string[] = []
+  const bodyHtml: string[] = []
+  let titleHtml = ''
   const attrs: { htmlAttrs: HeadAttrs; bodyAttrs: HeadAttrs } = { htmlAttrs: {}, bodyAttrs: {} }
 
   const resolvedEntries = resolveHeadEntry(head.headEntries, true)
@@ -73,21 +60,23 @@ export const renderHeadToString = async <T extends MergeHead = {}>(head: HeadCli
     await head.hookTagsResolved[h](headTags)
 
   for (const tag of headTags) {
-    if (tag.tag === 'title') { titleTag = tagToString(tag) }
+    if (tag.tag === 'title') { titleHtml = tagToString(tag) }
     else if (tag.tag === 'htmlAttrs' || tag.tag === 'bodyAttrs') {
       for (const k in tag.props) {
         // always encode name to avoid html errors
         attrs[tag.tag][stringifyAttrName(k)] = stringifyAttrValue(tag.props[k])
       }
     }
-    else if (tag.props.body) { bodyTags.push(tagToString(tag)) }
-    else { tags.push(tagToString(tag)) }
+    else if (tag._runtime.body) { bodyHtml.push(tagToString(tag)) }
+    else {
+      headHtml.push(tagToString(tag))
+    }
   }
-  tags.push(`<meta name="${HEAD_COUNT_KEY}" content="${tags.length}">`)
+  headHtml.push(`<meta name="${HEAD_COUNT_KEY}" content="${headHtml.length}">`)
 
   return {
     get headTags() {
-      return titleTag + tags.join('')
+      return titleHtml + headHtml.join('')
     },
     get htmlAttrs() {
       return stringifyAttrs({
@@ -108,7 +97,7 @@ export const renderHeadToString = async <T extends MergeHead = {}>(head: HeadCli
       )
     },
     get bodyTags() {
-      return bodyTags.join('')
+      return bodyHtml.join('')
     },
   }
 }
