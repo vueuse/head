@@ -1,7 +1,7 @@
 import { resolveUnref } from '@vueuse/shared'
 import { unref } from 'vue'
 import type { MergeHead } from '@zhead/schema'
-import type { HeadEntry, HeadObjectPlain, HeadTag, ResolvedUseHeadInput, TagKeys, UseHeadInput } from './types'
+import type { HeadEntry, HeadObjectPlain, HeadTag, ResolvedUseHeadInput, UseHeadInput } from './types'
 import { resolveHeadEntry } from './ssr'
 
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
@@ -49,7 +49,6 @@ export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
   const name = ['id']
   if (tagName === 'meta')
     name.push(...['name', 'property', 'http-equiv'])
-
   for (const n of name) {
     if (typeof props[n] !== 'undefined') {
       // for example: meta-name-description
