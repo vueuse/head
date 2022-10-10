@@ -27,9 +27,16 @@ export const updateDOM = async (head: HeadClient, previousTags: Set<string>, doc
         if (typeof tag._runtime.textContent !== 'undefined')
           document.title = tag._runtime.textContent
         break
-      default:
+
+      case 'base':
+      case 'meta':
+      case 'link':
+      case 'style':
+      case 'script':
+      case 'noscript':
         tags[tag.tag] = tags[tag.tag] || []
         tags[tag.tag].push(tag)
+        break
     }
   }
 
