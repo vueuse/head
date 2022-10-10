@@ -3,8 +3,7 @@ on:
   pull_request:
     branches:
       - main
-    paths-ignore:
-      - '**/README.md'
+      - v1
 jobs:
   size:
     runs-on: ubuntu-latest
