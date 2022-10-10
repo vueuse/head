@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.0-rc.2
+
+- fix(ci): release on rc
+
 ## 1.0.0-rc.1
 
 - Release v1.0.0-rc.0
