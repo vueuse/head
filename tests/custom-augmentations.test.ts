@@ -31,7 +31,7 @@ describe('custom augmentation', () => {
     app.use(head)
     await renderToString(app)
 
-    const headResult = renderHeadToString(head)
+    const headResult = await renderHeadToString(head)
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<title></title><link data-test=\\"test\\" href=\\"link-one\\"><meta name=\\"head:count\\" content=\\"1\\">"',
     )

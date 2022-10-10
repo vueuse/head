@@ -32,7 +32,7 @@ describe('use head raw', () => {
     app.use(head)
     await renderToString(app)
 
-    const headResult = renderHeadToString(head)
+    const headResult = await renderHeadToString(head)
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<script autofocus>console.log(2)</script><noscript><iframe src=\\"https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX\\" height=\\"0\\" width=\\"0\\" style=\\"display:none;visibility:hidden\\"></iframe></noscript><meta name=\\"head:count\\" content=\\"2\\">"',
     )

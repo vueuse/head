@@ -11,8 +11,9 @@ export default defineConfig({
     },
   },
   test: {
+    // note: we can't use a dom environment otherwise the tests will think we're
+    // browser based
     globals: true,
-    environment: 'jsdom',
     reporters: 'dot',
     isolate: true,
   },

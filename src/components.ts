@@ -2,7 +2,7 @@ import type { Ref, VNode } from 'vue'
 import { defineComponent, onBeforeUnmount, ref, watchEffect } from 'vue'
 import type { HeadObjectPlain } from './types'
 import type { HeadAttrs } from './index'
-import { injectHead } from './index'
+import { IS_BROWSER, injectHead } from './index'
 
 const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
   const type
@@ -15,18 +15,19 @@ const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
   if (typeof type !== 'string' || !(type in obj))
     return
 
-  const props = {
-    ...node.props,
-    children: Array.isArray(node.children)
+  const props: HeadAttrs = node.props || {} as HeadAttrs
+  if (node.children) {
+    const k = type === 'script' ? 'innerHTML' : 'textContent'
+    props[k] = Array.isArray(node.children)
       // @ts-expect-error untyped
       ? node.children[0]!.children
-      : node.children,
-  } as HeadAttrs
+      : node.children
+  }
   if (Array.isArray(obj[type]))
     (obj[type] as HeadAttrs[]).push(props)
 
   else if (type === 'title')
-    obj.title = props.children
+    obj.title = props.textContent
 
   else
     (obj[type] as HeadAttrs) = props
@@ -65,28 +66,23 @@ export const Head = /* @__PURE__ */ defineComponent({
   setup(_, { slots }) {
     const head = injectHead()
 
-    let obj: Ref<HeadObjectPlain>
+    const obj: Ref<HeadObjectPlain> = ref({})
 
-    onBeforeUnmount(() => {
-      // eslint-disable-next-line vue/no-ref-as-operand
-      if (obj) {
-        head.removeHeadObjs(obj)
-        head.updateDOM()
-      }
-    })
+    if (IS_BROWSER) {
+      const cleanUp = head.addReactiveEntry(obj, { raw: true })
+      onBeforeUnmount(() => {
+        cleanUp()
+      })
+    }
+    else {
+      head.addEntry(obj, { raw: true })
+    }
 
     return () => {
       watchEffect(() => {
         if (!slots.default)
           return
-        // eslint-disable-next-line vue/no-ref-as-operand
-        if (obj)
-          head.removeHeadObjs(obj)
-        // eslint-disable-next-line vue/no-ref-as-operand
-        obj = ref(vnodesToHeadObj(slots.default()))
-        head.addHeadObjs(obj)
-        if (typeof window !== 'undefined')
-          head.updateDOM()
+        obj.value = vnodesToHeadObj(slots.default())
       })
       return null
     }

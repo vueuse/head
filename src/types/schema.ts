@@ -2,6 +2,7 @@ import type { MergeHead, Head as PlainHead } from '@zhead/schema'
 import type { ReactiveHead } from '@zhead/schema-vue'
 import type { MaybeComputedRef } from '@vueuse/shared'
 import type { RawHeadAugmentation } from '@zhead/schema-raw'
+import type { HeadTag } from './index'
 
 export interface HandlesDuplicates {
   /**
@@ -50,8 +51,6 @@ export interface HasRenderPriority {
    * * 0 <meta http-equiv="content-security-policy" ...>
    *
    * All other tags have a default priority of 10: <meta>, <script>, <link>, <style>, etc
-   *
-   * @warn Experimental feature. Only available when rendering SSR
    */
   renderPriority?: number
 }
@@ -82,11 +81,10 @@ export interface VueUseHeadSchema extends MergeHead {
 export type HeadObjectPlain<T extends MergeHead = {}> = PlainHead<T & VueUseHeadSchema>
 export type HeadObject<T extends MergeHead = {}> = ReactiveHead<T & VueUseHeadSchema>
 export type UseHeadInput<T extends MergeHead = {}> = MaybeComputedRef<HeadObject<T>>
+export type ResolvedUseHeadInput<T extends MergeHead = {}> = PlainHead<T & VueUseHeadSchema>
 export type UseHeadRawInput = MaybeComputedRef<ReactiveHead<RawHeadAugmentation & VueUseHeadSchema>>
 
-export interface HeadEntryOptions { raw?: boolean }
-
-export interface HeadEntry<T extends MergeHead = {}> { options?: HeadEntryOptions; input: UseHeadInput<T>; id?: number }
-export interface ResolvedHeadEntry<T extends MergeHead = {}> { options?: HeadEntryOptions; input: PlainHead<T & VueUseHeadSchema> }
+export interface HeadEntryOptions { raw?: boolean; resolved?: boolean }
+export interface HeadEntry<T extends MergeHead = {}> { options: HeadEntryOptions; tags: HeadTag[]; input: ResolvedUseHeadInput<T>; resolved: boolean; id: number }
 
 export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>

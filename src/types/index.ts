@@ -1,9 +1,10 @@
+import type { MergeHead } from '@zhead/schema'
 import type {
   HandlesDuplicates,
   HasRenderPriority,
   HasTextContent,
   HeadEntryOptions,
-  RendersToBody,
+  RendersToBody, ResolvedUseHeadInput,
   TagKeys,
 } from './schema'
 
@@ -26,11 +27,16 @@ export interface HeadTag {
   _position?: number
 }
 
+export interface HeadObjectApi<T extends MergeHead = {}> {
+  update: (resolvedInput: ResolvedUseHeadInput<T>) => void
+  remove: () => void
+}
+
 export interface DomUpdateCtx {
   title: string | undefined
   htmlAttrs: HeadAttrs
   bodyAttrs: HeadAttrs
-  actualTags: Record<string, HeadTag[]>
+  tags: Record<string, HeadTag[]>
 }
 
 export interface HTMLResult {

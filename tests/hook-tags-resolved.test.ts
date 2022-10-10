@@ -1,4 +1,3 @@
-import { computed } from 'vue'
 import { JSDOM } from 'jsdom'
 import { createHead } from '../src'
 
@@ -12,15 +11,13 @@ describe('hook tags resolved', () => {
       })
     })
 
-    head.addHeadObjs(
-      computed(() => ({
-        title: 'test',
-      })),
-    )
+    head.addEntry({
+      title: 'test',
+    })
     const dom = new JSDOM(
       '<!DOCTYPE html><html><head></head><body></body></html>',
     )
-    head.updateDOM(dom.window.document)
+    await head.updateDOM(dom.window.document)
 
     const tags = await hookTags
     expect(tags[0].tag).toEqual('title')
@@ -28,6 +25,7 @@ describe('hook tags resolved', () => {
     expect(tags).toMatchInlineSnapshot(`
       [
         {
+          "_options": {},
           "_position": 0,
           "props": {
             "textContent": "test",
@@ -50,20 +48,19 @@ describe('hook tags resolved', () => {
       })
     })
 
-    head.addHeadObjs(
-      computed(() => ({
-        title: 'test',
-      })),
-    )
+    head.addEntry({
+      title: 'test',
+    })
     const dom = new JSDOM(
       '<!DOCTYPE html><html><head></head><body></body></html>',
     )
-    head.updateDOM(dom.window.document)
+    await head.updateDOM(dom.window.document)
 
     const hooks = await hookTags
     expect(hooks[0].props.extra).toBeTruthy()
     expect(hooks[0]).toMatchInlineSnapshot(`
       {
+        "_options": {},
         "_position": 0,
         "props": {
           "extra": true,

@@ -1,7 +1,7 @@
 import { computed, createSSRApp, ref } from 'vue'
 import { renderToString } from '@vue/server-renderer'
 import { createHead, renderHeadToString, useHead } from '../src'
-import type { HeadObject, HeadObjectPlain } from '../src/types'
+import type { HeadObjectPlain } from '../src/types'
 import { ssrRenderHeadToString } from './shared/utils'
 
 describe('reactivity', () => {
@@ -73,13 +73,9 @@ describe('reactivity', () => {
     const app = createSSRApp({
       setup() {
         const title = ref('')
-        useHead(
-          computed<HeadObject>(() => {
-            return {
-              title: title.value,
-            }
-          }),
-        )
+        useHead({
+          title: title.value,
+        })
         title.value = 'hello'
         return () => '<div>hi</div>'
       },
@@ -87,7 +83,7 @@ describe('reactivity', () => {
     app.use(head)
     await renderToString(app)
 
-    const headResult = renderHeadToString(head)
+    const headResult = await renderHeadToString(head)
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<title></title><meta name=\\"head:count\\" content=\\"0\\">"',
     )
@@ -141,7 +137,7 @@ describe('reactivity', () => {
     app.use(head)
     await renderToString(app)
 
-    const headResult = renderHeadToString(head)
+    const headResult = await renderHeadToString(head)
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<title>hello</title><meta name=\\"description\\" content=\\"hello this is my description\\" data-unknown-attr=\\"test\\"><meta property=\\"og:fake-prop\\" content=\\"test\\"><meta name=\\"fake-name-prop\\" content=\\"test\\"><meta property=\\"og:url\\" content=\\"test\\"><script src=\\"foo.js\\"></script><meta name=\\"head:count\\" content=\\"5\\">"',
     )

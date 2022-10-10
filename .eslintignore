@@ -1,4 +1,5 @@
 dist
 node_modules
 examples/vite-ssr
+examples/nuxt3
 tests/e2e/vite-ssr

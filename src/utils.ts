@@ -1,8 +1,20 @@
-import type { MaybeComputedRef } from '@vueuse/shared'
 import { resolveUnref } from '@vueuse/shared'
 import { unref } from 'vue'
 import type { MergeHead } from '@zhead/schema'
-import type { HeadEntry, HeadTag, ResolvedHeadEntry } from './types'
+import type { HeadEntry, HeadObjectPlain, HeadTag, ResolvedUseHeadInput, TagKeys, UseHeadInput } from './types'
+import { resolveHeadEntry } from './ssr'
+
+const acceptFields: Array<TagKeys> = [
+  'title',
+  'meta',
+  'link',
+  'base',
+  'style',
+  'script',
+  'noscript',
+  'htmlAttrs',
+  'bodyAttrs',
+]
 
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   const tagWeight = (tag: HeadTag) => {
@@ -66,13 +78,17 @@ export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
   return false
 }
 
-function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>): any {
+export function resolveUnrefHeadInput<T extends MergeHead = {}>(ref: UseHeadInput<T>): ResolvedUseHeadInput<T> {
   const root = resolveUnref(ref)
-  if (!ref || !root)
+  if (!ref || !root) {
+    // @ts-expect-error recursion untyped
     return root
+  }
 
-  if (Array.isArray(root))
-    return root.map(resolveUnrefDeeply)
+  if (Array.isArray(root)) {
+    // @ts-expect-error recursion untyped
+    return root.map(resolveUnrefHeadInput)
+  }
 
   if (typeof root === 'object') {
     return Object.fromEntries(
@@ -83,7 +99,7 @@ function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>): any {
 
         return [
           key,
-          resolveUnrefDeeply(value),
+          resolveUnrefHeadInput(value),
         ]
       }),
     )
@@ -91,9 +107,131 @@ function resolveUnrefDeeply<T>(ref: MaybeComputedRef<T>): any {
   return root
 }
 
-export function resolveHeadEntry<T extends MergeHead = {}>(obj: HeadEntry<T>): ResolvedHeadEntry {
-  return {
-    ...obj,
-    input: resolveUnrefDeeply(obj.input),
+export const headEntryToTags = (e: HeadEntry) => {
+  const input = e.input
+  const tags: HeadTag[] = []
+  const keys = Object.keys(input) as Array<keyof HeadObjectPlain>
+
+  const convertLegacyKey = (value: any) => {
+    if (value.hid) {
+      value.key = value.hid
+      delete value.hid
+    }
+    if (value.vmid) {
+      value.key = value.vmid
+      delete value.vmid
+    }
+    return value
   }
+
+  for (const key of keys) {
+    if (input[key] == null)
+      continue
+
+    switch (key) {
+      case 'title':
+        tags.push({ tag: key, props: { textContent: input[key] } })
+        break
+      case 'titleTemplate':
+        break
+      case 'base':
+        tags.push({ tag: key, props: { key: 'default', ...input[key] } })
+        break
+      default:
+        if (acceptFields.includes(key)) {
+          const value = input[key]
+          if (Array.isArray(value)) {
+            value.forEach((item) => {
+              const props = convertLegacyKey(item)
+              // unref item to support ref array entries
+              tags.push({ tag: key, props })
+            })
+          }
+          else if (value) {
+            tags.push({ tag: key, props: convertLegacyKey(value) })
+          }
+        }
+        break
+    }
+  }
+
+  return tags.map((tag) => {
+    // avoid untrusted data providing their own options key (fixes XSS)
+    if (tag._options)
+      delete tag._options
+    // tag inherits options from useHead registration
+    if (e.options)
+      tag._options = e.options
+
+    return tag
+  })
+}
+
+const renderTitleTemplate = (
+  template: Required<HeadObjectPlain>['titleTemplate'],
+  title?: string,
+): string => {
+  if (template == null)
+    return ''
+  if (typeof template === 'function')
+    return template(title)
+
+  return template.replace('%s', title ?? '')
+}
+
+export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
+  const deduped: HeadTag[] = []
+  const deduping: Record<string, HeadTag> = {}
+
+  const resolvedEntries = resolveHeadEntry(entries)
+
+  const titleTemplate = resolvedEntries
+    .map(i => i.input.titleTemplate)
+    .reverse()
+    .find(i => i != null)
+
+  resolvedEntries.forEach((entry, entryIndex) => {
+    const tags = headEntryToTags(entry)
+    tags.forEach((tag, tagIdx) => {
+      // used to restore the order after deduping
+      // a large number is needed otherwise the position will potentially duplicate (this support 10k tags)
+      // ideally we'd use the total tag count but this is too hard to calculate with the current reactivity
+      tag._position = entryIndex * 10000 + tagIdx
+
+      // resolve titles
+      if (titleTemplate && tag.tag === 'title') {
+        tag.props.textContent = renderTitleTemplate(
+          titleTemplate,
+          tag.props.textContent,
+        )
+      }
+      // validate XSS vectors
+      if (!tag._options?.raw) {
+        for (const k in tag.props) {
+          if (k.startsWith('on')) {
+            console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to set event listeners. See https://github.com/vueuse/head/pull/118', tag)
+            delete tag.props[k]
+          }
+        }
+        if (tag.props.innerHTML) {
+          console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to use `innerHTML`', tag)
+          delete tag.props.innerHTML
+        }
+      }
+
+      // Remove tags with the same key
+      const dedupeKey = tagDedupeKey(tag)
+      if (dedupeKey)
+        deduping[dedupeKey] = tag
+      else
+        deduped.push(tag)
+    })
+  })
+
+  // add the entries we were deduping
+  deduped.push(...Object.values(deduping))
+  // ensure their original positions are kept
+  const tags = deduped.sort((a, b) => a._position! - b._position!)
+
+  return tags.sort(sortTags)
 }

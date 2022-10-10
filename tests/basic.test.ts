@@ -1,40 +1,80 @@
-import { createHead } from '../src'
+import { ref } from 'vue'
+import { createHead, resolveHeadEntriesToTags } from '../src'
 
 describe('basic', () => {
   test('removing head works', async () => {
     const head = createHead()
-    head.addHeadObjs(
-      () => ({
-        title: 'old',
-        link: [
-          {
-            href: '/',
-          },
-        ],
-      }),
-    )
-    const rm = head.addHeadObjs(
-      () => ({
-        title: 'test',
-      }),
-    )
-    rm()
+    head.addEntry({
+      title: 'old',
+      link: [
+        {
+          href: '/',
+        },
+      ],
+    })
 
-    expect(head.headTags).toMatchInlineSnapshot(`
+    const { remove } = head.addEntry({
+      title: 'test',
+    })
+    remove()
+
+    expect(head.headEntries.length).toBe(1)
+    expect(head.headEntries).toMatchInlineSnapshot(`
       [
         {
+          "id": 0,
+          "input": {
+            "link": [
+              {
+                "href": "/",
+              },
+            ],
+            "title": "old",
+          },
+          "options": {},
+          "resolved": false,
+        },
+      ]
+    `)
+  })
+
+  test('computed getter', async () => {
+    const colour = ref('yellow')
+    const head = createHead()
+    head.addReactiveEntry(
+      () => ({
+        bodyAttrs: {
+          style: () => `background: ${colour.value}`,
+          class: () => `bg-${colour.value}-500`,
+        },
+      }),
+    )
+    expect(head.headEntries).toMatchInlineSnapshot(`
+      [
+        {
+          "id": 0,
+          "input": {
+            "bodyAttrs": {
+              "class": "bg-yellow-500",
+              "style": "background: yellow",
+            },
+          },
+          "options": {},
+          "resolved": true,
+        },
+      ]
+    `)
+
+    expect(resolveHeadEntriesToTags(head.headEntries)).toMatchInlineSnapshot(`
+      [
+        {
+          "_options": {},
           "_position": 0,
           "props": {
-            "textContent": "old",
+            "class": "bg-yellow-500",
+            "style": "background: yellow",
           },
-          "tag": "title",
-        },
-        {
-          "_position": 1,
-          "props": {
-            "href": "/",
-          },
-          "tag": "link",
+          "tag": "bodyAttrs",
         },
       ]
     `)
