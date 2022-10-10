@@ -27,16 +27,14 @@ export const updateDOM = async (head: HeadClient, previousTags: Set<string>, doc
         if (typeof tag._runtime.textContent !== 'undefined')
           document.title = tag._runtime.textContent
         break
-      case 'htmlAttrs':
-      case 'bodyAttrs':
-        setAttrs(document[tag.tag === 'htmlAttrs' ? 'documentElement' : 'body'], tag.props)
-        break
       default:
         tags[tag.tag] = tags[tag.tag] || []
         tags[tag.tag].push(tag)
     }
   }
 
+  setAttrs(document.documentElement, headTags.find(t => t.tag === 'htmlAttrs')?.props || {})
+  setAttrs(document.body, headTags.find(t => t.tag === 'bodyAttrs')?.props || {})
   const tagKeys = new Set([...Object.keys(tags), ...previousTags])
   for (const tag of tagKeys)
     updateElements(document, tag, tags[tag] || [])
