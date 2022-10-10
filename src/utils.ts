@@ -1,20 +1,8 @@
 import { resolveUnref } from '@vueuse/shared'
 import { unref } from 'vue'
 import type { MergeHead } from '@zhead/schema'
-import type { HeadEntry, HeadObjectPlain, HeadTag, ResolvedUseHeadInput, TagKeys, UseHeadInput } from './types'
+import type { HeadEntry, HeadObjectPlain, HeadTag, ResolvedUseHeadInput, UseHeadInput } from './types'
 import { resolveHeadEntry } from './ssr'
-
-const acceptFields: Array<TagKeys> = [
-  'title',
-  'meta',
-  'link',
-  'base',
-  'style',
-  'script',
-  'noscript',
-  'htmlAttrs',
-  'bodyAttrs',
-]
 
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   const tagWeight = (tag: HeadTag) => {
@@ -29,11 +17,9 @@ export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
         // charset must come early in case there's non-utf8 characters in the HTML document
         if (tag.props.charset)
           return -2
-
         // CSP needs to be as it effects the loading of assets
         if (tag.props['http-equiv'] === 'content-security-policy')
           return 0
-
         return 10
       default:
         // arbitrary safe number that can go up and down without conflicting
@@ -44,10 +30,6 @@ export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
 }
 
 export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
-  // only meta, base and script tags will be deduped
-  if (!['meta', 'base', 'script', 'link', 'title'].includes(tag.tag))
-    return false
-
   const { props, tag: tagName } = tag
   // must only be a single base so we always dedupe
   if (tagName === 'base' || tagName === 'title')
@@ -61,21 +43,17 @@ export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
   if (props.charset)
     return 'charset'
 
-  const name = ['key', 'id', 'name', 'property', 'http-equiv']
-  for (const n of name) {
-    let value
-    // Probably an HTML Element
-    if (typeof props.getAttribute === 'function' && props.hasAttribute(n))
-      value = props.getAttribute(n)
-    else
-      value = props[n]
+  const name = ['key', 'id']
+  if (tagName === 'meta')
+    name.push(...['name', 'property', 'http-equiv'])
 
-    if (value !== undefined) {
+  for (const n of name) {
+    if (typeof props[n] !== 'undefined') {
       // for example: meta-name-description
-      return `${tagName}-${n}-${value}`
+      return `${tagName}-${n}-${props[n]}`
     }
   }
-  return false
+  return tag._position!
 }
 
 export function resolveUnrefHeadInput<T extends MergeHead = {}>(ref: UseHeadInput<T>): ResolvedUseHeadInput<T> {
@@ -107,64 +85,48 @@ export function resolveUnrefHeadInput<T extends MergeHead = {}>(ref: UseHeadInpu
   return root
 }
 
-export const headEntryToTags = (e: HeadEntry) => {
-  const input = e.input
-  const tags: HeadTag[] = []
-  const keys = Object.keys(input) as Array<keyof HeadObjectPlain>
-
-  const convertLegacyKey = (value: any) => {
-    if (value.hid) {
-      value.key = value.hid
-      delete value.hid
+const resolveTag = (tag: HeadTag, e: HeadEntry): HeadTag => {
+  const legacyDedupeKeys = ['hid', 'vmid']
+  legacyDedupeKeys.forEach((key) => {
+    if (tag.props[key]) {
+      tag.props.key = tag.props[key]
+      delete tag.props[key]
     }
-    if (value.vmid) {
-      value.key = value.vmid
-      delete value.vmid
-    }
-    return value
-  }
-
-  for (const key of keys) {
-    if (input[key] == null)
-      continue
-
-    switch (key) {
-      case 'title':
-        tags.push({ tag: key, props: { textContent: input[key] } })
-        break
-      case 'titleTemplate':
-        break
-      case 'base':
-        tags.push({ tag: key, props: { key: 'default', ...input[key] } })
-        break
-      default:
-        if (acceptFields.includes(key)) {
-          const value = input[key]
-          if (Array.isArray(value)) {
-            value.forEach((item) => {
-              const props = convertLegacyKey(item)
-              // unref item to support ref array entries
-              tags.push({ tag: key, props })
-            })
-          }
-          else if (value) {
-            tags.push({ tag: key, props: convertLegacyKey(value) })
-          }
-        }
-        break
-    }
-  }
-
-  return tags.map((tag) => {
-    // avoid untrusted data providing their own options key (fixes XSS)
-    if (tag._options)
-      delete tag._options
-    // tag inherits options from useHead registration
-    if (e.options)
-      tag._options = e.options
-
-    return tag
   })
+  // avoid untrusted data providing their own options key (fixes XSS)
+  if (tag._options)
+    delete tag._options
+  // tag inherits options from useHead registration
+  if (e.options)
+    tag._options = e.options
+  return tag
+}
+
+export const headInputToTags = (e: HeadEntry) => {
+  return Object.entries(e.input)
+    .filter(([k, v]) => typeof v !== 'undefined' && v !== null && k !== 'titleTemplate')
+    .map(([key, value]) => {
+      return (Array.isArray(value) ? value : [value]).map((props) => {
+        switch (key) {
+          case 'title':
+            return resolveTag({ tag: key, props: { textContent: props } }, e)
+          case 'base':
+          case 'meta':
+          case 'link':
+          case 'style':
+          case 'script':
+          case 'noscript':
+          case 'htmlAttrs':
+          case 'bodyAttrs':
+            // unref item to support ref array entries
+            return resolveTag({ tag: key, props }, e)
+          default:
+            return false
+        }
+      })
+    })
+    .flat()
+    .filter(v => !!v) as HeadTag[]
 }
 
 const renderTitleTemplate = (
@@ -180,7 +142,6 @@ const renderTitleTemplate = (
 }
 
 export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
-  const deduped: HeadTag[] = []
   const deduping: Record<string, HeadTag> = {}
 
   const resolvedEntries = resolveHeadEntry(entries)
@@ -191,7 +152,7 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
     .find(i => i != null)
 
   resolvedEntries.forEach((entry, entryIndex) => {
-    const tags = headEntryToTags(entry)
+    const tags = headInputToTags(entry)
     tags.forEach((tag, tagIdx) => {
       // used to restore the order after deduping
       // a large number is needed otherwise the position will potentially duplicate (this support 10k tags)
@@ -205,33 +166,20 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
           tag.props.textContent,
         )
       }
-      // validate XSS vectors
+      // validate XSS vectors for non-raw input
       if (!tag._options?.raw) {
         for (const k in tag.props) {
-          if (k.startsWith('on')) {
-            console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to set event listeners. See https://github.com/vueuse/head/pull/118', tag)
+          if (k.startsWith('on') || k === 'innerHTML')
             delete tag.props[k]
-          }
-        }
-        if (tag.props.innerHTML) {
-          console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to use `innerHTML`', tag)
-          delete tag.props.innerHTML
         }
       }
 
       // Remove tags with the same key
-      const dedupeKey = tagDedupeKey(tag)
-      if (dedupeKey)
-        deduping[dedupeKey] = tag
-      else
-        deduped.push(tag)
+      deduping[tagDedupeKey(tag)] = tag
     })
   })
 
-  // add the entries we were deduping
-  deduped.push(...Object.values(deduping))
-  // ensure their original positions are kept
-  const tags = deduped.sort((a, b) => a._position! - b._position!)
-
-  return tags.sort(sortTags)
+  return Object.values(deduping)
+    .sort((a, b) => a._position! - b._position!)
+    .sort(sortTags)
 }

@@ -15,11 +15,25 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   nuxtApp.vueApp.use(head)
 
-  nuxtApp.hooks.hookOnce('app:mounted', () => {
-    watchEffect(() => {
+  if (process.client) {
+    // pause dom updates until page is ready and between page transitions
+    let pauseDOMUpdates = true
+    head.hookBeforeDomUpdate.push(() => !pauseDOMUpdates)
+    nuxtApp.hooks.hookOnce('app:mounted', () => {
+      pauseDOMUpdates = false
       head.updateDOM()
+
+      // start pausing DOM updates when route changes (trigger immediately)
+      useRouter().beforeEach(() => {
+        pauseDOMUpdates = true
+      })
+      // watch for new route before unpausing dom updates (triggered after suspense resolved)
+      useRouter().afterEach(() => {
+        pauseDOMUpdates = false
+        head.updateDOM()
+      })
     })
-  })
+  }
 
   nuxtApp._useHead = (_meta: MetaObject, options: HeadEntryOptions) => {
     const removeSideEffectFns = []
@@ -45,10 +59,12 @@ export default defineNuxtPlugin((nuxtApp) => {
       }
     }
 
-    const cleanUp = head.addReactiveEntry(_meta, options)
-
-    if (process.server)
+    if (process.server) {
+      head.addEntry(_meta, options)
       return
+    }
+
+    const cleanUp = head.addReactiveEntry(_meta, options)
 
     const vm = getCurrentInstance()
     if (!vm)

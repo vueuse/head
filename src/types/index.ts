@@ -12,8 +12,8 @@ export * from './schema'
 
 export interface HeadAttrs { [k: string]: any }
 
-export type HookBeforeDomUpdate = ((tags: Record<string, HeadTag[]>) => void | boolean)[]
-export type HookTagsResolved = ((tags: HeadTag[]) => void)[]
+export type HookBeforeDomUpdate = ((ctx: DomUpdateCtx) => Promise<void | boolean> | void | boolean)[]
+export type HookTagsResolved = ((tags: HeadTag[]) => Promise<void> | void)[]
 
 export interface HeadTag {
   tag: TagKeys
