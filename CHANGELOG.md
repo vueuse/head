@@ -2,6 +2,11 @@
 
 No unreleased changes.
 
+## 1.0.0-rc.1
+
+- Release v1.0.0-rc.0
+- chore: bump version
+
 ## 1.0.0-rc.0
 
 - chore: bump version
