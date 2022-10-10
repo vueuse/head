@@ -58,7 +58,7 @@ describe('vue ssr', () => {
     app.use(head)
     await renderToString(app)
 
-    const { headTags } = renderHeadToString(head)
+    const { headTags } = await renderHeadToString(head)
     expect(headTags).match(/new title/)
   })
 
@@ -81,7 +81,7 @@ describe('vue ssr', () => {
     app.use(head)
     await renderToString(app)
 
-    const { headTags } = renderHeadToString(head)
+    const { headTags } = await renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot(
       '"<meta property=\\"test1\\" content=\\"test1\\"><meta property=\\"test2\\" content=\\"test2\\"><meta name=\\"head:count\\" content=\\"2\\">"',
     )
@@ -100,7 +100,7 @@ describe('vue ssr', () => {
     app.use(head)
     await renderToString(app)
 
-    const { headTags } = renderHeadToString(head)
+    const { headTags } = await renderHeadToString(head)
     expect(headTags).match(/new title/)
   })
 

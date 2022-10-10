@@ -11,15 +11,13 @@ describe('hook tags resolved', () => {
       })
     })
 
-    head.setupHeadEntry({
-      resolvedInput: {
-        title: 'test',
-      },
+    head.addEntry({
+      title: 'test',
     })
     const dom = new JSDOM(
       '<!DOCTYPE html><html><head></head><body></body></html>',
     )
-    head.updateDOM(dom.window.document)
+    await head.updateDOM(dom.window.document)
 
     const tags = await hookTags
     expect(tags[0].tag).toEqual('title')
@@ -50,15 +48,13 @@ describe('hook tags resolved', () => {
       })
     })
 
-    head.setupHeadEntry({
-      resolvedInput: {
-        title: 'test',
-      },
+    head.addEntry({
+      title: 'test',
     })
     const dom = new JSDOM(
       '<!DOCTYPE html><html><head></head><body></body></html>',
     )
-    head.updateDOM(dom.window.document)
+    await head.updateDOM(dom.window.document)
 
     const hooks = await hookTags
     expect(hooks[0].props.extra).toBeTruthy()

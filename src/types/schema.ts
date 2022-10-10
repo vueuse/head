@@ -2,6 +2,7 @@ import type { MergeHead, Head as PlainHead } from '@zhead/schema'
 import type { ReactiveHead } from '@zhead/schema-vue'
 import type { MaybeComputedRef } from '@vueuse/shared'
 import type { RawHeadAugmentation } from '@zhead/schema-raw'
+import type { HeadTag } from './index'
 
 export interface HandlesDuplicates {
   /**
@@ -83,8 +84,7 @@ export type UseHeadInput<T extends MergeHead = {}> = MaybeComputedRef<HeadObject
 export type ResolvedUseHeadInput<T extends MergeHead = {}> = PlainHead<T & VueUseHeadSchema>
 export type UseHeadRawInput = MaybeComputedRef<ReactiveHead<RawHeadAugmentation & VueUseHeadSchema>>
 
-export interface HeadEntryOptions { raw?: boolean }
-export interface HeadEntry<T extends MergeHead = {}> { options: HeadEntryOptions; resolvedInput: ResolvedUseHeadInput<T>; input: UseHeadInput<T>; id: number }
-export interface HeadEntryInput<T extends MergeHead = {}> { options?: HeadEntryOptions; resolvedInput?: ResolvedUseHeadInput<T>; input?: UseHeadInput<T>; id?: number }
+export interface HeadEntryOptions { raw?: boolean; resolved?: boolean }
+export interface HeadEntry<T extends MergeHead = {}> { options: HeadEntryOptions; tags: HeadTag[]; input: ResolvedUseHeadInput<T>; resolved: boolean; id: number }
 
 export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>

@@ -28,7 +28,7 @@ export default defineConfig({
           await router.push(req.url!)
           await router.isReady()
           const appHTML = await renderToString(app)
-          const headHTML = renderHeadToString(head)
+          const headHTML = await renderHeadToString(head)
           html = await server.transformIndexHtml(req.url!, html)
           res.setHeader('content-type', 'text/html')
           res.end(

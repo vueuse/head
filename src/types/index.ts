@@ -4,8 +4,7 @@ import type {
   HasRenderPriority,
   HasTextContent,
   HeadEntryOptions,
-  RendersToBody,
-  ResolvedUseHeadInput,
+  RendersToBody, ResolvedUseHeadInput,
   TagKeys,
 } from './schema'
 
@@ -29,7 +28,7 @@ export interface HeadTag {
 }
 
 export interface HeadObjectApi<T extends MergeHead = {}> {
-  update: (objs: ResolvedUseHeadInput<T>) => void
+  update: (resolvedInput: ResolvedUseHeadInput<T>) => void
   remove: () => void
 }
 
@@ -37,7 +36,7 @@ export interface DomUpdateCtx {
   title: string | undefined
   htmlAttrs: HeadAttrs
   bodyAttrs: HeadAttrs
-  actualTags: Record<string, HeadTag[]>
+  tags: Record<string, HeadTag[]>
 }
 
 export interface HTMLResult {

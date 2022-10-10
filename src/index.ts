@@ -10,15 +10,12 @@ import type { MergeHead } from '@zhead/schema'
 import {
   PROVIDE_KEY,
 } from './constants'
-import { resolveUnrefHeadInput, sortTags, tagDedupeKey } from './utils'
+import { resolveUnrefHeadInput } from './utils'
 import type {
-  DomUpdateCtx,
-  HeadEntry, HeadEntryInput,
-  HeadEntryOptions, HeadObjectApi, HeadObjectPlain,
-  HeadTag,
+  HeadEntry,
+  HeadEntryOptions, HeadObjectApi,
   HookBeforeDomUpdate, HookTagsResolved,
-  ResolvedUseHeadInput,
-  TagKeys, UseHeadInput, UseHeadRawInput,
+  ResolvedUseHeadInput, UseHeadInput, UseHeadRawInput,
 } from './types'
 import { updateDOM } from './dom/update-dom'
 
@@ -27,22 +24,10 @@ export * from './types'
 export interface HeadClient<T extends MergeHead = {}> {
   install: (app: App) => void
 
-  headTags: HeadTag[]
+  headEntries: HeadEntry<T>[]
 
-  allHeadObjs: HeadEntry<T>[]
-
-  /**
-   * @deprecated Use addHeadEntry or setupReactiveHeadEntry for better performance.
-   */
-  addHeadObjs: (headObjs: UseHeadInput<T> | ResolvedUseHeadInput<T>) => () => void
-
-  setupHeadEntry: (entry: HeadEntryInput<T>) => HeadObjectApi<T>
-  setupReactiveHeadEntry: (objs: UseHeadInput<T>, options?: HeadEntryOptions) => () => void
-
-  /**
-   * @deprecated Use the return function from `addHeadObjs`
-   */
-  removeHeadObjs: (objs: ResolvedUseHeadInput<T>) => void
+  addEntry: (entry: UseHeadInput<T>, options?: HeadEntryOptions) => HeadObjectApi<T>
+  addReactiveEntry: (objs: UseHeadInput<T>, options?: HeadEntryOptions) => () => void
 
   updateDOM: (document?: Document, force?: boolean) => void
 
@@ -76,85 +61,12 @@ export const injectHead = <T extends MergeHead = {}>() => {
   return head
 }
 
-const acceptFields: Array<TagKeys> = [
-  'title',
-  'meta',
-  'link',
-  'base',
-  'style',
-  'script',
-  'noscript',
-  'htmlAttrs',
-  'bodyAttrs',
-]
-
-const renderTitleTemplate = (
-  template: Required<HeadObjectPlain>['titleTemplate'],
-  title?: string,
-): string => {
-  if (template == null)
-    return ''
-  if (typeof template === 'function')
-    return template(title)
-
-  return template.replace('%s', title ?? '')
-}
-
-const headObjToTags = (obj: HeadObjectPlain) => {
-  const tags: HeadTag[] = []
-  const keys = Object.keys(obj) as Array<keyof HeadObjectPlain>
-
-  const convertLegacyKey = (value: any) => {
-    if (value.hid) {
-      value.key = value.hid
-      delete value.hid
-    }
-    if (value.vmid) {
-      value.key = value.vmid
-      delete value.vmid
-    }
-    return value
-  }
-
-  for (const key of keys) {
-    if (obj[key] == null)
-      continue
-
-    switch (key) {
-      case 'title':
-        tags.push({ tag: key, props: { textContent: obj[key] } })
-        break
-      case 'titleTemplate':
-        break
-      case 'base':
-        tags.push({ tag: key, props: { key: 'default', ...obj[key] } })
-        break
-      default:
-        if (acceptFields.includes(key)) {
-          const value = obj[key]
-          if (Array.isArray(value)) {
-            value.forEach((item) => {
-              const props = convertLegacyKey(item)
-              // unref item to support ref array entries
-              tags.push({ tag: key, props })
-            })
-          }
-          else if (value) {
-            tags.push({ tag: key, props: convertLegacyKey(value) })
-          }
-        }
-        break
-    }
-  }
-
-  return tags
-}
-
 export const createHead = <T extends MergeHead = {}>(initHeadObject?: ResolvedUseHeadInput<T>) => {
-  let allHeadObjs: HeadEntry<T>[] = []
-  const previousTags = new Set<string>()
+  let entries: HeadEntry<T>[] = []
   // counter for keeping unique ids of head object entries
-  let headObjId = 0
+  let entryId = 0
+
+  const previousTags = new Set<string>()
 
   const hookBeforeDomUpdate: HookBeforeDomUpdate = []
   const hookTagsResolved: HookTagsResolved = []
@@ -170,164 +82,63 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: ResolvedUs
     hookBeforeDomUpdate,
     hookTagsResolved,
 
-    /**
-     * Get deduped tags
-     */
-    get headTags() {
-      const deduped: HeadTag[] = []
-      const deduping: Record<string, HeadTag> = {}
-
-      // ensure input is resolved
-      allHeadObjs.forEach((e) => {
-        // when SSR we need to re-resolve the input each time on demand
-        if ((e.input && !IS_BROWSER) || !e.resolvedInput)
-          e.resolvedInput = resolveUnrefHeadInput(e.input)
-      })
-
-      const titleTemplate = allHeadObjs
-        .map(i => i.resolvedInput.titleTemplate)
-        .reverse()
-        .find(i => i != null)
-
-      allHeadObjs.forEach((objs, headObjectIdx) => {
-        const tags = headObjToTags(objs.resolvedInput)
-        tags.forEach((tag, tagIdx) => {
-          // used to restore the order after deduping
-          // a large number is needed otherwise the position will potentially duplicate (this support 10k tags)
-          // ideally we'd use the total tag count but this is too hard to calculate with the current reactivity
-          tag._position = headObjectIdx * 10000 + tagIdx
-          // avoid untrusted data providing their own options key (fixes XSS)
-          if (tag._options)
-            delete tag._options
-          // tag inherits options from useHead registration
-          if (objs.options)
-            tag._options = objs.options
-
-          // resolve titles
-          if (titleTemplate && tag.tag === 'title') {
-            tag.props.textContent = renderTitleTemplate(
-              titleTemplate,
-              tag.props.textContent,
-            )
-          }
-          // validate XSS vectors
-          if (!tag._options?.raw) {
-            for (const k in tag.props) {
-              if (k.startsWith('on')) {
-                console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to set event listeners. See https://github.com/vueuse/head/pull/118', tag)
-                delete tag.props[k]
-              }
-            }
-            if (tag.props.innerHTML) {
-              console.warn('[@vueuse/head] Warning, you must use `useHeadRaw` to use `innerHTML`', tag)
-              delete tag.props.innerHTML
-            }
-          }
-
-          // Remove tags with the same key
-          const dedupeKey = tagDedupeKey(tag)
-          if (dedupeKey)
-            deduping[dedupeKey] = tag
-          else
-            deduped.push(tag)
-        })
-      })
-
-      // add the entries we were deduping
-      deduped.push(...Object.values(deduping))
-      // ensure their original positions are kept
-      const tags = deduped.sort((a, b) => a._position! - b._position!)
-
-      head.hookTagsResolved.forEach(fn => fn(tags))
-      return tags.sort(sortTags)
+    get headEntries() {
+      return entries
     },
 
-    allHeadObjs,
-
-    addHeadObjs(headObjs) {
-      // not resolved by default
-      const api = head.setupHeadEntry({ input: headObjs })
-      return () => api.remove()
-    },
-
-    setupHeadEntry(entry) {
-      entry.id = entry.id || headObjId++
-      entry.options = entry.options || {}
-      allHeadObjs.push(entry as HeadEntry<T>)
+    addEntry(input, options = {}) {
+      let resolved = false
+      if (options?.resolved) {
+        resolved = true
+        delete options.resolved
+      }
+      const entry: any = {
+        id: entryId++,
+        options,
+        resolved,
+        input,
+      }
+      entries.push(entry as HeadEntry<T>)
       return {
         remove() {
-          allHeadObjs = allHeadObjs.filter(_objs => _objs.id !== entry.id)
+          entries = entries.filter(_objs => _objs.id !== entry.id)
         },
-        update(val: ResolvedUseHeadInput<T>) {
-          allHeadObjs = allHeadObjs.map((_objs) => {
-            if (_objs.id === entry.id)
-              _objs.resolvedInput = val
-
-            return _objs
+        update(updatedInput: ResolvedUseHeadInput<T>) {
+          entries = entries.map((e) => {
+            if (e.id === entry.id)
+              e.input = updatedInput
+            return e
           })
         },
       }
     },
 
-    removeHeadObjs(objs) {
-      allHeadObjs = allHeadObjs.filter(_objs => _objs.input !== objs)
-    },
-
-    updateDOM: (document?: Document, force?: boolean) => {
+    async updateDOM(document?: Document, force?: boolean) {
       // within the debounced dom update we need to compute all the tags so that watchEffects still works
       const doDomUpdate = () => {
-        const domCtx: DomUpdateCtx = {
-          title: undefined,
-          htmlAttrs: {},
-          bodyAttrs: {},
-          actualTags: {},
-        }
-
-        // call first in case the dom update hook returns
         domUpdateTick = null
-        // head sorting here is not guaranteed to be honoured
-        for (const tag of head.headTags) {
-          if (tag.tag === 'title') {
-            domCtx.title = tag.props.textContent
-            continue
-          }
-          if (tag.tag === 'htmlAttrs' || tag.tag === 'bodyAttrs') {
-            Object.assign(domCtx[tag.tag], tag.props)
-            continue
-          }
-
-          domCtx.actualTags[tag.tag] = domCtx.actualTags[tag.tag] || []
-          domCtx.actualTags[tag.tag].push(tag)
-        }
-
-        // allow integration to disable dom update and / or modify it
-        for (const k in head.hookBeforeDomUpdate) {
-          if (head.hookBeforeDomUpdate[k](domCtx.actualTags) === false)
-            return
-        }
-        updateDOM({ domCtx, document, previousTags })
+        return updateDOM({ head, document, previousTags })
       }
-      if (force) {
-        doDomUpdate()
-        return
-      }
-      domUpdateTick = domUpdateTick || nextTick(() => {
-        doDomUpdate()
-      })
+
+      if (force)
+        return doDomUpdate()
+
+      return domUpdateTick = domUpdateTick || new Promise(resolve => nextTick(() => resolve(doDomUpdate())))
     },
 
-    setupReactiveHeadEntry(entry: UseHeadInput<T>, options = {}) {
+    // browser only
+    addReactiveEntry(input: UseHeadInput<T>, options = {}) {
       let entrySideEffect: HeadObjectApi<T> | null = null
       const cleanUpWatch = watchEffect(() => {
-        const meta = resolveUnrefHeadInput(entry)
+        const resolvedInput = resolveUnrefHeadInput(input)
         if (entrySideEffect === null) {
-          entrySideEffect = head.setupHeadEntry({
-            resolvedInput: meta,
-            options,
-          })
+          entrySideEffect = head.addEntry(
+            resolvedInput,
+            { ...options, resolved: true },
+          )
         }
         else {
-          entrySideEffect.update(meta)
+          entrySideEffect.update(resolvedInput)
         }
         if (IS_BROWSER)
           head.updateDOM()
@@ -341,7 +152,7 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: ResolvedUs
   }
 
   if (initHeadObject)
-    head.setupHeadEntry({ resolvedInput: initHeadObject })
+    head.addEntry(initHeadObject)
 
   return head
 }
@@ -350,10 +161,10 @@ const _useHead = <T extends MergeHead = {}>(headObj: UseHeadInput<T>, options: H
   const head = injectHead()
 
   if (!IS_BROWSER) {
-    head.setupHeadEntry({ input: headObj, options })
+    head.addEntry(headObj, options)
   }
   else {
-    const cleanUp = head.setupReactiveHeadEntry(headObj, options)
+    const cleanUp = head.addReactiveEntry(headObj, options)
     onBeforeUnmount(() => {
       cleanUp()
       head.updateDOM()

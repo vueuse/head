@@ -1,8 +1,15 @@
 import type { MergeHead } from '@zhead/schema'
-import type { HTMLResult, HeadAttrs, HeadTag } from '../types'
+import type { HTMLResult, HeadAttrs, HeadEntry, HeadTag } from '../types'
 import { BODY_TAG_ATTR_NAME, HEAD_ATTRS_KEY, HEAD_COUNT_KEY, SELF_CLOSING_TAGS } from '../constants'
 import type { HeadClient } from '../index'
-import { escapeHtml, escapeJS, stringifyAttrName, stringifyAttrValue } from '../index'
+import {
+  escapeHtml,
+  escapeJS,
+  resolveHeadEntriesToTags,
+  resolveUnrefHeadInput,
+  stringifyAttrName,
+  stringifyAttrValue,
+} from '../index'
 import { stringifyAttrs } from './stringify-attrs'
 
 export * from './stringify-attrs'
@@ -45,13 +52,27 @@ export const tagToString = (tag: HeadTag) => {
   }>${innerContent}</${tag.tag}>`
 }
 
-export const renderHeadToString = <T extends MergeHead = {}>(head: HeadClient<T>): HTMLResult => {
+export const resolveHeadEntry = (entries: HeadEntry[], force?: boolean) => {
+  return entries.map((e) => {
+    // when SSR we need to re-resolve the input each time on demand
+    if (e.input && (force || !e.resolved))
+      e.input = resolveUnrefHeadInput(e.input)
+    return e
+  })
+}
+
+export const renderHeadToString = async <T extends MergeHead = {}>(head: HeadClient<T>): Promise<HTMLResult> => {
   const tags: string[] = []
   const bodyTags: string[] = []
   let titleTag = ''
   const attrs: { htmlAttrs: HeadAttrs; bodyAttrs: HeadAttrs } = { htmlAttrs: {}, bodyAttrs: {} }
 
-  for (const tag of head.headTags) {
+  const resolvedEntries = resolveHeadEntry(head.headEntries, true)
+  const headTags = resolveHeadEntriesToTags(resolvedEntries)
+  for (const h in head.hookTagsResolved)
+    await head.hookTagsResolved[h](headTags)
+
+  for (const tag of headTags) {
     if (tag.tag === 'title') { titleTag = tagToString(tag) }
     else if (tag.tag === 'htmlAttrs' || tag.tag === 'bodyAttrs') {
       for (const k in tag.props) {

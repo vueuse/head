@@ -69,13 +69,13 @@ export const Head = /* @__PURE__ */ defineComponent({
     const obj: Ref<HeadObjectPlain> = ref({})
 
     if (IS_BROWSER) {
-      const cleanUp = head.setupReactiveHeadEntry(obj, { raw: true })
+      const cleanUp = head.addReactiveEntry(obj, { raw: true })
       onBeforeUnmount(() => {
         cleanUp()
       })
     }
     else {
-      head.setupHeadEntry({ input: obj, options: { raw: true } })
+      head.addEntry(obj, { raw: true })
     }
 
     return () => {

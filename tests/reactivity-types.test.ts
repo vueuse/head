@@ -83,7 +83,7 @@ describe('reactivity', () => {
     app.use(head)
     await renderToString(app)
 
-    const headResult = renderHeadToString(head)
+    const headResult = await renderHeadToString(head)
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<title></title><meta name=\\"head:count\\" content=\\"0\\">"',
     )
@@ -137,7 +137,7 @@ describe('reactivity', () => {
     app.use(head)
     await renderToString(app)
 
-    const headResult = renderHeadToString(head)
+    const headResult = await renderHeadToString(head)
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<title>hello</title><meta name=\\"description\\" content=\\"hello this is my description\\" data-unknown-attr=\\"test\\"><meta property=\\"og:fake-prop\\" content=\\"test\\"><meta name=\\"fake-name-prop\\" content=\\"test\\"><meta property=\\"og:url\\" content=\\"test\\"><script src=\\"foo.js\\"></script><meta name=\\"head:count\\" content=\\"5\\">"',
     )

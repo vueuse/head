@@ -39,13 +39,13 @@ export default defineNuxtPlugin((nuxtApp) => {
         })
       }
       if (shortcutMeta.length) {
-        removeSideEffectFns.push(head.setupHeadEntry({
+        removeSideEffectFns.push(head.addEntry({
           meta: shortcutMeta,
         }))
       }
     }
 
-    const cleanUp = head.setupReactiveHeadEntry(_meta, options)
+    const cleanUp = head.addReactiveEntry(_meta, options)
 
     if (process.server)
       return
@@ -62,8 +62,8 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   if (process.server) {
-    nuxtApp.ssrContext!.renderMeta = () => {
-      const meta = renderHeadToString(head)
+    nuxtApp.ssrContext!.renderMeta = async () => {
+      const meta = await renderHeadToString(head)
       return {
         ...meta,
         // resolves naming difference with NuxtMeta and @vueuse/head

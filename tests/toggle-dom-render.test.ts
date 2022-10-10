@@ -6,10 +6,8 @@ import { createHead, useHead } from '../src'
 describe('toggle dom render', () => {
   test('basic', async () => {
     const head = createHead()
-    head.setupHeadEntry({
-      resolvedInput: {
-        title: 'test',
-      },
+    head.addEntry({
+      title: 'test',
     })
 
     let pauseDOMUpdates = true
@@ -19,13 +17,13 @@ describe('toggle dom render', () => {
       '<!DOCTYPE html><html><head></head><body></body></html>',
     )
 
-    head.updateDOM(dom.window.document, true)
+    await head.updateDOM(dom.window.document, true)
 
     expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot('""')
 
     pauseDOMUpdates = false
 
-    head.updateDOM(dom.window.document, true)
+    await head.updateDOM(dom.window.document, true)
 
     expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot(
       '"<title>test</title>"',
@@ -35,7 +33,7 @@ describe('toggle dom render', () => {
   test('vue', async () => {
     const head = createHead()
     const app = createSSRApp({
-      setup() {
+      async setup() {
         let pauseDOMUpdates = true
         head.hookBeforeDomUpdate.push(() => !pauseDOMUpdates)
         const title = ref('')
@@ -53,7 +51,7 @@ describe('toggle dom render', () => {
         pauseDOMUpdates = false
         title.value = 'hello'
 
-        head.updateDOM(dom.window.document, true)
+        await head.updateDOM(dom.window.document, true)
 
         expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot(
           '"<title>hello</title>"',

@@ -1,44 +1,39 @@
 import { ref } from 'vue'
+import { resolveHeadEntriesToTags } from '@vueuse/head'
 import { createHead } from '../src'
 
 describe('basic', () => {
   test('removing head works', async () => {
     const head = createHead()
-    head.setupHeadEntry({
-      resolvedInput: {
-        title: 'old',
-        link: [
-          {
-            href: '/',
-          },
-        ],
-      },
+    head.addEntry({
+      title: 'old',
+      link: [
+        {
+          href: '/',
+        },
+      ],
     })
 
-    const { remove } = head.setupHeadEntry({
-      resolvedInput: {
-        title: 'test',
-      },
+    const { remove } = head.addEntry({
+      title: 'test',
     })
     remove()
 
-    expect(head.headTags).toMatchInlineSnapshot(`
+    expect(head.headEntries.length).toBe(1)
+    expect(head.headEntries).toMatchInlineSnapshot(`
       [
         {
-          "_options": {},
-          "_position": 0,
-          "props": {
-            "textContent": "old",
+          "id": 0,
+          "input": {
+            "link": [
+              {
+                "href": "/",
+              },
+            ],
+            "title": "old",
           },
-          "tag": "title",
-        },
-        {
-          "_options": {},
-          "_position": 1,
-          "props": {
-            "href": "/",
-          },
-          "tag": "link",
+          "options": {},
+          "resolved": false,
         },
       ]
     `)
@@ -47,7 +42,7 @@ describe('basic', () => {
   test('computed getter', async () => {
     const colour = ref('yellow')
     const head = createHead()
-    head.setupReactiveHeadEntry(
+    head.addReactiveEntry(
       () => ({
         bodyAttrs: {
           style: () => `background: ${colour.value}`,
@@ -55,18 +50,34 @@ describe('basic', () => {
         },
       }),
     )
-    expect(head.headTags).toMatchInlineSnapshot(`
-        [
-          {
-            "_options": {},
-            "_position": 0,
-            "props": {
+    expect(head.headEntries).toMatchInlineSnapshot(`
+      [
+        {
+          "id": 0,
+          "input": {
+            "bodyAttrs": {
               "class": "bg-yellow-500",
               "style": "background: yellow",
             },
-            "tag": "bodyAttrs",
           },
-        ]
-      `)
+          "options": {},
+          "resolved": true,
+        },
+      ]
+    `)
+
+    expect(resolveHeadEntriesToTags(head.headEntries)).toMatchInlineSnapshot(`
+      [
+        {
+          "_options": {},
+          "_position": 0,
+          "props": {
+            "class": "bg-yellow-500",
+            "style": "background: yellow",
+          },
+          "tag": "bodyAttrs",
+        },
+      ]
+    `)
   })
 })
