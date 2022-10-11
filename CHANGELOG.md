@@ -2,6 +2,14 @@
 
 No unreleased changes.
 
+## 1.0.0-rc.4
+
+- fix: add `headTags` for backwards compatibility (#133)
+- chore: prefer runtime prop for id & position (#134)
+- feat: improved hook api (#132)
+- fix: use simpler API for tags (#131)
+- fix(ci): use --pre
+
 ## 1.0.0-rc.3
 
 - fix(ci): remove broken --pre
