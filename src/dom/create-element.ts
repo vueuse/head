@@ -12,13 +12,13 @@ export const createElement = (
       $el.setAttribute(k, v)
   })
 
-  if (tag.options.body === true) {
+  if (tag.options?.body) {
     // set meta-body attribute to add the tag before </body>
     $el.setAttribute(BODY_TAG_ATTR_NAME, 'true')
   }
 
   if (tag.children)
-    $el[tag.options.raw ? 'innerHTML' : 'textContent'] = tag.children
+    $el[tag.options?.raw ? 'innerHTML' : 'textContent'] = tag.children
 
   return $el
 }
