@@ -28,15 +28,6 @@ export interface HeadClient<T extends MergeHead = {}> {
 
   headEntries: HeadEntry<T>[]
 
-  /**
-   * Backwards compatibility function to fetch the headTags.
-   *
-   * This function forces reactivity resolving and is not performant.
-   *
-   * @deprecated Use hooks.
-   */
-  headTags: HeadTag[]
-
   addEntry: (entry: UseHeadInput<T>, options?: HeadEntryOptions) => HeadObjectApi<T>
   addReactiveEntry: (objs: UseHeadInput<T>, options?: HeadEntryOptions) => () => void
 
@@ -57,6 +48,23 @@ export interface HeadClient<T extends MergeHead = {}> {
      * Array of user provided functions to hook into after the tags have been resolved (deduped and sorted).
      */
   Record<'resolved:tags', HookTagsResolved[]>
+
+  /**
+   * Backwards compatibility function to fetch the headTags.
+   *
+   * This function forces reactivity resolving and is not performant.
+   *
+   * @deprecated Use hooks.
+   */
+  headTags: HeadTag[]
+  /**
+   * Backwards compatibility function to add a head obj.
+   *
+   * Note: This will not support reactivity. Use `addReactiveEntry` instead.
+   *
+   * @deprecated Use addEntry
+   */
+  addHeadObjs: (entry: UseHeadInput<T>, options?: HeadEntryOptions) => HeadObjectApi<T>
 }
 
 export const IS_BROWSER = typeof window !== 'undefined'
@@ -106,6 +114,10 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: ResolvedUs
       // Note: we don't call hooks here as this function is sync
       const resolvedEntries = resolveHeadEntries(head.headEntries)
       return resolveHeadEntriesToTags(resolvedEntries)
+    },
+
+    addHeadObjs(input, options) {
+      return head.addEntry(input, options)
     },
 
     addEntry(input, options = {}) {
