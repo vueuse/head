@@ -2,6 +2,12 @@
 
 No unreleased changes.
 
+## 1.0.0-rc.5
+
+- chore: useHeadSafe types
+- refactor!: useHeadRaw -> useHeadSafe (#136)
+- fix: add legacy `addHeadObjs` (#135)
+
 ## 1.0.0-rc.4
 
 - fix: add `headTags` for backwards compatibility (#133)
