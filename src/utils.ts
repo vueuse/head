@@ -6,7 +6,7 @@ import { resolveHeadEntries } from './ssr'
 
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   const tagWeight = (tag: HeadTag) => {
-    if (tag.options.renderPriority)
+    if (tag.options?.renderPriority)
       return tag.options.renderPriority
 
     switch (tag.tag) {
@@ -43,7 +43,7 @@ export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
   if (props.charset)
     return 'charset'
 
-  if (options.key)
+  if (options?.key)
     return `${tagName}:${options.key}`
 
   const name = ['id']
@@ -55,7 +55,7 @@ export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
       return `${tagName}:${n}:${props[n]}`
     }
   }
-  return tag.options.position!
+  return tag.runtime!.position
 }
 
 export function resolveUnrefHeadInput<T extends MergeHead = {}>(ref: UseHeadInput<T>): ResolvedUseHeadInput<T> {
@@ -90,24 +90,23 @@ export function resolveUnrefHeadInput<T extends MergeHead = {}>(ref: UseHeadInpu
 const resolveTag = (name: TagKeys, input: Record<string, any>, e: HeadEntry): HeadTag => {
   const tag: HeadTag = {
     tag: name,
-    props: [],
-    options: {
+    props: {},
+    runtime: {
       entryId: e.id,
       position: 0,
+    },
+    // tag inherits options from useHead registration
+    options: {
+      ...e.options,
     },
   }
   // dedupe keys
   ;['hid', 'vmid', 'key'].forEach((key) => {
     if (input[key]) {
-      tag.options.key = input[key]
+      tag.options!.key = input[key]
       delete input[key]
     }
   })
-  // tag inherits options from useHead registration
-  tag.options = {
-    ...tag.options,
-    ...e.options,
-  }
   // set children key
   ;['children', 'innerHTML', 'textContent']
     .forEach((key) => {
@@ -120,8 +119,7 @@ const resolveTag = (name: TagKeys, input: Record<string, any>, e: HeadEntry): He
   ;['body', 'renderPriority']
     .forEach((key) => {
       if (typeof input[key] !== 'undefined') {
-        // @ts-expect-error untyped
-        tag.options[key] = input[key]
+        tag.options![key] = input[key]
         delete input[key]
       }
     })
@@ -181,10 +179,11 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
   resolvedEntries.forEach((entry, entryIndex) => {
     const tags = headInputToTags(entry)
     tags.forEach((tag, tagIdx) => {
+      tag.runtime = tag.runtime || {}
       // used to restore the order after deduping
       // a large number is needed otherwise the position will potentially duplicate (this support 10k tags)
       // ideally we'd use the total tag count but this is too hard to calculate with the current reactivity
-      tag.options.position = entryIndex * 10000 + tagIdx
+      tag.runtime.position = entryIndex * 10000 + tagIdx
 
       // resolve titles
       if (titleTemplate && tag.tag === 'title') {
@@ -207,6 +206,6 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
   })
 
   return Object.values(deduping)
-    .sort((a, b) => a.options.position - b.options.position)
+    .sort((a, b) => a.runtime?.position - b.runtime?.position)
     .sort(sortTags)
 }
