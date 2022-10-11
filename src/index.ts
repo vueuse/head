@@ -20,6 +20,7 @@ import type {
 } from './types'
 import { updateDOM } from './dom/update-dom'
 import { resolveHeadEntries } from './ssr'
+import { escapeHtml, escapeJS, sanitiseAttrName, sanitiseAttrValue } from './encoding'
 
 export * from './types'
 
@@ -198,7 +199,27 @@ export const useHead = <T extends MergeHead = {}>(headObj: UseHeadInput<T>) => {
 }
 
 export const useHeadSafe = (headObj: UseHeadRawInput) => {
-  _useHead(headObj, { safe: true })
+  _useHead(headObj, {
+    beforeTagRender: (tag) => {
+      for (const p in tag.props) {
+        const value = tag.props[p]
+        const key = sanitiseAttrName(p)
+        delete tag.props[p]
+        if (!p.startsWith('on') && p !== 'innerHTML') {
+          if (p === 'href' || p === 'src')
+            tag.props[key] = encodeURI(value)
+          tag.props[key] = sanitiseAttrValue(value)
+        }
+      }
+      if (tag.children) {
+        if (tag.tag === 'script')
+          delete tag.children
+        else
+          tag.children = escapeJS(escapeHtml(tag.children))
+      }
+    },
+  },
+  )
 }
 
 export * from './components'

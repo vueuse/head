@@ -37,7 +37,7 @@ describe('encoding', () => {
     const { headTags } = await renderHeadToString(head)
     // valid html (except for the tag name)
     expect(headTags).toMatchInlineSnapshot(
-      '"<meta consolealerttest=\\"<style>body { background: red; }</style>\\"><meta name=\\"head:count\\" content=\\"1\\">"',
+      '"<meta > console.alert(\\"test\\")=\\"<style>body { background: red; }</style>\\"><meta name=\\"head:count\\" content=\\"1\\">"',
     )
   })
 
@@ -63,7 +63,7 @@ describe('encoding', () => {
     )
     // valid html
     expect(bodyTags).toMatchInlineSnapshot(
-      '"<script src=\\"https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly\\" data-key=\\"AIzaSyD9hQ0Z7Y9XQX8Zjwq7Q9Z2YQ9Z2YQ9Z2Y\\" defer data-meta-body=\\"true\\"></script>"',
+      '"<script src=\\"https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly\\" data-key=\\"AIzaSyD9hQ0Z7Y9XQX8Zjwq7Q9Z2YQ9Z2YQ9Z2Y\\" defer data-meta-body></script>"',
     )
   })
 

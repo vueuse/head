@@ -2,10 +2,9 @@ import type { MergeHead } from '@zhead/schema'
 import type {
   HandlesDuplicates,
   HasRenderPriority,
-  HasTextContent, HeadEntry,
-  HeadEntryOptions,
-  RendersToBody, ResolvedUseHeadInput,
-  TagKeys,
+  HasTextContent,
+  HeadObjectPlain, RendersToBody,
+  ResolvedUseHeadInput,
 } from './schema'
 
 export * from './schema'
@@ -21,11 +20,22 @@ HasRenderPriority &
 RendersToBody &
 HasTextContent
 
+export interface HeadEntryOptions { safe?: boolean; resolved?: boolean; beforeTagRender?: (tag: HeadTag) => void }
+export interface HeadEntry<T extends MergeHead = {}> {
+  options: HeadEntryOptions
+  tags: HeadTag[]
+  input: ResolvedUseHeadInput<T>
+  resolved: boolean
+  id: number
+}
+
+export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>
+
 export interface HeadTag {
   tag: TagKeys
   props: Record<string, any>
   children?: string
-  runtime?: { position?: number; entryId?: number }
+  runtime?: { position?: number; entryId?: number; beforeTagRender?: (tag: HeadTag) => void }
   options?: HeadTagOptions
 }
 

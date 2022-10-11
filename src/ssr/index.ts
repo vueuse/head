@@ -1,34 +1,35 @@
 import type { MergeHead } from '@zhead/schema'
 import type { HTMLResult, HeadAttrs, HeadEntry, HeadTag } from '../types'
-import { BODY_TAG_ATTR_NAME, HEAD_ATTRS_KEY, HEAD_COUNT_KEY, SELF_CLOSING_TAGS } from '../constants'
+import { HEAD_ATTRS_KEY, HEAD_COUNT_KEY, SELF_CLOSING_TAGS } from '../constants'
 import type { HeadClient } from '../index'
 import {
-  escapeHtml,
-  escapeJS,
   resolveHeadEntriesToTags,
   resolveUnrefHeadInput,
-  sanitiseAttrName,
-  sanitiseAttrValue,
 } from '../index'
-import { sanitiseAttrs } from './stringify-attrs'
+import { sanitiseAttrName, sanitiseAttrValue } from '../encoding'
 
-export * from './stringify-attrs'
+export const propsToString = (props: HeadTag['props']) => {
+  const handledAttributes = []
+
+  for (const [key, value] of Object.entries(props)) {
+    if (value === false || value == null)
+      continue
+
+    let attribute = key
+
+    if (value !== true)
+      attribute += `="${String(value).replace(/"/g, '&quot;')}"`
+
+    handledAttributes.push(attribute)
+  }
+
+  return handledAttributes.length > 0 ? ` ${handledAttributes.join(' ')}` : ''
+}
 
 export const tagToString = (tag: HeadTag) => {
-  const body = tag.options?.body ? ` ${BODY_TAG_ATTR_NAME}="true"` : ''
-  const attrs = sanitiseAttrs(tag.props, tag.options?.safe || false)
-  if (SELF_CLOSING_TAGS.includes(tag.tag))
-    return `<${tag.tag}${attrs}${body}>`
-
-  let children = ''
-  if (tag.options?.safe) {
-    if (tag.tag !== 'script')
-      children = escapeJS(escapeHtml(children))
-  }
-  else {
-    children = tag.children || children
-  }
-  return `<${tag.tag}${attrs}${body}>${children}</${tag.tag}>`
+  const attrs = propsToString(tag.props)
+  const openTag = `<${tag.tag}${attrs}>`
+  return SELF_CLOSING_TAGS.includes(tag.tag) ? openTag : `${openTag}${tag.children || ''}</${tag.tag}>`
 }
 
 export const resolveHeadEntries = (entries: HeadEntry[], force?: boolean) => {
@@ -57,6 +58,9 @@ export const renderHeadToString = async <T extends MergeHead = {}>(head: HeadCli
     await head.hooks['resolved:tags'][h](headTags)
 
   for (const tag of headTags) {
+    if (tag.options?.beforeTagRender)
+      tag.options.beforeTagRender(tag)
+
     if (tag.tag === 'title') { titleHtml = tagToString(tag) }
     else if (tag.tag === 'htmlAttrs' || tag.tag === 'bodyAttrs') {
       for (const k in tag.props) {
@@ -76,22 +80,16 @@ export const renderHeadToString = async <T extends MergeHead = {}>(head: HeadCli
       return titleHtml + headHtml.join('')
     },
     get htmlAttrs() {
-      return sanitiseAttrs({
+      return propsToString({
         ...attrs.htmlAttrs,
         [HEAD_ATTRS_KEY]: Object.keys(attrs.htmlAttrs).join(','),
-      },
-      // values have already been encoded if they are not raw
-      false,
-      )
+      })
     },
     get bodyAttrs() {
-      return sanitiseAttrs({
+      return propsToString({
         ...attrs.bodyAttrs,
         [HEAD_ATTRS_KEY]: Object.keys(attrs.bodyAttrs).join(','),
-      },
-      // values have already been encoded if they are not raw
-      false,
-      )
+      })
     },
     get bodyTags() {
       return bodyHtml.join('')

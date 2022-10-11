@@ -60,7 +60,7 @@ describe('reactivity', () => {
     expect(headResult).toMatchInlineSnapshot(`
       {
         "bodyAttrs": " data-some-body-attr=\\"some-value\\" data-head-attrs=\\"data-some-body-attr\\"",
-        "bodyTags": "<style data-meta-body=\\"true\\">* { color: red }</style>",
+        "bodyTags": "<style data-meta-body>* { color: red }</style>",
         "headTags": "<title>hello - My site</title><meta name=\\"description\\" content=\\"desc 2\\"><meta property=\\"og:locale:alternate\\" content=\\"fr\\"><meta property=\\"og:locale:alternate\\" content=\\"zh\\"><link as=\\"style\\" href=\\"/style.css\\"><script src=\\"foo.js\\"></script><meta name=\\"head:count\\" content=\\"5\\">",
         "htmlAttrs": " lang=\\"zh\\" data-head-attrs=\\"lang\\"",
       }

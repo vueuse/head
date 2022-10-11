@@ -1,4 +1,3 @@
-import { BODY_TAG_ATTR_NAME } from '../constants'
 import type { HeadTag } from '../'
 
 export const createElement = (
@@ -11,11 +10,6 @@ export const createElement = (
     if (v !== false)
       $el.setAttribute(k, v)
   })
-
-  if (tag.options?.body) {
-    // set meta-body attribute to add the tag before </body>
-    $el.setAttribute(BODY_TAG_ATTR_NAME, 'true')
-  }
 
   if (tag.children) {
     if (tag.options?.safe) {
