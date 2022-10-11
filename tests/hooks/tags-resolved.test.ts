@@ -26,11 +26,12 @@ describe('hook tags resolved', () => {
       [
         {
           "children": "test",
-          "options": {
+          "options": {},
+          "props": {},
+          "runtime": {
             "entryId": 0,
             "position": 0,
           },
-          "props": {},
           "tag": "title",
         },
       ]
@@ -62,12 +63,13 @@ describe('hook tags resolved', () => {
     expect(hooks[0]).toMatchInlineSnapshot(`
       {
         "children": "test",
-        "options": {
-          "entryId": 0,
-          "position": 0,
-        },
+        "options": {},
         "props": {
           "extra": true,
+        },
+        "runtime": {
+          "entryId": 0,
+          "position": 0,
         },
         "tag": "title",
       }
