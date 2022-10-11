@@ -59,11 +59,11 @@ describe('e2e: vite ssr', async () => {
       return resolveHeadEntriesToTags(head.headEntries)
     }
     expect(
-      (await getHeadTags()).find(t => t.tag === 'title')!._runtime.textContent,
+      (await getHeadTags()).find(t => t.tag === 'title')!.children,
     ).toMatchInlineSnapshot('"0 | @vueuse/head"')
     await page.click('button')
     expect(
-      (await getHeadTags()).find(t => t.tag === 'title')!._runtime.textContent,
+      (await getHeadTags()).find(t => t.tag === 'title')!.children,
     ).toMatchInlineSnapshot('"1 | @vueuse/head"')
   })
 

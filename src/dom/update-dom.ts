@@ -24,8 +24,8 @@ export const updateDOM = async (head: HeadClient, previousTags: Set<string>, doc
   for (const tag of headTags) {
     switch (tag.tag) {
       case 'title':
-        if (typeof tag._runtime.textContent !== 'undefined')
-          document.title = tag._runtime.textContent
+        if (typeof tag.children !== 'undefined')
+          document.title = tag.children
         break
 
       case 'base':

@@ -17,8 +17,7 @@ const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
 
   const props: HeadAttrs = node.props || {} as HeadAttrs
   if (node.children) {
-    const k = type === 'script' ? 'innerHTML' : 'textContent'
-    props[k] = Array.isArray(node.children)
+    props.children = Array.isArray(node.children)
       // @ts-expect-error untyped
       ? node.children[0]!.children
       : node.children
@@ -27,7 +26,7 @@ const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
     (obj[type] as HeadAttrs[]).push(props)
 
   else if (type === 'title')
-    obj.title = props.textContent
+    obj.title = props.children
 
   else
     (obj[type] as HeadAttrs) = props
