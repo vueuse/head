@@ -15,13 +15,13 @@ import { stringifyAttrs } from './stringify-attrs'
 export * from './stringify-attrs'
 
 export const tagToString = (tag: HeadTag) => {
-  const body = tag.options.body ? ` ${BODY_TAG_ATTR_NAME}="true"` : ''
+  const body = tag.options?.body ? ` ${BODY_TAG_ATTR_NAME}="true"` : ''
   const attrs = stringifyAttrs(tag.props, tag.options)
   if (SELF_CLOSING_TAGS.includes(tag.tag))
     return `<${tag.tag}${attrs}${body}>`
 
   let children = tag.children || ''
-  children = tag.options.raw ? children : escapeJS(escapeHtml(children))
+  children = tag.options?.raw ? children : escapeJS(escapeHtml(children))
   return `<${tag.tag}${attrs}${body}>${children}</${tag.tag}>`
 }
 
@@ -58,7 +58,7 @@ export const renderHeadToString = async <T extends MergeHead = {}>(head: HeadCli
         attrs[tag.tag][stringifyAttrName(k)] = stringifyAttrValue(tag.props[k])
       }
     }
-    else if (tag.options.body) { bodyHtml.push(tagToString(tag)) }
+    else if (tag.options?.body) { bodyHtml.push(tagToString(tag)) }
     else {
       headHtml.push(tagToString(tag))
     }

@@ -12,22 +12,21 @@ export * from './schema'
 
 export interface HeadAttrs { [k: string]: any }
 
-export type HookBeforeDomUpdate = ((tags: HeadTag[]) => Promise<void | boolean> | void | boolean)[]
-export type HookTagsResolved = ((tags: HeadTag[]) => Promise<void> | void)[]
-export type HookEntriesResolved = ((entries: HeadEntry[]) => Promise<void> | void)[]
+export type HookBeforeDomUpdate = (() => Promise<void | boolean> | void | boolean)
+export type HookTagsResolved = ((tags: HeadTag[]) => Promise<void> | void)
+export type HookEntriesResolved = ((entries: HeadEntry[]) => Promise<void> | void)
 
-export type HeadTagRuntime = HeadEntryOptions & HandlesDuplicates &
+export type HeadTagOptions = HeadEntryOptions & HandlesDuplicates &
 HasRenderPriority &
 RendersToBody &
-HasTextContent & { position: number; entryId: number }
+HasTextContent
 
 export interface HeadTag {
   tag: TagKeys
-  props: {
-    [k: string]: any
-  }
+  props: Record<string, any>
   children?: string
-  options: HeadTagRuntime
+  runtime?: { position?: number; entryId?: number }
+  options?: HeadTagOptions
 }
 
 export interface HeadObjectApi<T extends MergeHead = {}> {

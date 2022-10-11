@@ -51,12 +51,12 @@ export interface HeadClient<T extends MergeHead = {}> {
    *
    * You are able to modify the payload of hook using this.
    */
-  Record<'before:dom', HookBeforeDomUpdate> &
-  Record<'resolved:entries', HookEntriesResolved> &
+  Record<'before:dom', HookBeforeDomUpdate[]> &
+  Record<'resolved:entries', HookEntriesResolved[]> &
   /**
      * Array of user provided functions to hook into after the tags have been resolved (deduped and sorted).
      */
-  Record<'resolved:tags', HookTagsResolved>
+  Record<'resolved:tags', HookTagsResolved[]>
 }
 
 export const IS_BROWSER = typeof window !== 'undefined'
