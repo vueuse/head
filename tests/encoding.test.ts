@@ -19,7 +19,7 @@ describe('encoding', () => {
       ],
     })
     const { htmlAttrs, headTags } = await renderHeadToString(head)
-    expect(headTags).toMatchInlineSnapshot('"<script src=\\"javascript:console.log(\\\\\'xss\\\\\');\\"></script><noscript></noscript><meta name=\\"head:count\\" content=\\"2\\">"')
+    expect(headTags).toMatchInlineSnapshot('"<script src=\\"javascript:console.log(\\\\\'xss\\\\\');\\">alert(2)</script><noscript>&lt;iframe src=&quot;https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX&quot; height=&quot;0&quot; width=&quot;0&quot; style=&quot;display:none;visibility:hidden&quot;&gt;&lt;/iframe&gt;</noscript><meta name=\\"head:count\\" content=\\"2\\">"')
     expect(htmlAttrs).toMatchInlineSnapshot('" data-head-attrs=\\"\\""')
   })
 
@@ -102,7 +102,7 @@ describe('encoding', () => {
     head.updateDOM(dom.window.document, true)
 
     expect(dom.window.document.head.innerHTML).toMatchInlineSnapshot(
-      '"<script></script><meta name=\\"head:count\\" content=\\"1\\">"',
+      '"<script>console.alert(\\"xss\\")</script><meta name=\\"head:count\\" content=\\"1\\">"',
     )
   })
 })
