@@ -25,7 +25,7 @@ export const tagToString = (tag: HeadTag) => {
   return `<${tag.tag}${attrs}${body}>${children}</${tag.tag}>`
 }
 
-export const resolveHeadEntry = (entries: HeadEntry[], force?: boolean) => {
+export const resolveHeadEntries = (entries: HeadEntry[], force?: boolean) => {
   return entries.map((e) => {
     // when SSR we need to re-resolve the input each time on demand
     if (e.input && (force || !e.resolved))
@@ -40,10 +40,15 @@ export const renderHeadToString = async <T extends MergeHead = {}>(head: HeadCli
   let titleHtml = ''
   const attrs: { htmlAttrs: HeadAttrs; bodyAttrs: HeadAttrs } = { htmlAttrs: {}, bodyAttrs: {} }
 
-  const resolvedEntries = resolveHeadEntry(head.headEntries, true)
+  const resolvedEntries = resolveHeadEntries(head.headEntries)
+
+  for (const h in head.hooks['resolved:entries'])
+    await head.hooks['resolved:entries'][h](resolvedEntries)
+
   const headTags = resolveHeadEntriesToTags(resolvedEntries)
-  for (const h in head.hookTagsResolved)
-    await head.hookTagsResolved[h](headTags)
+
+  for (const h in head.hooks['resolved:tags'])
+    await head.hooks['resolved:tags'][h](headTags)
 
   for (const tag of headTags) {
     if (tag.tag === 'title') { titleHtml = tagToString(tag) }

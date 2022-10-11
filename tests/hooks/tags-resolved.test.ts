@@ -1,12 +1,12 @@
 import { JSDOM } from 'jsdom'
-import { createHead } from '../src'
+import { createHead } from '../../src'
 
 describe('hook tags resolved', () => {
   test('read tags', async () => {
     const head = createHead()
 
     const hookTags = new Promise((resolve) => {
-      head.hookTagsResolved.push((tags) => {
+      head.hooks['resolved:tags'].push((tags) => {
         resolve(tags)
       })
     })
@@ -41,7 +41,7 @@ describe('hook tags resolved', () => {
     const head = createHead()
 
     const hookTags = new Promise((resolve) => {
-      head.hookTagsResolved.push((tags) => {
+      head.hooks['resolved:tags'].push((tags) => {
         for (const k in tags)
           tags[k].props.extra = true
 

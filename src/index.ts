@@ -14,8 +14,9 @@ import { resolveUnrefHeadInput } from './utils'
 import type {
   HeadEntry,
   HeadEntryOptions, HeadObjectApi,
-  HookBeforeDomUpdate, HookTagsResolved,
-  ResolvedUseHeadInput, UseHeadInput, UseHeadRawInput,
+  HookBeforeDomUpdate, HookEntriesResolved,
+  HookTagsResolved, ResolvedUseHeadInput, UseHeadInput,
+  UseHeadRawInput,
 } from './types'
 import { updateDOM } from './dom/update-dom'
 
@@ -31,6 +32,7 @@ export interface HeadClient<T extends MergeHead = {}> {
 
   updateDOM: (document?: Document, force?: boolean) => void
 
+  hooks:
   /**
    * Array of user provided functions to hook into before the DOM is updated.
    *
@@ -39,11 +41,12 @@ export interface HeadClient<T extends MergeHead = {}> {
    *
    * You are able to modify the payload of hook using this.
    */
-  hookBeforeDomUpdate: HookBeforeDomUpdate
+  Record<'before:dom', HookBeforeDomUpdate> &
+  Record<'resolved:entries', HookEntriesResolved> &
   /**
-   * Array of user provided functions to hook into after the tags have been resolved (deduped and sorted).
-   */
-  hookTagsResolved: HookTagsResolved
+     * Array of user provided functions to hook into after the tags have been resolved (deduped and sorted).
+     */
+  Record<'resolved:tags', HookTagsResolved>
 }
 
 export const IS_BROWSER = typeof window !== 'undefined'
@@ -68,9 +71,6 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: ResolvedUs
 
   const previousTags = new Set<string>()
 
-  const hookBeforeDomUpdate: HookBeforeDomUpdate = []
-  const hookTagsResolved: HookTagsResolved = []
-
   let domUpdateTick: Promise<void> | null = null
 
   const head: HeadClient<T> = {
@@ -79,8 +79,11 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: ResolvedUs
       app.provide(PROVIDE_KEY, head)
     },
 
-    hookBeforeDomUpdate,
-    hookTagsResolved,
+    hooks: {
+      'before:dom': [],
+      'resolved:tags': [],
+      'resolved:entries': [],
+    },
 
     get headEntries() {
       return entries
