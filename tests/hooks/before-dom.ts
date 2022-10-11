@@ -1,7 +1,7 @@
 import { createSSRApp, ref } from 'vue'
 import { JSDOM } from 'jsdom'
 import { renderToString } from '@vue/server-renderer'
-import { createHead, useHead } from '../src'
+import { createHead, useHead } from '../../src'
 
 describe('toggle dom render', () => {
   test('basic', async () => {
@@ -11,7 +11,7 @@ describe('toggle dom render', () => {
     })
 
     let pauseDOMUpdates = true
-    head.hookBeforeDomUpdate.push(() => !pauseDOMUpdates)
+    head.hooks['before:dom'].push(() => !pauseDOMUpdates)
 
     const dom = new JSDOM(
       '<!DOCTYPE html><html><head></head><body></body></html>',
@@ -35,7 +35,7 @@ describe('toggle dom render', () => {
     const app = createSSRApp({
       async setup() {
         let pauseDOMUpdates = true
-        head.hookBeforeDomUpdate.push(() => !pauseDOMUpdates)
+        head.hooks['before:dom'].push(() => !pauseDOMUpdates)
         const title = ref('')
         useHead({
           title,

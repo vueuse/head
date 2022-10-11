@@ -1,5 +1,5 @@
 import type { HeadClient } from '../index'
-import { resolveHeadEntriesToTags } from '../index'
+import { resolveHeadEntries, resolveHeadEntriesToTags } from '../index'
 import type { HeadTag } from '../types'
 import { setAttrs } from './utils'
 import { updateElements } from './update-elements'
@@ -10,15 +10,21 @@ export const updateDOM = async (head: HeadClient, previousTags: Set<string>, doc
   if (!document)
     document = window.document
 
-  const headTags = resolveHeadEntriesToTags(head.headEntries)
-  for (const h in head.hookTagsResolved)
-    await head.hookTagsResolved[h](headTags)
-
   // allow integration to disable dom update and / or modify it
-  for (const k in head.hookBeforeDomUpdate) {
-    if (await head.hookBeforeDomUpdate[k](headTags) === false)
+  for (const k in head.hooks['before:dom']) {
+    if (await head.hooks['before:dom'][k]() === false)
       return
   }
+
+  const resolvedEntries = resolveHeadEntries(head.headEntries)
+
+  for (const h in head.hooks['resolved:entries'])
+    await head.hooks['resolved:entries'][h](resolvedEntries)
+
+  const headTags = resolveHeadEntriesToTags(resolvedEntries)
+
+  for (const h in head.hooks['resolved:tags'])
+    await head.hooks['resolved:tags'][h](headTags)
 
   // head sorting here is not guaranteed to be honoured
   for (const tag of headTags) {

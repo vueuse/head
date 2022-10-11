@@ -18,7 +18,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   if (process.client) {
     // pause dom updates until page is ready and between page transitions
     let pauseDOMUpdates = true
-    head.hookBeforeDomUpdate.push(() => !pauseDOMUpdates)
+    head.hooks["before:dom"].push(() => !pauseDOMUpdates)
     nuxtApp.hooks.hookOnce('app:mounted', () => {
       pauseDOMUpdates = false
       head.updateDOM()

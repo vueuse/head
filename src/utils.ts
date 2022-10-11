@@ -2,7 +2,7 @@ import { resolveUnref } from '@vueuse/shared'
 import { unref } from 'vue'
 import type { MergeHead } from '@zhead/schema'
 import type { HeadEntry, HeadObjectPlain, HeadTag, ResolvedUseHeadInput, TagKeys, UseHeadInput } from './types'
-import { resolveHeadEntry } from './ssr'
+import { resolveHeadEntries } from './ssr'
 
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   const tagWeight = (tag: HeadTag) => {
@@ -171,7 +171,7 @@ const renderTitleTemplate = (
 export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
   const deduping: Record<string, HeadTag> = {}
 
-  const resolvedEntries = resolveHeadEntry(entries)
+  const resolvedEntries = resolveHeadEntries(entries)
 
   const titleTemplate = resolvedEntries
     .map(i => i.input.titleTemplate)
