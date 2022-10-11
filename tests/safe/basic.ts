@@ -1,14 +1,14 @@
 import { createSSRApp, ref } from 'vue'
 import { renderToString } from '@vue/server-renderer'
-import { createHead, renderHeadToString, useHeadRaw } from '../src'
+import { createHead, renderHeadToString, useHeadSafe } from '../../src'
 
-describe('use head raw', () => {
+describe('use head safe', () => {
   test('basic', async () => {
     const head = createHead()
     const app = createSSRApp({
       setup() {
         const title = ref('')
-        useHeadRaw({
+        useHeadSafe({
           htmlAttrs: {
             'aria-label': 'test',
             'onkeyup': 'alert(1)',

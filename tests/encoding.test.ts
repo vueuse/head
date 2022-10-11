@@ -19,8 +19,8 @@ describe('encoding', () => {
       ],
     })
     const { htmlAttrs, headTags } = await renderHeadToString(head)
-    expect(headTags).toMatchInlineSnapshot('"<script src=\\"javascript:console.log(\\\\\'xss\\\\\');\\">alert(2)</script><noscript>&lt;iframe src=&quot;https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX&quot; height=&quot;0&quot; width=&quot;0&quot; style=&quot;display:none;visibility:hidden&quot;&gt;&lt;/iframe&gt;</noscript><meta name=\\"head:count\\" content=\\"2\\">"')
-    expect(htmlAttrs).toMatchInlineSnapshot('" data-head-attrs=\\"\\""')
+    expect(headTags).toMatchInlineSnapshot('"<script src=\\"javascript:console.log(\'xss\');\\">alert(2)</script><noscript><iframe src=\\"https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX\\" height=\\"0\\" width=\\"0\\" style=\\"display:none;visibility:hidden\\"></iframe></noscript><meta name=\\"head:count\\" content=\\"2\\">"')
+    expect(htmlAttrs).toMatchInlineSnapshot('" onload=\\"console.log(\\\\\'executed\\\\\')\\" data-head-attrs=\\"onload\\""')
   })
 
   it('ssr jailbreak', async () => {
@@ -37,7 +37,7 @@ describe('encoding', () => {
     const { headTags } = await renderHeadToString(head)
     // valid html (except for the tag name)
     expect(headTags).toMatchInlineSnapshot(
-      '"<meta consolealerttest=\\"&lt;style&gt;body { background: red; }&lt;/style&gt;\\"><meta name=\\"head:count\\" content=\\"1\\">"',
+      '"<meta consolealerttest=\\"<style>body { background: red; }</style>\\"><meta name=\\"head:count\\" content=\\"1\\">"',
     )
   })
 
@@ -80,7 +80,7 @@ describe('encoding', () => {
     head.addEntry(externalApiHeadData)
     const { headTags } = await renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot(
-      '"<script>console.alert(&quot;xss&quot;)</script><meta name=\\"head:count\\" content=\\"1\\">"',
+      '"<script>console.alert(\\"xss\\")</script><meta name=\\"head:count\\" content=\\"1\\">"',
     )
   })
 

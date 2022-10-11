@@ -17,8 +17,16 @@ export const createElement = (
     $el.setAttribute(BODY_TAG_ATTR_NAME, 'true')
   }
 
-  if (tag.children)
-    $el[tag.options?.raw ? 'innerHTML' : 'textContent'] = tag.children
+  if (tag.children) {
+    if (tag.options?.safe) {
+      // script is not safe with textContent
+      if (tag.tag !== 'script')
+        $el.textContent = tag.children
+    }
+    else {
+      $el.innerHTML = tag.children
+    }
+  }
 
   return $el
 }

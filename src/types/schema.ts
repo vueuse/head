@@ -92,7 +92,7 @@ export type UseHeadInput<T extends MergeHead = {}> = MaybeComputedRef<HeadObject
 export type ResolvedUseHeadInput<T extends MergeHead = {}> = PlainHead<T & VueUseHeadSchema>
 export type UseHeadRawInput = MaybeComputedRef<ReactiveHead<RawHeadAugmentation & VueUseHeadSchema>>
 
-export interface HeadEntryOptions { raw?: boolean; resolved?: boolean }
+export interface HeadEntryOptions { safe?: boolean; resolved?: boolean }
 export interface HeadEntry<T extends MergeHead = {}> {
   options: HeadEntryOptions
   tags: HeadTag[]

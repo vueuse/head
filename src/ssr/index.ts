@@ -7,21 +7,27 @@ import {
   escapeJS,
   resolveHeadEntriesToTags,
   resolveUnrefHeadInput,
-  stringifyAttrName,
-  stringifyAttrValue,
+  sanitiseAttrName,
+  sanitiseAttrValue,
 } from '../index'
-import { stringifyAttrs } from './stringify-attrs'
+import { sanitiseAttrs } from './stringify-attrs'
 
 export * from './stringify-attrs'
 
 export const tagToString = (tag: HeadTag) => {
   const body = tag.options?.body ? ` ${BODY_TAG_ATTR_NAME}="true"` : ''
-  const attrs = stringifyAttrs(tag.props, tag.options)
+  const attrs = sanitiseAttrs(tag.props, tag.options?.safe || false)
   if (SELF_CLOSING_TAGS.includes(tag.tag))
     return `<${tag.tag}${attrs}${body}>`
 
-  let children = tag.children || ''
-  children = tag.options?.raw ? children : escapeJS(escapeHtml(children))
+  let children = ''
+  if (tag.options?.safe) {
+    if (tag.tag !== 'script')
+      children = escapeJS(escapeHtml(children))
+  }
+  else {
+    children = tag.children || children
+  }
   return `<${tag.tag}${attrs}${body}>${children}</${tag.tag}>`
 }
 
@@ -55,7 +61,7 @@ export const renderHeadToString = async <T extends MergeHead = {}>(head: HeadCli
     else if (tag.tag === 'htmlAttrs' || tag.tag === 'bodyAttrs') {
       for (const k in tag.props) {
         // always encode name to avoid html errors
-        attrs[tag.tag][stringifyAttrName(k)] = stringifyAttrValue(tag.props[k])
+        attrs[tag.tag][sanitiseAttrName(k)] = sanitiseAttrValue(tag.props[k])
       }
     }
     else if (tag.options?.body) { bodyHtml.push(tagToString(tag)) }
@@ -70,21 +76,21 @@ export const renderHeadToString = async <T extends MergeHead = {}>(head: HeadCli
       return titleHtml + headHtml.join('')
     },
     get htmlAttrs() {
-      return stringifyAttrs({
+      return sanitiseAttrs({
         ...attrs.htmlAttrs,
         [HEAD_ATTRS_KEY]: Object.keys(attrs.htmlAttrs).join(','),
       },
       // values have already been encoded if they are not raw
-      { raw: true },
+      false,
       )
     },
     get bodyAttrs() {
-      return stringifyAttrs({
+      return sanitiseAttrs({
         ...attrs.bodyAttrs,
         [HEAD_ATTRS_KEY]: Object.keys(attrs.bodyAttrs).join(','),
       },
       // values have already been encoded if they are not raw
-      { raw: true },
+      false,
       )
     },
     get bodyTags() {

@@ -197,8 +197,8 @@ export const useHead = <T extends MergeHead = {}>(headObj: UseHeadInput<T>) => {
   _useHead(headObj)
 }
 
-export const useHeadRaw = (headObj: UseHeadRawInput) => {
-  _useHead(headObj, { raw: true })
+export const useHeadSafe = (headObj: UseHeadRawInput) => {
+  _useHead(headObj, { safe: true })
 }
 
 export * from './components'

@@ -6,7 +6,7 @@ import {
   createRouter,
   createWebHistory,
 } from 'vue-router'
-import { createHead, useHead, useHeadRaw } from '../../src'
+import { createHead, useHead, useHeadSafe } from '../../src'
 import Contact from './Contact.vue'
 
 export const createApp = () => {
@@ -17,7 +17,7 @@ export const createApp = () => {
         title: (() => `count: ${count.value}`),
         link: [{ href: '/foo', rel: 'stylesheet' }],
       })
-      useHeadRaw({
+      useHead({
         script: [{ children: 'console.log("a")', key: 'a' }],
       })
       return () => (
@@ -71,7 +71,7 @@ export const createApp = () => {
         ],
       })
 
-      useHeadRaw({
+      useHead({
         script: [
           {
             children: 'console.log(\'hi\')',

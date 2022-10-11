@@ -202,8 +202,8 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
           tag.children,
         )
       }
-      // validate XSS vectors for non-raw input
-      if (!tag.options?.raw) {
+
+      if (tag.options?.safe) {
         for (const k in tag.props) {
           if (k.startsWith('on') || k === 'innerHTML')
             delete tag.props[k]
