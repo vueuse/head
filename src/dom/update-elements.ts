@@ -45,7 +45,7 @@ export const updateElements = (
   }
   let newElements = tags.map(tag => ({
     element: createElement(tag, document),
-    body: tag._runtime.body ?? false,
+    body: tag.options.body ?? false,
   }))
 
   newElements = newElements.filter((newEl) => {

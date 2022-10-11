@@ -68,7 +68,7 @@ describe('basic', () => {
     expect(resolveHeadEntriesToTags(head.entries)).toMatchInlineSnapshot(`
       [
         {
-          "_runtime": {
+          "options": {
             "entryId": 0,
             "position": 0,
           },

@@ -34,5 +34,8 @@ useHead({
     <nuxt-link to="/second">
       second page
     </nuxt-link>
+    <nuxt-link to="/red">
+      red
+    </nuxt-link>
   </div>
 </template>

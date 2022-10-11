@@ -32,16 +32,18 @@ export interface HasTextContent {
    * Text content of the tag.
    *
    * @deprecated This can only be used with `useHeadRaw`.
+   *
+   * Alias for children
    */
   innerHTML?: string
   /**
    * Sets the textContent of an element.
-   *
-   * @deprecated Use `textContent` instead.
    */
   children?: string
   /**
    * Sets the textContent of an element. This will be HTML encoded.
+   *
+   * Alias for children
    */
   textContent?: string
 }

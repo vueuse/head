@@ -30,7 +30,8 @@ export interface HeadTag {
   props: {
     [k: string]: any
   }
-  _runtime: HeadTagRuntime
+  children?: string
+  options: HeadTagRuntime
 }
 
 export interface HeadObjectApi<T extends MergeHead = {}> {
