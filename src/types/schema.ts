@@ -1,7 +1,6 @@
 import type { MergeHead, Head as PlainHead } from '@zhead/schema'
 import type { ReactiveHead } from '@zhead/schema-vue'
 import type { MaybeComputedRef } from '@vueuse/shared'
-import type { RawHeadAugmentation } from '@zhead/schema-raw'
 
 export interface HandlesDuplicates {
   /**
@@ -29,8 +28,6 @@ export interface RendersToBody {
 export interface HasTextContent {
   /**
    * Text content of the tag.
-   *
-   * @deprecated This can only be used with `useHeadRaw`.
    *
    * Alias for children
    */
@@ -89,5 +86,4 @@ export type HeadObjectPlain<T extends MergeHead = {}> = PlainHead<T & VueUseHead
 export type HeadObject<T extends MergeHead = {}> = ReactiveHead<T & VueUseHeadSchema>
 export type UseHeadInput<T extends MergeHead = {}> = MaybeComputedRef<HeadObject<T>>
 export type ResolvedUseHeadInput<T extends MergeHead = {}> = PlainHead<T & VueUseHeadSchema>
-export type UseHeadRawInput = MaybeComputedRef<ReactiveHead<RawHeadAugmentation & VueUseHeadSchema>>
 

@@ -186,9 +186,6 @@ useHead({ title })
 
 #### Render Priority
 
-> :warning: Experimental feature
-> Only available when rendering SSR.
-
 To set the render priority of a tag you can use the `renderPriority` attribute:
 
 ```ts

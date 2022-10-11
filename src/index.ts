@@ -16,7 +16,6 @@ import type {
   HeadEntryOptions, HeadObjectApi, HeadTag,
   HookBeforeDomUpdate, HookEntriesResolved,
   HookTagsResolved, ResolvedUseHeadInput, UseHeadInput,
-  UseHeadRawInput,
 } from './types'
 import { updateDOM } from './dom/update-dom'
 import { resolveHeadEntries } from './ssr'
@@ -210,7 +209,7 @@ export const useHead = <T extends MergeHead = {}>(headObj: UseHeadInput<T>) => {
   _useHead(headObj)
 }
 
-export const useHeadSafe = (headObj: UseHeadRawInput) => {
+export const useHeadSafe = <T extends MergeHead = {}>(headObj: UseHeadInput<T>) => {
   _useHead(headObj, {
     beforeTagRender: (tag) => {
       for (const p in tag.props) {
