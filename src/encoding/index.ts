@@ -1,5 +1,3 @@
-import type { HeadEntryOptions } from '../types'
-
 export const escapeHtml = (s: string) =>
   s.replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
@@ -9,15 +7,11 @@ export const escapeHtml = (s: string) =>
 
 export const escapeJS = (s: string) =>
   s.replace(/["'\\\n\r\u2028\u2029]/g, (character) => {
-    // Escape all characters not included in SingleStringCharacters and
-    // DoubleStringCharacters on
-    // http://www.ecma-international.org/ecma-262/5.1/#sec-7.8.4
     switch (character) {
       case '"':
       case '\'':
       case '\\':
         return `\\${character}`
-      // Four possible LineTerminator characters need to be escaped:
       case '\n':
         return '\\n'
       case '\r':
@@ -38,7 +32,7 @@ export const escapeJS = (s: string) =>
  *
  * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2
  */
-export const stringifyAttrName = (str: string) =>
+export const sanitiseAttrName = (str: string) =>
   str
     // replace special characters
     .replace(/[\s"'><\/=]/g, '')
@@ -50,35 +44,31 @@ export const stringifyAttrName = (str: string) =>
  *
  * @see https://html.spec.whatwg.org/multipage/syntax.html#attributes-2
  */
-export const stringifyAttrValue = (str: string) =>
-  escapeJS(str.replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'))
+export const sanitiseAttrValue = (str: string) =>
+  escapeJS(
+    str.replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;'),
+  )
 
-export const stringifyAttrs = (attributes: Record<string, any>, options: HeadEntryOptions = {}) => {
+export const sanitiseAttrs = (attributes: Record<string, any>, safe: boolean) => {
   const handledAttributes = []
 
   for (const [key, value] of Object.entries(attributes)) {
-    if (key === 'children' || key === 'innerHTML' || key === 'textContent' || key === 'key')
-      continue
-
     if (value === false || value == null)
       continue
 
-    let attribute = stringifyAttrName(key)
+    let attribute = sanitiseAttrName(key)
 
     if (value !== true) {
-      const val = String(value)
-      if (options.raw) {
-        attribute += `="${val}"`
+      let val = String(value)
+      if (!safe) {
+        attribute += `="${val.replace(/"/g, '&quot;')}"`
       }
       else {
-        /*
-         * Link attributes should be URI encoded to prevent XSS.
-         * @see https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html#rule-5-url-escape-then-javascript-escape-before-inserting-untrusted-data-into-url-attribute-subcontext-within-the-execution-context
-         */
         if (attribute === 'href' || attribute === 'src')
-          attribute += `="${stringifyAttrValue(encodeURI(val))}"`
-        else
-          attribute += `="${stringifyAttrValue(val)}"`
+          val = encodeURI(val)
+        attribute += `="${sanitiseAttrValue(val)}"`
       }
     }
 

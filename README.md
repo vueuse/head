@@ -52,9 +52,7 @@ Used to modify the head of the document. You can call this function in any page 
 
 All values are reactive and support ref and computed getter syntax.
 
-To provide inner content you should use the `textContent` attribute (previously `children` which is deprecated).
-
-Note: All values provided to `useHead` will be encoded to avoid XSS injection. If you need to insert raw data use `useHeadRaw`.
+To provide inner content you should use the `children` attribute.
 
 #### Example
 
@@ -71,7 +69,7 @@ useHead({
     { name: 'description', content: () => myPage.value.description },
   ],
   style: [
-    { type: 'text/css', textContent: 'body { background: red; }' },
+    { type: 'text/css', children: 'body { background: red; }' },
   ],
   script: [
     // primitive values are also fine
@@ -102,21 +100,18 @@ interface HeadObject {
 }
 ```
 
-### `useHeadRaw(head: MaybeComputedRef<HeadObject>)`
+### `useHeadSafe(head: MaybeComputedRef<HeadObject>)`
 
-Has the same functionality as `useHead` but does not encode values. This is useful for inserting raw data such as scripts
-and attribute events.
-
-When inserting raw inner content you should use `innerHTML`.
+Has the same functionality as `useHead` but encodes values to prevent XSS. This is useful for inserting untrusted data from third-parties.
 
 ```ts
-useHeadRaw({
+useHeadSafe({
   bodyAttrs: {
     onfocus: 'alert("hello")',
   },
   script: [
     {
-      innerHTML: 'alert("hello world")',
+      children: 'alert("hello world")',
     },
   ],
 })
@@ -148,7 +143,7 @@ useHead({
 To render tags at the end of the `<body>`, set `body: true` in a HeadAttrs Object.
 
 ```ts
-useHeadRaw({
+useHead({
   script: [
     {
       children: `console.log('Hello world!')`,

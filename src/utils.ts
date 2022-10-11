@@ -11,6 +11,7 @@ import type {
   UseHeadInput,
 } from './types'
 import { resolveHeadEntries } from './ssr'
+import { BODY_TAG_ATTR_NAME } from './constants'
 
 export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
   const tagWeight = (tag: HeadTag) => {
@@ -133,6 +134,9 @@ const resolveTag = (name: TagKeys, input: Record<string, any>, e: HeadEntry): He
         delete input[key]
       }
     })
+  if (tag.options?.body)
+    input[BODY_TAG_ATTR_NAME] = true
+
   tag.props = input
   return tag
 }
@@ -201,13 +205,6 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
           titleTemplate,
           tag.children,
         )
-      }
-      // validate XSS vectors for non-raw input
-      if (!tag.options?.raw) {
-        for (const k in tag.props) {
-          if (k.startsWith('on') || k === 'innerHTML')
-            delete tag.props[k]
-        }
       }
 
       // Remove tags with the same key

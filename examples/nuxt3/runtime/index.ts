@@ -8,8 +8,8 @@ export function useHead(meta: MaybeComputedRef<MetaObject>) {
   useNuxtApp()._useHead(meta)
 }
 
-export function useHeadRaw(meta: UseHeadRawInput) {
-  useNuxtApp()._useHead(meta, { raw: true })
+export function useHeadSafe(meta: UseHeadRawInput) {
+  useNuxtApp()._useHead(meta, { safe: true })
 }
 
 export function useMeta(meta: MetaObject) {

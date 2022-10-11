@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { createSSRApp, h, ref } from 'vue'
 import { renderToString } from '@vue/server-renderer'
-import { Head, createHead, renderHeadToString, useHead, useHeadRaw } from '../src'
+import { Head, createHead, renderHeadToString, useHead } from '../src'
 import { ssrRenderHeadToString } from './shared/utils'
 
 describe('vue ssr', () => {
@@ -106,7 +106,7 @@ describe('vue ssr', () => {
 
   test('children', async () => {
     const headResult = await ssrRenderHeadToString(() => {
-      useHeadRaw({
+      useHead({
         script: [
           {
             innerHTML: 'console.log(\'hi\')',
@@ -121,7 +121,7 @@ describe('vue ssr', () => {
   })
 
   test('script key', async () => {
-    const headResult = await ssrRenderHeadToString(() => useHeadRaw({
+    const headResult = await ssrRenderHeadToString(() => useHead({
       script: [
         {
           key: 'my-script',

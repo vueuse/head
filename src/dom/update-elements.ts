@@ -69,7 +69,7 @@ export const updateElements = (
   oldBodyElements.forEach(t => t.parentNode?.removeChild(t))
   oldHeadElements.forEach(t => t.parentNode?.removeChild(t))
   newElements.forEach((t) => {
-    if (t.body === true)
+    if (t.body)
       body.insertAdjacentElement('beforeend', t.element)
     else
       head.insertBefore(t.element, headCountEl)
