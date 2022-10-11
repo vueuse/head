@@ -10,15 +10,16 @@ import type { MergeHead } from '@zhead/schema'
 import {
   PROVIDE_KEY,
 } from './constants'
-import { resolveUnrefHeadInput } from './utils'
+import { resolveHeadEntriesToTags, resolveUnrefHeadInput } from './utils'
 import type {
   HeadEntry,
-  HeadEntryOptions, HeadObjectApi,
+  HeadEntryOptions, HeadObjectApi, HeadTag,
   HookBeforeDomUpdate, HookEntriesResolved,
   HookTagsResolved, ResolvedUseHeadInput, UseHeadInput,
   UseHeadRawInput,
 } from './types'
 import { updateDOM } from './dom/update-dom'
+import { resolveHeadEntries } from './ssr'
 
 export * from './types'
 
@@ -26,6 +27,15 @@ export interface HeadClient<T extends MergeHead = {}> {
   install: (app: App) => void
 
   headEntries: HeadEntry<T>[]
+
+  /**
+   * Backwards compatibility function to fetch the headTags.
+   *
+   * This function forces reactivity resolving and is not performant.
+   *
+   * @deprecated Use hooks.
+   */
+  headTags: HeadTag[]
 
   addEntry: (entry: UseHeadInput<T>, options?: HeadEntryOptions) => HeadObjectApi<T>
   addReactiveEntry: (objs: UseHeadInput<T>, options?: HeadEntryOptions) => () => void
@@ -87,6 +97,15 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: ResolvedUs
 
     get headEntries() {
       return entries
+    },
+
+    /**
+     * Backwards compatibility with < v1.
+     */
+    get headTags() {
+      // Note: we don't call hooks here as this function is sync
+      const resolvedEntries = resolveHeadEntries(head.headEntries)
+      return resolveHeadEntriesToTags(resolvedEntries)
     },
 
     addEntry(input, options = {}) {
