@@ -55,4 +55,4 @@ export interface HTMLResult {
   readonly bodyTags: string
 }
 
-export { MaybeComputedRef } from '@vueuse/shared'
+export type { MaybeComputedRef } from '@vueuse/shared'
