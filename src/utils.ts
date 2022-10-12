@@ -41,7 +41,7 @@ export const sortTags = (aTag: HeadTag, bTag: HeadTag) => {
 export const tagDedupeKey = <T extends HeadTag>(tag: T) => {
   const { props, tag: tagName, options } = tag
   // must only be a single base so we always dedupe
-  if (tagName === 'base' || tagName === 'title')
+  if (tagName === 'base' || tagName === 'title' || tagName === 'titleTemplate')
     return tagName
 
   // support only a single canonical
@@ -104,7 +104,6 @@ const resolveTag = (name: TagKeys, input: Record<string, any>, e: HeadEntry): He
     props: {},
     runtime: {
       entryId: e.id,
-      position: 0,
     },
     // tag inherits options from useHead registration
     options: {
@@ -143,12 +142,20 @@ const resolveTag = (name: TagKeys, input: Record<string, any>, e: HeadEntry): He
 
 export const headInputToTags = (e: HeadEntry) => {
   return Object.entries(e.input)
-    .filter(([k, v]) => typeof v !== 'undefined' && v !== null && k !== 'titleTemplate')
+    .filter(([, v]) => typeof v !== 'undefined')
     .map(([key, value]) => {
       return (Array.isArray(value) ? value : [value]).map((props) => {
         switch (key) {
           case 'title':
-            return resolveTag(key, { children: props }, e)
+          case 'titleTemplate':
+            // titleTemplate is a fake tag so we can dedupe it, this will be removed
+            return <HeadTag> {
+              tag: key,
+              children: props,
+              props: {},
+              runtime: { entryId: e.id },
+              options: e.options,
+            }
           case 'base':
           case 'meta':
           case 'link':
@@ -171,9 +178,9 @@ export const headInputToTags = (e: HeadEntry) => {
 const renderTitleTemplate = (
   template: Required<HeadObjectPlain>['titleTemplate'],
   title?: string,
-): string => {
+): string | null => {
   if (template == null)
-    return ''
+    return title || null
   if (typeof template === 'function')
     return template(title)
 
@@ -185,11 +192,6 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
 
   const resolvedEntries = resolveHeadEntries(entries)
 
-  const titleTemplate = resolvedEntries
-    .map(i => i.input.titleTemplate)
-    .reverse()
-    .find(i => i != null)
-
   resolvedEntries.forEach((entry, entryIndex) => {
     const tags = headInputToTags(entry)
     tags.forEach((tag, tagIdx) => {
@@ -199,20 +201,47 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
       // ideally we'd use the total tag count but this is too hard to calculate with the current reactivity
       tag.runtime.position = entryIndex * 10000 + tagIdx
 
-      // resolve titles
-      if (titleTemplate && tag.tag === 'title') {
-        tag.children = renderTitleTemplate(
-          titleTemplate,
-          tag.children,
-        )
-      }
-
       // Remove tags with the same key
       deduping[tagDedupeKey(tag)] = tag
     })
   })
 
-  return Object.values(deduping)
+  let resolvedTags = Object.values(deduping)
     .sort((a, b) => a.runtime!.position! - b.runtime!.position!)
     .sort(sortTags)
+
+  // resolve title
+  const titleTemplateIdx = resolvedTags.findIndex(i => i.tag === 'titleTemplate')
+  const titleIdx = resolvedTags.findIndex(i => i.tag === 'title')
+  if (titleIdx !== -1 && titleTemplateIdx !== -1) {
+    const newTitle = renderTitleTemplate(
+      resolvedTags[titleTemplateIdx].children,
+      resolvedTags[titleIdx].children,
+    )
+    if (newTitle !== null) {
+      resolvedTags[titleIdx].children = newTitle || resolvedTags[titleIdx].children
+    }
+    else {
+      // remove the title
+      resolvedTags = resolvedTags.filter((_, i) => i !== titleIdx)
+    }
+    // remove the title template
+    resolvedTags = resolvedTags.filter((_, i) => i !== titleTemplateIdx)
+  }
+  // titleTemplate is set but title is not set, convert to a title
+  else if (titleTemplateIdx !== -1) {
+    const newTitle = renderTitleTemplate(
+      resolvedTags[titleTemplateIdx].children,
+    )
+    if (newTitle !== null) {
+      resolvedTags[titleTemplateIdx].children = newTitle
+      resolvedTags[titleTemplateIdx].tag = 'title'
+    }
+    else {
+      // remove the title template
+      resolvedTags = resolvedTags.filter((_, i) => i !== titleTemplateIdx)
+    }
+  }
+
+  return resolvedTags
 }
