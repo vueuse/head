@@ -2,6 +2,11 @@
 
 No unreleased changes.
 
+## 1.0.0-rc.6
+
+- chore: add missing `type`
+- fix(types): export `MaybeComputedRef`
+
 ## 1.0.0-rc.5
 
 - chore: useHeadSafe types
