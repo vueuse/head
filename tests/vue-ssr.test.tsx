@@ -49,7 +49,9 @@ describe('vue ssr', () => {
     const app = createSSRApp({
       async setup() {
         const title = ref('initial title')
-        useHead({ title })
+        useHead({
+          title,
+        })
         await new Promise(resolve => setTimeout(resolve, 200))
         title.value = 'new title'
         return () => <div>hi</div>
@@ -121,18 +123,21 @@ describe('vue ssr', () => {
   })
 
   test('script key', async () => {
-    const headResult = await ssrRenderHeadToString(() => useHead({
-      script: [
-        {
-          key: 'my-script',
-          innerHTML: 'console.log(\'A\')',
-        },
-        {
-          key: 'my-script',
-          innerHTML: 'console.log(\'B\')',
-        },
-      ],
-    }))
+    const headResult = await ssrRenderHeadToString(() =>
+      useHead({
+        script: [
+          {
+            src: 'test',
+            key: 'my-script',
+            innerHTML: 'console.log(\'A\')',
+          },
+          {
+            key: 'my-script',
+            innerHTML: 'console.log(\'B\')',
+          },
+        ],
+      }),
+    )
 
     expect(headResult.headTags).toMatchInlineSnapshot(
       '"<script>console.log(\'B\')</script><meta name=\\"head:count\\" content=\\"1\\">"',

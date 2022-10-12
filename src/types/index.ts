@@ -29,7 +29,7 @@ export interface HeadEntry<T extends MergeHead = {}> {
   id: number
 }
 
-export type TagKeys = keyof Omit<HeadObjectPlain, 'titleTemplate'>
+export type TagKeys = keyof HeadObjectPlain
 
 export interface HeadTag {
   tag: TagKeys
