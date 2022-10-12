@@ -175,13 +175,13 @@ export const headInputToTags = (e: HeadEntry) => {
 }
 
 const renderTitleTemplate = (
-  template?: string | ((title?: string) => string | null),
+  template: string | ((title?: string) => string | null),
   title?: string,
 ): string | null => {
   if (template == null)
     return title || null
   if (typeof template === 'function')
-    return template(title) || null
+    return template(title)
 
   return template.replace('%s', title ?? '')
 }
