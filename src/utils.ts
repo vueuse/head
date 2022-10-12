@@ -214,7 +214,7 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
   const titleIdx = resolvedTags.findIndex(i => i.tag === 'title')
   if (titleIdx !== -1 && titleTemplateIdx !== -1) {
     const newTitle = renderTitleTemplate(
-      resolvedTags[titleTemplateIdx].children,
+      resolvedTags[titleTemplateIdx].children!,
       resolvedTags[titleIdx].children,
     )
     if (newTitle !== null) {
@@ -230,7 +230,7 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
   // titleTemplate is set but title is not set, convert to a title
   else if (titleTemplateIdx !== -1) {
     const newTitle = renderTitleTemplate(
-      resolvedTags[titleTemplateIdx].children,
+      resolvedTags[titleTemplateIdx].children!,
     )
     if (newTitle !== null) {
       resolvedTags[titleTemplateIdx].children = newTitle
