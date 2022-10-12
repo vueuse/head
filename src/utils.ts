@@ -175,7 +175,7 @@ export const headInputToTags = (e: HeadEntry) => {
 }
 
 const renderTitleTemplate = (
-  template: Required<HeadObject>['titleTemplate'],
+  template: HeadObject['titleTemplate'],
   title?: string,
 ): string | null => {
   if (template == null)
@@ -214,7 +214,6 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
   const titleIdx = resolvedTags.findIndex(i => i.tag === 'title')
   if (titleIdx !== -1 && titleTemplateIdx !== -1) {
     const newTitle = renderTitleTemplate(
-      // @ts-expect-error hacky runtime children usage
       resolvedTags[titleTemplateIdx].children,
       resolvedTags[titleIdx].children,
     )
@@ -231,7 +230,6 @@ export const resolveHeadEntriesToTags = (entries: HeadEntry[]) => {
   // titleTemplate is set but title is not set, convert to a title
   else if (titleTemplateIdx !== -1) {
     const newTitle = renderTitleTemplate(
-      // @ts-expect-error hacky runtime children usage
       resolvedTags[titleTemplateIdx].children,
     )
     if (newTitle !== null) {
