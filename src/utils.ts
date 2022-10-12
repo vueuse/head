@@ -2,7 +2,7 @@ import { resolveUnref } from '@vueuse/shared'
 import { unref } from 'vue'
 import type { MergeHead } from '@zhead/schema'
 import type {
-  HeadEntry, HeadObject,
+  HeadEntry,
   HeadTag,
   HeadTagOptions,
   ResolvedUseHeadInput,
@@ -175,7 +175,7 @@ export const headInputToTags = (e: HeadEntry) => {
 }
 
 const renderTitleTemplate = (
-  template: HeadObject['titleTemplate'],
+  template?: string | ((title?: string) => string | null),
   title?: string,
 ): string | null => {
   if (template == null)

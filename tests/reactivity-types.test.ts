@@ -1,5 +1,6 @@
 import { computed, createSSRApp, ref } from 'vue'
 import { renderToString } from '@vue/server-renderer'
+import type { UseHeadInput } from '@vueuse/head'
 import { createHead, renderHeadToString, useHead } from '../src'
 import type { HeadObjectPlain } from '../src/types'
 import { ssrRenderHeadToString } from './shared/utils'
@@ -154,7 +155,7 @@ describe('reactivity', () => {
 
   test('computed getter entries', async () => {
     const test = ref('test')
-    const input = {
+    const input: UseHeadInput = {
       title: () => 'my title',
       script: () => {
         return [

@@ -15,7 +15,7 @@ describe('titleTemplate', () => {
     )
   })
   test('fn replace', async () => {
-    const titleTemplate = title => `${title} - my template`
+    const titleTemplate = (title?: string) => `${title} - my template`
     const headResult = await ssrRenderHeadToString(() => {
       useHead({
         titleTemplate,
@@ -27,7 +27,7 @@ describe('titleTemplate', () => {
     )
   })
   test('titleTemplate as title', async () => {
-    const titleTemplate = title => title ? `${title} - Template` : 'Default Title'
+    const titleTemplate = (title?: string) => title ? `${title} - Template` : 'Default Title'
     const headResult = await ssrRenderHeadToString(() => {
       useHead({
         titleTemplate,
@@ -39,7 +39,7 @@ describe('titleTemplate', () => {
     )
   })
   test('reset title template', async () => {
-    const titleTemplate = title => title ? `${title} - Template` : 'Default Title'
+    const titleTemplate = (title?: string) => title ? `${title} - Template` : 'Default Title'
     const headResult = await ssrRenderHeadToString(() => {
       useHead({
         titleTemplate,
@@ -56,7 +56,7 @@ describe('titleTemplate', () => {
   })
 
   test('nested title template', async () => {
-    const titleTemplate = title => title ? `${title} - Template` : 'Default Title'
+    const titleTemplate = (title?: string | null) => title ? `${title} - Template` : 'Default Title'
     const headResult = await ssrRenderHeadToString(() => {
       useHead({
         titleTemplate,
@@ -71,7 +71,7 @@ describe('titleTemplate', () => {
   })
 
   test('null fn return', async () => {
-    const titleTemplate = title => title === 'test' ? null : `${title} - Template`
+    const titleTemplate = (title?: string | null) => title === 'test' ? null : `${title} - Template`
     const headResult = await ssrRenderHeadToString(() => {
       useHead({
         titleTemplate,
