@@ -14,6 +14,18 @@ describe('titleTemplate', () => {
       '"<title>test - my template</title><meta name=\\"head:count\\" content=\\"0\\">"',
     )
   })
+  test('fn replace', async () => {
+    const titleTemplate = title => `${title} - my template`
+    const headResult = await ssrRenderHeadToString(() => {
+      useHead({
+        titleTemplate,
+        title: 'test',
+      })
+    })
+    expect(headResult.headTags).toMatchInlineSnapshot(
+      '"<title>test - my template</title><meta name=\\"head:count\\" content=\\"0\\">"',
+    )
+  })
   test('titleTemplate as title', async () => {
     const titleTemplate = title => title ? `${title} - Template` : 'Default Title'
     const headResult = await ssrRenderHeadToString(() => {
