@@ -98,6 +98,8 @@ export function resolveUnrefHeadInput<T extends MergeHead = {}>(ref: UseHeadInpu
 type HeadTagOptionKeys = (keyof HeadTagOptions)[]
 
 const resolveTag = (name: TagKeys, input: Record<string, any>, e: HeadEntry): HeadTag => {
+  // clone the input so we're not modifying source
+  input = { ...input }
   const tag: HeadTag = {
     tag: name,
     props: {},
