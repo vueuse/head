@@ -2,6 +2,13 @@
 
 No unreleased changes.
 
+## 1.0.0-rc.8
+
+- chore(pkg): bump deps
+- chore: linting
+- chore: test issue #138
+- chore: bump deps
+
 ## 1.0.0-rc.7
 
 - fix(titleTemplate): allow titleTemplate to resolve the title (#137)
