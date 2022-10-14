@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.0-rc.9
+
+- fix: ensure tags props are immutable (#139)
+
 ## 1.0.0-rc.8
 
 - chore(pkg): bump deps
