@@ -143,4 +143,25 @@ describe('vue ssr', () => {
       '"<script>console.log(\'B\')</script><meta name=\\"head:count\\" content=\\"1\\">"',
     )
   })
+
+  test('#issue 138', async () => {
+    const headResult = await ssrRenderHeadToString(() =>
+      useHead({
+        link: [
+          {
+            href: '/',
+          },
+          ...[].map(() => ({
+            rel: 'prefetch',
+            href: ''
+          })), // this damages the type inference
+          { rel: 'icon', type: 'image/svg', href: '/favicon.svg' },
+        ],
+      }),
+    )
+
+    expect(headResult.headTags).toMatchInlineSnapshot(
+      '"<link href=\\"/\\"><link rel=\\"icon\\" type=\\"image/svg\\" href=\\"/favicon.svg\\"><meta name=\\"head:count\\" content=\\"2\\">"',
+    )
+  })
 })
