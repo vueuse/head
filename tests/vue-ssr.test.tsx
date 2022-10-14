@@ -153,7 +153,7 @@ describe('vue ssr', () => {
           },
           ...[].map(() => ({
             rel: 'prefetch',
-            href: ''
+            href: '',
           })), // this damages the type inference
           { rel: 'icon', type: 'image/svg', href: '/favicon.svg' },
         ],
