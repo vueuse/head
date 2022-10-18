@@ -11,9 +11,9 @@ specifiers:
   '@vitejs/plugin-vue-jsx': ^2.0.1
   '@vue/compiler-sfc': ^3.2.41
   '@vue/server-renderer': ^3.2.41
-  '@vueuse/shared': ^9.3.0
-  '@zhead/schema': ^0.9.7
-  '@zhead/schema-vue': ^0.9.7
+  '@vueuse/shared': ^9.3.1
+  '@zhead/schema': ^0.9.8
+  '@zhead/schema-vue': ^0.9.8
   cheerio: 1.0.0-rc.12
   eslint: ^8.25.0
   execa: ^6.1.0
@@ -34,9 +34,9 @@ specifiers:
   vue-router: ^4.1.5
 
 dependencies:
-  '@vueuse/shared': 9.3.0_vue@3.2.41
-  '@zhead/schema': 0.9.7
-  '@zhead/schema-vue': 0.9.7_vue@3.2.41
+  '@vueuse/shared': 9.3.1_vue@3.2.41
+  '@zhead/schema': 0.9.8
+  '@zhead/schema-vue': 0.9.8_vue@3.2.41
 
 devDependencies:
   '@antfu/eslint-config': 0.27.0_z4bbprzjrhnsfa24uvmcbu7f5q
@@ -1328,8 +1328,8 @@ packages:
   /@vue/shared/3.2.41:
     resolution: {integrity: sha512-W9mfWLHmJhkfAmV+7gDjcHeAWALQtgGT3JErxULl0oz6R6+3ug91I7IErs93eCFhPCZPHBs4QJS7YWEV7A3sxw==}
 
-  /@vueuse/shared/9.3.0_vue@3.2.41:
-    resolution: {integrity: sha512-caGUWLY0DpPC6l31KxeUy6vPVNA0yKxx81jFYLoMpyP6cF84FG5Dkf69DfSUqL57wX8JcUkJDMnQaQIZPWFEQQ==}
+  /@vueuse/shared/9.3.1_vue@3.2.41:
+    resolution: {integrity: sha512-YFu3qcnVeu0S2L4XdQJtBpDcjz6xwqHZtTv/XRhu66/yge1XVhxskUcc7VZbX52xF9A34V6KCfwncP9YDqYFiw==}
     dependencies:
       vue-demi: 0.13.11_vue@3.2.41
     transitivePeerDependencies:
@@ -1337,20 +1337,20 @@ packages:
       - vue
     dev: false
 
-  /@zhead/schema-vue/0.9.7_vue@3.2.41:
-    resolution: {integrity: sha512-FjOYF7FeuBzIH8ec+7RTvAsa87mGOuBp6eSaS5memJ6HL37PN3t0mRf8tEKhZisJx0kO0YVEdsDEvwiK4esfNA==}
+  /@zhead/schema-vue/0.9.8_vue@3.2.41:
+    resolution: {integrity: sha512-tFAJ0ejDuaRWqLZOrcNZj3oKavg6jdXErNFJsXCczarAt3lTSv1AMzNx1LIHn3Bkm4P7DlADmXRwdxzX+CSXvQ==}
     peerDependencies:
       vue: '>=2.7 || >=3'
     dependencies:
-      '@vueuse/shared': 9.3.0_vue@3.2.41
-      '@zhead/schema': 0.9.7
+      '@vueuse/shared': 9.3.1_vue@3.2.41
+      '@zhead/schema': 0.9.8
       vue: 3.2.41
     transitivePeerDependencies:
       - '@vue/composition-api'
     dev: false
 
-  /@zhead/schema/0.9.7:
-    resolution: {integrity: sha512-2vEMXcjbMG7K0W2kZC0s2Ls5QkGpkftYIY3IgFbFasEPQ+bjvjpRfPUvH85iI7MH+L92IZ366Xylgu4Yli+XAQ==}
+  /@zhead/schema/0.9.8:
+    resolution: {integrity: sha512-6aQo7eyS5tBwYFuZ4YTEvAsIbG+pWXqFxNnMKLdaR6e0vyxtxzgjS96istTEIPta2Tby9IdKWJM5sVHPTzB7uQ==}
     dev: false
 
   /abab/2.0.6:
