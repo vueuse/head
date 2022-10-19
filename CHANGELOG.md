@@ -2,6 +2,13 @@
 
 No unreleased changes.
 
+## 1.0.0-rc.11
+
+- Merge branch 'v1' of github.com:vueuse/head into v1
+- chore(pkg): bump deps
+- fix: ensure csr elements are created equally (#145)
+- fix: ensure single pass of `htmlAttr` sanitization, fixes #142 (#143)
+
 ## 1.0.0-rc.10
 
 - chore(pkg): bump deps
