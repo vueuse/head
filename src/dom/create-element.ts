@@ -7,8 +7,10 @@ export const createElement = (
   const $el = document.createElement(tag.tag)
 
   Object.entries(tag.props).forEach(([k, v]) => {
-    if (v !== false)
-      $el.setAttribute(k, v)
+    if (v !== false) {
+      // ensure boolean values are set as empty to avoid ssr mismatch
+      $el.setAttribute(k, v === true ? '' : String(v))
+    }
   })
 
   if (tag.children) {
