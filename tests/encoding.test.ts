@@ -20,7 +20,7 @@ describe('encoding', () => {
     })
     const { htmlAttrs, headTags } = await renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot('"<script src=\\"javascript:console.log(\'xss\');\\">alert(2)</script><noscript><iframe src=\\"https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX\\" height=\\"0\\" width=\\"0\\" style=\\"display:none;visibility:hidden\\"></iframe></noscript><meta name=\\"head:count\\" content=\\"2\\">"')
-    expect(htmlAttrs).toMatchInlineSnapshot('" onload=\\"console.log(\\\\\'executed\\\\\')\\" data-head-attrs=\\"onload\\""')
+    expect(htmlAttrs).toMatchInlineSnapshot('" onload=\\"console.log(\'executed\')\\" data-head-attrs=\\"onload\\""')
   })
 
   it('ssr jailbreak', async () => {

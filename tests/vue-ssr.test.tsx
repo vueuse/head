@@ -164,4 +164,16 @@ describe('vue ssr', () => {
       '"<link href=\\"/\\"><link rel=\\"icon\\" type=\\"image/svg\\" href=\\"/favicon.svg\\"><meta name=\\"head:count\\" content=\\"2\\">"',
     )
   })
+
+  test('non-strings', async () => {
+    const headResult = await ssrRenderHeadToString(() => useHead({
+      htmlAttrs: {
+        'data-something': true,
+      },
+    }))
+
+    expect(headResult.htmlAttrs).toMatchInlineSnapshot(
+      '" data-something data-head-attrs=\\"data-something\\""',
+    )
+  })
 })
