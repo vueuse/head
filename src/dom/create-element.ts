@@ -1,4 +1,5 @@
 import type { HeadTag } from '../'
+import { sanitiseAttrName, sanitiseAttrValue } from '../encoding'
 
 export const createElement = (
   tag: HeadTag,
@@ -7,8 +8,11 @@ export const createElement = (
   const $el = document.createElement(tag.tag)
 
   Object.entries(tag.props).forEach(([k, v]) => {
-    if (v !== false)
-      $el.setAttribute(k, v)
+    if (v !== false) {
+      // ensure the values are sanitised, so we can match with SSR results
+      // ensure boolean values are set as empty
+      $el.setAttribute(sanitiseAttrName(k), v === true ? '' : sanitiseAttrValue(String(v)))
+    }
   })
 
   if (tag.children) {
