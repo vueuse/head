@@ -8,8 +8,7 @@ export const createElement = (
 
   Object.entries(tag.props).forEach(([k, v]) => {
     if (v !== false) {
-      // ensure the values are sanitised, so we can match with SSR results
-      // ensure boolean values are set as empty
+      // ensure boolean values are set as empty to avoid ssr mismatch
       $el.setAttribute(k, v === true ? '' : String(v))
     }
   })
