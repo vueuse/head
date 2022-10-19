@@ -6,7 +6,6 @@ import {
   resolveHeadEntriesToTags,
   resolveUnrefHeadInput,
 } from '../index'
-import { sanitiseAttrName, sanitiseAttrValue } from '../encoding'
 
 export const propsToString = (props: HeadTag['props']) => {
   const handledAttributes = []
@@ -61,17 +60,14 @@ export const renderHeadToString = async <T extends MergeHead = {}>(head: HeadCli
     if (tag.options?.beforeTagRender)
       tag.options.beforeTagRender(tag)
 
-    if (tag.tag === 'title') { titleHtml = tagToString(tag) }
-    else if (tag.tag === 'htmlAttrs' || tag.tag === 'bodyAttrs') {
-      for (const k in tag.props) {
-        // always encode name to avoid html errors
-        attrs[tag.tag][sanitiseAttrName(k)] = sanitiseAttrValue(tag.props[k])
-      }
-    }
-    else if (tag.options?.body) { bodyHtml.push(tagToString(tag)) }
-    else {
+    if (tag.tag === 'title')
+      titleHtml = tagToString(tag)
+    else if (tag.tag === 'htmlAttrs' || tag.tag === 'bodyAttrs')
+      attrs[tag.tag] = { ...attrs[tag.tag], ...tag.props }
+    else if (tag.options?.body)
+      bodyHtml.push(tagToString(tag))
+    else
       headHtml.push(tagToString(tag))
-    }
   }
   headHtml.push(`<meta name="${HEAD_COUNT_KEY}" content="${headHtml.length}">`)
 
