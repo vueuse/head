@@ -43,8 +43,8 @@
   },
   "dependencies": {
     "@vueuse/shared": "^9.3.1",
-    "@zhead/schema": "^0.9.8",
-    "@zhead/schema-vue": "^0.9.8"
+    "@zhead/schema": "^0.9.9",
+    "@zhead/schema-vue": "^0.9.9"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.27.0",

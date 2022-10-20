@@ -12,8 +12,8 @@ specifiers:
   '@vue/compiler-sfc': ^3.2.41
   '@vue/server-renderer': ^3.2.41
   '@vueuse/shared': ^9.3.1
-  '@zhead/schema': ^0.9.8
-  '@zhead/schema-vue': ^0.9.8
+  '@zhead/schema': ^0.9.9
+  '@zhead/schema-vue': ^0.9.9
   cheerio: 1.0.0-rc.12
   eslint: ^8.25.0
   execa: ^6.1.0
@@ -35,8 +35,8 @@ specifiers:
 
 dependencies:
   '@vueuse/shared': 9.3.1_vue@3.2.41
-  '@zhead/schema': 0.9.8
-  '@zhead/schema-vue': 0.9.8_vue@3.2.41
+  '@zhead/schema': 0.9.9
+  '@zhead/schema-vue': 0.9.9_vue@3.2.41
 
 devDependencies:
   '@antfu/eslint-config': 0.27.0_z4bbprzjrhnsfa24uvmcbu7f5q
@@ -1364,20 +1364,20 @@ packages:
       - vue
     dev: false
 
-  /@zhead/schema-vue/0.9.8_vue@3.2.41:
-    resolution: {integrity: sha512-tFAJ0ejDuaRWqLZOrcNZj3oKavg6jdXErNFJsXCczarAt3lTSv1AMzNx1LIHn3Bkm4P7DlADmXRwdxzX+CSXvQ==}
+  /@zhead/schema-vue/0.9.9_vue@3.2.41:
+    resolution: {integrity: sha512-f7sOPMc1zQJ+tDDWWaksNsGoGGuRv5aHvOdZvsL3dIxbiHVlGVhDi/HZbUUupCtlYAPv2D8E/tUmwWKh/UrbXw==}
     peerDependencies:
       vue: '>=2.7 || >=3'
     dependencies:
       '@vueuse/shared': 9.3.1_vue@3.2.41
-      '@zhead/schema': 0.9.8
+      '@zhead/schema': 0.9.9
       vue: 3.2.41
     transitivePeerDependencies:
       - '@vue/composition-api'
     dev: false
 
-  /@zhead/schema/0.9.8:
-    resolution: {integrity: sha512-6aQo7eyS5tBwYFuZ4YTEvAsIbG+pWXqFxNnMKLdaR6e0vyxtxzgjS96istTEIPta2Tby9IdKWJM5sVHPTzB7uQ==}
+  /@zhead/schema/0.9.9:
+    resolution: {integrity: sha512-B/No5zsZB1gz6BT7OKcD0rbyZCGoF6ImeQm2ffupQrgUpYAIv/LGtn3RVNSOcX2R2DB4g79UtuIwK0OxugFjJQ==}
     dev: false
 
   /abab/2.0.6:
