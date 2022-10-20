@@ -2,6 +2,11 @@
 
 No unreleased changes.
 
+## 1.0.0-rc.12
+
+- chore(pkg): bump zhead
+- fix: vue 2.7 globalProperties, fixes #141
+
 ## 1.0.0-rc.11
 
 - Merge branch 'v1' of github.com:vueuse/head into v1
