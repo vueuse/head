@@ -1,26 +1,32 @@
 import type { Ref, VNode } from 'vue'
 import { defineComponent, onBeforeUnmount, ref, watchEffect } from 'vue'
+import { isVue2 } from 'vue-demi'
 import type { HeadObjectPlain } from './types'
 import type { HeadAttrs } from './index'
 import { IS_BROWSER, injectHead } from './index'
 
 const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
+  // @ts-expect-error vue2 vnode API
+  const nodeType = isVue2 ? node.tag : node.type
   const type
-    = node.type === 'html'
+    = nodeType === 'html'
       ? 'htmlAttrs'
-      : node.type === 'body'
+      : nodeType === 'body'
         ? 'bodyAttrs'
-        : (node.type as keyof HeadObjectPlain)
+        : (nodeType as keyof HeadObjectPlain)
 
   if (typeof type !== 'string' || !(type in obj))
     return
 
-  const props: HeadAttrs = node.props || {} as HeadAttrs
+  // @ts-expect-error vue2 vnode API
+  const props: HeadAttrs = (isVue2 ? (node.data || {}).attrs : node.props) || {} as HeadAttrs
   if (node.children) {
+    const childrenAttr = isVue2 ? 'text' : 'children'
     props.children = Array.isArray(node.children)
       // @ts-expect-error untyped
-      ? node.children[0]!.children
-      : node.children
+      ? node.children[0]![childrenAttr]
+      // @ts-expect-error vue2 vnode API
+      : node[childrenAttr]
   }
   if (Array.isArray(obj[type]))
     (obj[type] as HeadAttrs[]).push(props)
