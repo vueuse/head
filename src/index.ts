@@ -93,7 +93,9 @@ export const createHead = <T extends MergeHead = {}>(initHeadObject?: ResolvedUs
 
   const head: HeadClient<T> = {
     install(app) {
-      app.config.globalProperties.$head = head
+      // vue 3 only
+      if (app.config.globalProperties)
+        app.config.globalProperties.$head = head
       app.provide(PROVIDE_KEY, head)
     },
 
