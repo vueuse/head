@@ -235,6 +235,8 @@ export const useHeadSafe = <T extends MergeHead = {}>(headObj: UseHeadInput<T>) 
   )
 }
 
+export { HeadVuePlugin } from './vue2-plugin'
+
 export * from './components'
 export * from './dom'
 export * from './ssr'
