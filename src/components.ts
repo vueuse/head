@@ -1,9 +1,10 @@
 import type { Ref, VNode } from 'vue'
-import { defineComponent, onBeforeUnmount, ref, watchEffect } from 'vue'
-import { isVue2 } from 'vue-demi'
+import { defineComponent, onBeforeUnmount, ref, version, watchEffect } from 'vue'
 import type { HeadObjectPlain } from './types'
 import type { HeadAttrs } from './index'
 import { IS_BROWSER, injectHead } from './index'
+
+const isVue2 = version.startsWith('2.')
 
 const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
   // @ts-expect-error vue2 vnode API
