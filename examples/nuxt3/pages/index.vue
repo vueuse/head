@@ -8,6 +8,20 @@ const page = ref({
 })
 
 useHead({
+  bodyAttrs: {
+    style: 'background-color: red'
+  },
+})
+
+onMounted(() => {
+  useHead({
+    bodyAttrs: {
+      style: 'background-color: white'
+    },
+  })
+})
+
+useHead({
   title: computed(() => `${page.value.title} | Nuxt`),
   // note: this is still XSS vulnerable
   // script: [

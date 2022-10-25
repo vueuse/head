@@ -2,6 +2,12 @@
 
 No unreleased changes.
 
+## 1.0.0-rc.13
+
+- fix: dedupe `htmlAttrs` and `bodyAttrs` for csr (#149)
+- chore(pkg): bump deps
+- add vue 2.7 compatibility to Head component (#147)
+
 ## 1.0.0-rc.12
 
 - chore(pkg): bump zhead
