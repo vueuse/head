@@ -2,6 +2,11 @@
 
 No unreleased changes.
 
+## 1.0.0-rc.14
+
+- chore(pkg): ignore eslint in vue2 example
+- fix: Vue 2.7 compatibility (#150)
+
 ## 1.0.0-rc.13
 
 - fix: dedupe `htmlAttrs` and `bodyAttrs` for csr (#149)
