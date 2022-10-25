@@ -55,7 +55,7 @@
     "@vue/compiler-sfc": "^3.2.41",
     "@vue/server-renderer": "^3.2.41",
     "cheerio": "1.0.0-rc.12",
-    "eslint": "^8.25.0",
+    "eslint": "^8.26.0",
     "execa": "^6.1.0",
     "get-port-please": "^2.6.1",
     "jsdom": "^20.0.1",
@@ -71,7 +71,7 @@
     "vite": "^3.1.8",
     "vitest": "^0.24.3",
     "vue": "^3.2.41",
-    "vue-router": "^4.1.5"
+    "vue-router": "^4.1.6"
   },
   "resolutions": {
     "@vueuse/head": "link:."
