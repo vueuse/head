@@ -20,7 +20,15 @@ const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
     return
 
   // @ts-expect-error vue2 vnode API
-  const props: HeadAttrs = (isVue2 ? (node.data || {}).attrs : node.props) || {} as HeadAttrs
+  const nodeData = isVue2 ? node.data : node
+  const props: HeadAttrs = (isVue2 ? nodeData.attrs : node.props) || {} as HeadAttrs
+  // handle class and style attrs
+  if (isVue2) {
+    if (nodeData.staticClass)
+      props.class = nodeData.staticClass
+    if (nodeData.staticStyle)
+      props.style = Object.entries(nodeData.staticStyle).map(([key, value]) => `${key}:${value}`).join(';')
+  }
   if (node.children) {
     const childrenAttr = isVue2 ? 'text' : 'children'
     props.children = Array.isArray(node.children)
