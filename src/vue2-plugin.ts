@@ -1,7 +1,8 @@
-import type { Plugin } from 'vue-demi'
+import type { Plugin } from 'vue'
 import { PROVIDE_KEY } from './constants'
 
 export const HeadVuePlugin: Plugin = function (_Vue) {
+  // copied from https://github.com/vuejs/pinia/blob/v2/packages/pinia/src/vue2-plugin.ts
   _Vue.mixin({
     beforeCreate() {
       const options = this.$options
