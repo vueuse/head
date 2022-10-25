@@ -1,6 +1,6 @@
 {
   "name": "@vueuse/head",
-  "version": "1.0.0-rc.12",
+  "version": "1.0.0-rc.13",
   "packageManager": "pnpm@7.5.0",
   "description": "Document head manager for Vue 3. SSR ready.",
   "author": {
