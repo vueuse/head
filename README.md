@@ -250,6 +250,7 @@ For integrating @vueuse/head with a framework.
 Register the Vue plugin:
 
 ```ts
+// Vue 3
 import { createApp } from "vue"
 import { createHead } from "@vueuse/head"
 
@@ -259,6 +260,20 @@ const head = createHead()
 app.use(head)
 
 app.mount("#app")
+```
+
+```ts
+// Vue 2
+import { createHead, HeadVuePlugin } from "@vueuse/head"
+
+Vue.use(HeadVuePlugin)
+const head = createHead()
+
+new Vue({
+  el: '#app',
+  // ...
+  head,
+})
 ```
 
 Manage `head` with the composition API `useHead` in your component:
