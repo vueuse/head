@@ -2,6 +2,18 @@
 
 No unreleased changes.
 
+## 1.0.0-next.1
+
+- chore: document install
+- Merge branch 'main' of github.com:vueuse/head into v1
+- chore(ci): switch to next channel
+- chore(pkg): bump deps
+- chore: fix typo (#159)
+- chore: readme link fix
+- feat: migrate core to unhead (#157)
+- Release v0.9.8
+- chore: bump deps
+
 ## 1.0.0-rc.14
 
 - chore(pkg): ignore eslint in vue2 example
