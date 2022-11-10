@@ -38,12 +38,18 @@ describe('e2e: vite ssr', async () => {
     `)
 
     await page.click('button.counter')
+
+    await page.waitForTimeout(500)
+
     expect(await page.title()).equals('count: 1 | @vueuse/head')
 
     await page.click('button.change-home-title')
     expect(await page.title()).equals('count: 1 | @vueuse/head')
 
     await page.click('a[href="/about"]')
+
+    await page.waitForTimeout(500)
+
     expect(await page.title()).equals('About | About Template')
   })
 
