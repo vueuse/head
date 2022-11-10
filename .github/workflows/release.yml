@@ -26,7 +26,7 @@ jobs:
           version: 6.24.0
           run_install: true
       - name: Release
-        run: npx kanpai release --channel=rc --pre
+        run: npx kanpai release --channel=next --pre
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
