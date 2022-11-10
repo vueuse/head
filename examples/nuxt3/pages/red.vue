@@ -7,6 +7,15 @@ useHead({
   ],
   title: 'red',
 })
+
+useHead({
+  script: [
+    {
+      src: 'https://js.stripe.com/v3/',
+      onload: (e) => console.log('script loaded', e),
+    }
+  ],
+}, { mode: 'client' })
 </script>
 
 <template>
