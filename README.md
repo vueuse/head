@@ -1,14 +1,16 @@
 <h1 align='center'>@vueuse/head</h1>
 
 <p align="center">
-<a href="https://www.npmjs.com/package/@vueuse/head" target="__blank"><img src="https://img.shields.io/npm/v/@vueuse/head?color=a1b858&label=" alt="NPM version"></a>
-<a href="https://www.npmjs.com/package/@vueuse/head" target="__blank"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/@vueuse/head?color=50a36f&label="></a>
-<br>
-<a href="https://github.com/vueuse/head" target="__blank"><img alt="GitHub stars" src="https://img.shields.io/github/stars/vueuse/head?style=social"></a>
+<a href='https://github.com/harlan-zw/unhead/actions/workflows/test.yml'>
+</a>
+<a href="https://www.npmjs.com/package/@vueuse/head" target="__blank"><img src="https://img.shields.io/npm/v/@vueuse/head?style=flat&colorA=002438&colorB=28CF8D" alt="NPM version"></a>
+<a href="https://www.npmjs.com/package/@vueuse/head" target="__blank"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/@vueuse/head?flat&colorA=002438&colorB=28CF8D"></a>
+<a href="https://github.com/vueuse/head" target="__blank"><img alt="GitHub stars" src="https://img.shields.io/github/stars/vueuse/head?flat&colorA=002438&colorB=28CF8D"></a>
 </p>
 
+
 <p align="center">
-Super-charged document head management for Vue, powered by [unhead](https://unhead.harlanzw.com/).
+Super-charged document head management for Vue, powered by <a href="https://unhead.harlanzw.com/">unhead</a>.
 </p>
 
 <p align="center">
