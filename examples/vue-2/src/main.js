@@ -4,10 +4,10 @@ import { createHead, HeadVuePlugin } from "@vueuse/head"
 
 Vue.config.productionTip = false
 
-Vue.use(HeadVuePlugin)
 const head = createHead()
+Vue.use(HeadVuePlugin, head)
+Vue.use(head)
 
 new Vue({
   render: h => h(App),
-  head,
 }).$mount('#app')

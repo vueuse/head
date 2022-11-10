@@ -37,18 +37,52 @@ Created by <a href="https://github.com/sponsors/egoist">egoist</a>, maintained b
 ## Installation
 
 ```bash
-npm i @vueuse/head
+npm i @vueuse/head@next
 # Or Yarn
-yarn add @vueuse/head
+yarn add @vueuse/head@next
 ```
 
 > Requires vue >= v3 or >=2.7
 
-## Documentation
+## Usage
 
-This package is powered by [unhead](https://github.com/harlan-zw/unhead), the universal document &lt;head&gt; manager.
+### Vue 3
 
-Please refer to the [unhead documentation](https://unhead.harlanzw.com/) for full API reference and more.
+Register the Vue plugin:
+
+```ts
+import { createApp } from "vue"
+import { createHead } from "@vueuse/head"
+
+const app = createApp()
+const head = createHead()
+
+app.use(head)
+
+app.mount("#app")
+```
+
+### Vue 2
+
+Register the Vue plugin:
+
+```ts
+import Vue from 'vue'
+import { createHead, HeadVuePlugin } from "@vueuse/head"
+
+const head = createHead()
+// needed for Vue 2
+Vue.use(HeadVuePlugin, head)
+Vue.use(head)
+
+new Vue({
+  render: h => h(App),
+}).$mount('#app')
+```
+
+## Further Documentation
+
+Refer to the [unhead documentation](https://unhead.harlanzw.com/) for full API reference and more.
 
 ## Sponsors
 

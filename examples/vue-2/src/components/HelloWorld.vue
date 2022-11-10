@@ -4,6 +4,15 @@ export default {
   props: {
     msg: String,
   },
+  head() {
+    return {
+      style: [
+        {
+          children: () => 'body { background-color: blue; }',
+        }
+      ]
+    }
+  },
 }
 </script>
 
