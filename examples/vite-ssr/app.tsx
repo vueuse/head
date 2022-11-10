@@ -6,10 +6,10 @@ import {
   createRouter,
   createWebHistory,
 } from 'vue-router'
-import { createHead, useHead, useHeadSafe } from '../../src'
+import { createHead, useHead } from '../../src'
 import Contact from './Contact.vue'
 
-export const createApp = () => {
+export const createApp = async () => {
   const Counter = defineComponent({
     setup() {
       const count = ref(0)
@@ -18,7 +18,7 @@ export const createApp = () => {
         link: [{ href: '/foo', rel: 'stylesheet' }],
       })
       useHead({
-        script: [{ children: 'console.log("a")', key: 'a' }],
+        script: [{ children: 'console.log("counter mount")', key: 'a' }],
       })
       return () => (
         <button
@@ -66,7 +66,7 @@ export const createApp = () => {
           {
             name: 'custom-priority',
             content: 'of 1',
-            renderPriority: 1,
+            tagPriority: 1,
           },
         ],
       })
@@ -74,7 +74,7 @@ export const createApp = () => {
       useHead({
         script: [
           {
-            children: 'console.log(\'hi\')',
+            children: 'console.log(\'home mount\')',
             body: true,
           },
         ],

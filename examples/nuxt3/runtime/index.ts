@@ -1,17 +1,8 @@
-import type { HeadObject, UseHeadRawInput } from '@vueuse/head'
-import type { MaybeComputedRef } from '@vueuse/shared'
-import { useNuxtApp } from '#app'
+import type { HeadObject } from '@vueuse/head'
+import { useHead } from '@vueuse/head'
 
 export type MetaObject = HeadObject
 
-export function useHead(meta: MaybeComputedRef<MetaObject>) {
-  useNuxtApp()._useHead(meta)
-}
+export const useMeta = useHead
 
-export function useHeadSafe(meta: UseHeadRawInput) {
-  useNuxtApp()._useHead(meta, { safe: true })
-}
-
-export function useMeta(meta: MetaObject) {
-  useHead(meta)
-}
+export { useHead }

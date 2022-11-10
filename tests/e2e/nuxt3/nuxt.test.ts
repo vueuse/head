@@ -51,24 +51,12 @@ describe('e2e: nuxt 3', () => {
 
     expect(ctx).toMatchInlineSnapshot(`
       {
-        "bodyAttrs": [
-          {
-            "name": "style",
-            "value": "background-color: white",
-          },
-          {
-            "name": "data-head-attrs",
-            "value": "style",
-          },
-        ],
+        "bodyAttrs": [],
         "bodyTags": {},
-        "headTagCount": 2,
-        "headTags": [
-          "<meta name=\\"description\\" content=\\"Home page description\\">",
-          "<meta property=\\"og:image\\" content=\\"https://nuxtjs.org/meta_400.png\\">",
-        ],
+        "headTagCount": 0,
+        "headTags": [],
         "htmlAttrs": [],
-        "title": "Home | Nuxt | Title Site",
+        "title": "Hello world: 3.2.44 | Title Site",
       }
     `)
     await expectNoClientErrors('/')

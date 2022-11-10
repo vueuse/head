@@ -24,7 +24,7 @@ export default defineConfig({
           const mod = (await server.ssrLoadModule(
             '/app.tsx',
           )) as typeof import('./app')
-          const { app, router, head } = mod.createApp()
+          const { app, router, head } = await mod.createApp()
           await router.push(req.url!)
           await router.isReady()
           const appHTML = await renderToString(app)
@@ -34,7 +34,8 @@ export default defineConfig({
           res.end(
             html
               .replace('<html>', `<html${headHTML.htmlAttrs}>`)
-              .replace('<body>', `<body${headHTML.bodyAttrs}>`)
+              .replace('<body>', `<body${headHTML.bodyAttrs}>\n${headHTML.bodyTagsOpen}`)
+              .replace('</body>', `${headHTML.bodyTags}</body>`)
               .replace('</head>', `${headHTML.headTags}</head>`)
               .replace(
                 '<div id="app"></div>',

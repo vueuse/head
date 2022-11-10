@@ -13,5 +13,5 @@ export async function ssrRenderHeadToString(fn: () => void) {
   app.use(head)
   await renderToString(app)
 
-  return renderHeadToString(head)
+  return await renderHeadToString(head)
 }

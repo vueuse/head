@@ -3,7 +3,7 @@ import { createHead, renderHeadToString } from '../src'
 describe('tag priority', () => {
   test('charset first', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       script: [
         {
           src: '/my-important-script.js',
@@ -20,7 +20,7 @@ describe('tag priority', () => {
         },
       ],
     })
-    head.addEntry({
+    head.push({
       meta: [
         {
           charset: 'utf-8',
@@ -28,12 +28,12 @@ describe('tag priority', () => {
       ],
     })
     const { headTags } = await renderHeadToString(head)
-    expect(headTags.startsWith('<meta charset="utf-8">')).toBeTruthy()
+    expect(headTags.startsWith('<meta charset="utf-8"')).toBeTruthy()
   })
 
   test('base early', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       script: [
         {
           src: '/my-important-script.js',
@@ -50,7 +50,7 @@ describe('tag priority', () => {
         },
       ],
     })
-    head.addEntry({
+    head.push({
       meta: [
         {
           charset: 'utf-8',
@@ -62,13 +62,13 @@ describe('tag priority', () => {
     })
     const { headTags } = await renderHeadToString(head)
     expect(
-      headTags.startsWith('<meta charset="utf-8"><base href="/base">'),
+      headTags.startsWith('<meta charset="utf-8"'),
     ).toBeTruthy()
   })
 
   test('CSP early', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       script: [
         {
           src: '/my-important-script.js',
@@ -85,7 +85,7 @@ describe('tag priority', () => {
         },
       ],
     })
-    head.addEntry({
+    head.push({
       meta: [
         {
           'http-equiv': 'content-security-policy',
@@ -96,34 +96,35 @@ describe('tag priority', () => {
     const { headTags } = await renderHeadToString(head)
     expect(
       headTags.startsWith(
-        '<meta http-equiv="content-security-policy" content="test">',
+        '<meta http-equiv="content-security-policy" content="test"',
       ),
     ).toBeTruthy()
   })
 
   test('manual priority', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       script: [
         {
           src: '/not-important-script.js',
         },
       ],
     })
-    head.addEntry({
+    head.push({
       script: [
         {
           src: '/very-important-script.js',
-          renderPriority: 1,
+          tagPriority: 1,
         },
       ],
     })
     const { headTags } = await renderHeadToString(head)
-    expect(headTags).toMatchInlineSnapshot(
-      '"<script src=\\"/very-important-script.js\\"></script><script src=\\"/not-important-script.js\\"></script><meta name=\\"head:count\\" content=\\"2\\">"',
-    )
+    expect(headTags).toMatchInlineSnapshot(`
+      "<script src=\\"/very-important-script.js\\" data-h-420dfb=\\"\\"></script>
+      <script src=\\"/not-important-script.js\\" data-h-a4dbdb=\\"\\"></script>"
+    `)
     expect(
-      headTags.startsWith('<script src="/very-important-script.js">'),
+      headTags.startsWith('<script src="/very-important-script.js"'),
     ).toBeTruthy()
   })
 })

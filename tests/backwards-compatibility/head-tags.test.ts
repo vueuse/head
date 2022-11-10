@@ -3,7 +3,7 @@ import { createHead } from '../../src'
 describe('head tags', () => {
   test('calling them works', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       title: 'test',
       link: [
         {
@@ -12,26 +12,23 @@ describe('head tags', () => {
       ],
     })
 
-    expect(head.headTags).toMatchInlineSnapshot(`
+    expect(await head.headTags()).toMatchInlineSnapshot(`
       [
         {
+          "_d": "title",
+          "_e": 0,
+          "_p": 0,
           "children": "test",
-          "options": {},
           "props": {},
-          "runtime": {
-            "entryId": 0,
-            "position": 0,
-          },
           "tag": "title",
         },
         {
-          "options": {},
+          "_e": 0,
+          "_p": 1,
+          "_s": "data-h-877ffb",
           "props": {
+            "data-h-877ffb": "",
             "href": "/",
-          },
-          "runtime": {
-            "entryId": 0,
-            "position": 1,
           },
           "tag": "link",
         },

@@ -7,7 +7,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   resolve: {
     alias: {
-      '@vueuse/head': resolve(__dirname),
+      '@vueuse/head': resolve(__dirname, 'src'),
     },
   },
   test: {

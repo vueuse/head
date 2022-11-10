@@ -11,7 +11,7 @@ describe('titleTemplate', () => {
       })
     })
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<title>test - my template</title><meta name=\\"head:count\\" content=\\"0\\">"',
+      '"<title>test - my template</title>"',
     )
   })
   test('fn replace', async () => {
@@ -23,7 +23,7 @@ describe('titleTemplate', () => {
       })
     })
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<title>test - my template</title><meta name=\\"head:count\\" content=\\"0\\">"',
+      '"<title>test - my template</title>"',
     )
   })
   test('titleTemplate as title', async () => {
@@ -35,7 +35,7 @@ describe('titleTemplate', () => {
       })
     })
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<title>Default Title</title><meta name=\\"head:count\\" content=\\"0\\">"',
+      '"<title>Default Title</title>"',
     )
   })
   test('reset title template', async () => {
@@ -51,7 +51,7 @@ describe('titleTemplate', () => {
       })
     })
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<title>page title</title><meta name=\\"head:count\\" content=\\"0\\">"',
+      '"<title>page title</title>"',
     )
   })
 
@@ -66,7 +66,7 @@ describe('titleTemplate', () => {
       })
     })
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<meta name=\\"head:count\\" content=\\"0\\">"',
+      '""',
     )
   })
 
@@ -79,7 +79,7 @@ describe('titleTemplate', () => {
       })
     })
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<meta name=\\"head:count\\" content=\\"0\\">"',
+      '""',
     )
   })
 
@@ -90,7 +90,7 @@ describe('titleTemplate', () => {
       })
     })
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<title></title><meta name=\\"head:count\\" content=\\"0\\">"',
+      '"<title></title>"',
     )
   })
 })
