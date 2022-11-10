@@ -25,6 +25,20 @@ Created by <a href="https://github.com/sponsors/egoist">egoist</a>, maintained b
 </table>
 </p>
 
+## ✨ Announcement
+
+Lots of work is going on behind the scenes and for a v1 release that will be out in the coming week! 
+
+Some highlights:
+- Vue 2 support
+- More intuitive deduping, sorting, title templates, class merging and more
+- DOM event handlers
+- Server / client only tags
+- New DOM Patching algorithm
+
+You can try it out now by switching to the [v1 branch](https://github.com/vueuse/head/tree/v1), documentation, release notes and migration guide will be coming soon.
+
+
 ## Features
 
 - ✨ Best practice head with deduping and default ordering
