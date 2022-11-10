@@ -1,6 +1,6 @@
 import { createSSRApp, ref } from 'vue'
 import { renderToString } from '@vue/server-renderer'
-import type { MergeHead } from '@zhead/schema'
+import type { MergeHead } from '@unhead/vue'
 import { createHead, renderHeadToString, useHead } from '../src'
 
 describe('custom augmentation', () => {
@@ -33,7 +33,10 @@ describe('custom augmentation', () => {
 
     const headResult = await renderHeadToString(head)
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<title></title><link data-test=\\"test\\" href=\\"link-one\\"><meta name=\\"head:count\\" content=\\"1\\">"',
+      `
+      "<title></title>
+      <link data-test=\\"test\\" href=\\"link-one\\" data-h-1051b2=\\"\\">"
+    `,
     )
   })
 })

@@ -1,8 +1,8 @@
 import { computed, createSSRApp, ref } from 'vue'
 import { renderToString } from '@vue/server-renderer'
 import type { UseHeadInput } from '@vueuse/head'
+import type { HeadObjectPlain } from '../src'
 import { createHead, renderHeadToString, useHead } from '../src'
-import type { HeadObjectPlain } from '../src/types'
 import { ssrRenderHeadToString } from './shared/utils'
 
 describe('reactivity', () => {
@@ -60,13 +60,20 @@ describe('reactivity', () => {
 
     expect(headResult).toMatchInlineSnapshot(`
       {
-        "bodyAttrs": " data-some-body-attr=\\"some-value\\" data-head-attrs=\\"data-some-body-attr\\"",
-        "bodyTags": "<style data-meta-body>* { color: red }</style>",
-        "headTags": "<title>hello - My site</title><meta name=\\"description\\" content=\\"desc 2\\"><meta property=\\"og:locale:alternate\\" content=\\"fr\\"><meta property=\\"og:locale:alternate\\" content=\\"zh\\"><link as=\\"style\\" href=\\"/style.css\\"><script src=\\"foo.js\\"></script><meta name=\\"head:count\\" content=\\"5\\">",
-        "htmlAttrs": " lang=\\"zh\\" data-head-attrs=\\"lang\\"",
+        "bodyAttrs": " data-some-body-attr=\\"some-value\\"",
+        "bodyTags": "<style data-h-5845cb=\\"\\">* { color: red }</style>",
+        "bodyTagsOpen": "",
+        "headTags": "<title>hello - My site</title>
+      <meta name=\\"description\\" content=\\"test\\" data-h-889faf=\\"\\">
+      <meta name=\\"description\\" content=\\"desc 2\\" data-h-889faf5=\\"\\">
+      <meta property=\\"og:locale:alternate\\" content=\\"fr\\" data-h-3f7248=\\"\\">
+      <meta property=\\"og:locale:alternate\\" content=\\"zh\\" data-h-321fb4=\\"\\">
+      <link as=\\"style\\" href=\\"/style.css\\" data-h-230b58=\\"\\">
+      <script src=\\"foo.js\\" data-h-d66090=\\"\\"></script>",
+        "htmlAttrs": " lang=\\"zh\\"",
       }
     `)
-    expect(headResult.htmlAttrs).toEqual(' lang="zh" data-head-attrs="lang"')
+    expect(headResult.htmlAttrs).toEqual(' lang="zh"')
   })
 
   test('computed', async () => {
@@ -86,7 +93,7 @@ describe('reactivity', () => {
 
     const headResult = await renderHeadToString(head)
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<title></title><meta name=\\"head:count\\" content=\\"0\\">"',
+      '"<title></title>"',
     )
   })
 
@@ -140,7 +147,14 @@ describe('reactivity', () => {
 
     const headResult = await renderHeadToString(head)
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<title>hello</title><meta name=\\"description\\" content=\\"hello this is my description\\" data-unknown-attr=\\"test\\"><meta property=\\"og:fake-prop\\" content=\\"test\\"><meta name=\\"fake-name-prop\\" content=\\"test\\"><meta property=\\"og:url\\" content=\\"test\\"><script src=\\"foo.js\\"></script><meta name=\\"head:count\\" content=\\"5\\">"',
+      `
+      "<title>hello</title>
+      <meta name=\\"description\\" content=\\"hello this is my description\\" data-unknown-attr=\\"test\\" data-h-889faf=\\"\\">
+      <meta property=\\"og:fake-prop\\" content=\\"test\\" data-h-38add9=\\"\\">
+      <meta name=\\"fake-name-prop\\" content=\\"test\\" data-h-624d02=\\"\\">
+      <meta property=\\"og:url\\" content=\\"test\\" data-h-79e151=\\"\\">
+      <script src=\\"foo.js\\" data-h-ed7ece=\\"\\"></script>"
+    `,
     )
   })
 
@@ -149,7 +163,7 @@ describe('reactivity', () => {
       title: 'test',
     })))
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<title>test</title><meta name=\\"head:count\\" content=\\"0\\">"',
+      '"<title>test</title>"',
     )
   })
 
@@ -181,12 +195,24 @@ describe('reactivity', () => {
     }
     const headResult = await ssrRenderHeadToString(() => useHead(input))
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<title>my title</title><script src=\\"foo.js\\"></script><meta name=\\"test\\" content=\\"test\\"><meta name=\\"some-flag-test\\" content=\\"test\\"><meta property=\\"og:fake-prop\\" content=\\"test\\"><meta name=\\"head:count\\" content=\\"4\\">"',
+      `
+      "<title>my title</title>
+      <script src=\\"foo.js\\" data-h-ed7ece=\\"\\"></script>
+      <meta name=\\"test\\" content=\\"test\\" data-h-d5992c=\\"\\">
+      <meta name=\\"some-flag-test\\" content=\\"test\\" data-h-40328b=\\"\\">
+      <meta property=\\"og:fake-prop\\" content=\\"test\\" data-h-38add9=\\"\\">"
+    `,
     )
     test.value = 'test2'
     const headResult2 = await ssrRenderHeadToString(() => useHead(input))
     expect(headResult2.headTags).toMatchInlineSnapshot(
-      '"<title>my title</title><script src=\\"foo.js\\"></script><meta name=\\"test2\\" content=\\"test2\\"><meta name=\\"some-flag-test2\\" content=\\"test\\"><meta property=\\"og:fake-prop\\" content=\\"test2\\"><meta name=\\"head:count\\" content=\\"4\\">"',
+      `
+      "<title>my title</title>
+      <script src=\\"foo.js\\" data-h-ed7ece=\\"\\"></script>
+      <meta name=\\"test2\\" content=\\"test2\\" data-h-836155=\\"\\">
+      <meta name=\\"some-flag-test2\\" content=\\"test\\" data-h-6682bb=\\"\\">
+      <meta property=\\"og:fake-prop\\" content=\\"test2\\" data-h-38add9=\\"\\">"
+    `,
     )
   })
 
@@ -206,19 +232,23 @@ describe('reactivity', () => {
           },
           {
             name: 'some-flag',
-            // @ts-expect-error boolean is not valid for name
             content: true,
           },
           {
             property: 'og:fake-prop',
-            // @ts-expect-error arrays not allowed
             content: ['test1', 'test2'],
           },
         ],
       },
       ))
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<title>my title</title><meta name=\\"123\\" data-unknown-attr=\\"test\\"><meta name=\\"some-flag\\" content><meta property=\\"og:fake-prop\\" content=\\"test1,test2\\"><meta name=\\"head:count\\" content=\\"3\\">"',
+      `
+      "<title>my title</title>
+      <meta name=\\"123\\" data-unknown-attr=\\"test\\" data-h-24abca=\\"\\">
+      <meta name=\\"some-flag\\" content=\\"\\" data-h-6a4798=\\"\\">
+      <meta property=\\"og:fake-prop\\" content=\\"test1\\" data-h-28f8b0=\\"\\">
+      <meta property=\\"og:fake-prop\\" content=\\"test2\\" data-h-b8eef8=\\"\\">"
+    `,
     )
   })
 })

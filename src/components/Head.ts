@@ -1,36 +1,34 @@
 import type { Ref, VNode } from 'vue'
-import { defineComponent, onBeforeUnmount, ref, version, watchEffect } from 'vue'
-import type { HeadObjectPlain } from './types'
-import type { HeadAttrs } from './index'
-import { IS_BROWSER, injectHead } from './index'
+import { defineComponent, onBeforeUnmount, ref, watchEffect } from 'vue'
+import type { ReactiveHead } from '@unhead/vue'
+import { injectHead } from '@unhead/vue'
+import { IsBrowser, Vue2 } from '../env'
 
-const isVue2 = version.startsWith('2.')
-
-const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
+const addVNodeToHeadObj = (node: VNode, obj: ReactiveHead) => {
   // @ts-expect-error vue2 vnode API
-  const nodeType = isVue2 ? node.tag : node.type
+  const nodeType = Vue2 ? node.tag : node.type
   const type
     = nodeType === 'html'
       ? 'htmlAttrs'
       : nodeType === 'body'
         ? 'bodyAttrs'
-        : (nodeType as keyof HeadObjectPlain)
+        : (nodeType as keyof ReactiveHead)
 
   if (typeof type !== 'string' || !(type in obj))
     return
 
   // @ts-expect-error vue2 vnode API
-  const nodeData = isVue2 ? node.data : node
-  const props: HeadAttrs = (isVue2 ? nodeData.attrs : node.props) || {} as HeadAttrs
+  const nodeData = Vue2 ? node.data : node
+  const props: Record<string, any> = (Vue2 ? nodeData.attrs : node.props) || {}
   // handle class and style attrs
-  if (isVue2) {
+  if (Vue2) {
     if (nodeData.staticClass)
       props.class = nodeData.staticClass
     if (nodeData.staticStyle)
       props.style = Object.entries(nodeData.staticStyle).map(([key, value]) => `${key}:${value}`).join(';')
   }
   if (node.children) {
-    const childrenAttr = isVue2 ? 'text' : 'children'
+    const childrenAttr = Vue2 ? 'text' : 'children'
     props.children = Array.isArray(node.children)
       // @ts-expect-error untyped
       ? node.children[0]![childrenAttr]
@@ -38,17 +36,17 @@ const addVNodeToHeadObj = (node: VNode, obj: HeadObjectPlain) => {
       : node[childrenAttr]
   }
   if (Array.isArray(obj[type]))
-    (obj[type] as HeadAttrs[]).push(props)
+    (obj[type] as Record<string, any>[]).push(props)
 
   else if (type === 'title')
     obj.title = props.children
 
   else
-    (obj[type] as HeadAttrs) = props
+    (obj[type] as Record<string, any>) = props
 }
 
 const vnodesToHeadObj = (nodes: VNode[]) => {
-  const obj: HeadObjectPlain = {
+  const obj: ReactiveHead = {
     title: undefined,
     htmlAttrs: undefined,
     bodyAttrs: undefined,
@@ -80,23 +78,21 @@ export const Head = /* @__PURE__ */ defineComponent({
   setup(_, { slots }) {
     const head = injectHead()
 
-    const obj: Ref<HeadObjectPlain> = ref({})
+    const obj: Ref<ReactiveHead> = ref({})
 
-    if (IS_BROWSER) {
-      const cleanUp = head.addReactiveEntry(obj)
+    const entry = head.push(obj)
+
+    if (IsBrowser) {
       onBeforeUnmount(() => {
-        cleanUp()
+        entry.dispose()
       })
-    }
-    else {
-      head.addEntry(obj)
     }
 
     return () => {
       watchEffect(() => {
         if (!slots.default)
           return
-        obj.value = vnodesToHeadObj(slots.default())
+        entry.patch(vnodesToHeadObj(slots.default()))
       })
       return null
     }

@@ -6,12 +6,12 @@ describe('hook tags resolved', () => {
     const head = createHead()
 
     const hookTags = new Promise((resolve) => {
-      head.hooks['resolved:tags'].push((tags) => {
-        resolve(tags)
+      head.hooks.hook('tags:resolve', (ctx) => {
+        resolve(ctx.tags)
       })
     })
 
-    head.addEntry({
+    head.push({
       title: 'test',
     })
     const dom = new JSDOM(
@@ -25,13 +25,11 @@ describe('hook tags resolved', () => {
     expect(tags).toMatchInlineSnapshot(`
       [
         {
+          "_d": "title",
+          "_e": 0,
+          "_p": 0,
           "children": "test",
-          "options": {},
           "props": {},
-          "runtime": {
-            "entryId": 0,
-            "position": 0,
-          },
           "tag": "title",
         },
       ]
@@ -42,15 +40,15 @@ describe('hook tags resolved', () => {
     const head = createHead()
 
     const hookTags = new Promise((resolve) => {
-      head.hooks['resolved:tags'].push((tags) => {
-        for (const k in tags)
-          tags[k].props.extra = true
+      head.hooks.hook('tags:resolve', (ctx) => {
+        for (const k in ctx.tags)
+          ctx.tags[k].props.extra = true
 
-        resolve(tags)
+        resolve(ctx.tags)
       })
     })
 
-    head.addEntry({
+    head.push({
       title: 'test',
     })
     const dom = new JSDOM(
@@ -58,18 +56,16 @@ describe('hook tags resolved', () => {
     )
     await head.updateDOM(dom.window.document)
 
-    const hooks = await hookTags
-    expect(hooks[0].props.extra).toBeTruthy()
-    expect(hooks[0]).toMatchInlineSnapshot(`
+    const tags = await hookTags
+    expect(tags[0].props.extra).toBeTruthy()
+    expect(tags[0]).toMatchInlineSnapshot(`
       {
+        "_d": "title",
+        "_e": 0,
+        "_p": 0,
         "children": "test",
-        "options": {},
         "props": {
           "extra": true,
-        },
-        "runtime": {
-          "entryId": 0,
-          "position": 0,
         },
         "tag": "title",
       }

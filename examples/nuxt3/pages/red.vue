@@ -1,8 +1,10 @@
 <script setup lang="ts">
 useHead({
-  htmlAttrs: {
-    style: 'background: red',
-  },
+  style: [
+    {
+      children: 'body { background-color: red; }',
+    }
+  ],
   title: 'red',
 })
 </script>

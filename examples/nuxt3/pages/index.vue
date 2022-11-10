@@ -1,55 +1,51 @@
 <script lang="ts" setup>
 import { useHead } from '#head'
+import {Ref, version} from "vue";
+import {HeadObjectPlain} from "@vueuse/head";
 
-const page = ref({
-  title: 'Home',
-  description: 'Home page description',
-  image: 'https://nuxtjs.org/meta_400.png',
-})
+
+const head : Ref<HeadObjectPlain> = ref({})
+
+useHead(head)
+
+head.value.title =  `Hello world: ${version}`
+head.value.meta = [
+  { name: 'description', content: 'This is an example' },
+  { property: 'og:title', content: 'Hello world' },
+]
+
+const doClick = () => {
+  head.value.title =  `Hello world 2: ${version}`
+  head.value.meta = [
+    { name: 'description', content: 'This is an example 2' },
+    { property: 'og:title', content: 'Hello world 2' },
+  ]
+}
 
 useHead({
-  bodyAttrs: {
-    style: 'background-color: red'
-  },
-})
-
-onMounted(() => {
-  useHead({
-    bodyAttrs: {
-      style: 'background-color: white'
-    },
-  })
-})
-
-useHead({
-  title: computed(() => `${page.value.title} | Nuxt`),
-  // note: this is still XSS vulnerable
-  // script: [
-  // {
-  //   children: 'alert(2)',
-  // },
-  // ],
-  meta: [
-    {
-      name: 'description',
-      content: computed(() => page.value.description),
-    },
-    {
-      property: 'og:image',
-      content: computed(() => page.value.image),
-    },
+  link: [
+    { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
   ],
+  script: [
+    { src: 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js' },
+  ]
 })
 </script>
 
 <template>
+<div>
+  <h1>Index</h1>
+  <nuxt-link to="/second">
+    second page
+  </nuxt-link>
+  <nuxt-link to="/red">
+    red
+  </nuxt-link>
+  <button @click="doClick">
+    update
+  </button>
   <div>
-    <h1>Index</h1>
-    <nuxt-link to="/second">
-      second page
-    </nuxt-link>
-    <nuxt-link to="/red">
-      red
-    </nuxt-link>
+    {{ head }}
   </div>
+</div>
 </template>

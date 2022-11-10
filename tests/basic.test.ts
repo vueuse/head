@@ -1,10 +1,10 @@
 import { ref } from 'vue'
-import { createHead, resolveHeadEntriesToTags } from '../src'
+import { createHead } from '../src'
 
 describe('basic', () => {
   test('removing head works', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       title: 'old',
       link: [
         {
@@ -13,16 +13,17 @@ describe('basic', () => {
       ],
     })
 
-    const { remove } = head.addEntry({
+    const { dispose } = head.push({
       title: 'test',
     })
-    remove()
+    dispose()
 
-    expect(head.headEntries.length).toBe(1)
-    expect(head.headEntries).toMatchInlineSnapshot(`
+    expect(head.headEntries().length).toBe(1)
+    expect(head.headEntries()).toMatchInlineSnapshot(`
       [
         {
-          "id": 0,
+          "_i": 0,
+          "_sde": {},
           "input": {
             "link": [
               {
@@ -31,8 +32,6 @@ describe('basic', () => {
             ],
             "title": "old",
           },
-          "options": {},
-          "resolved": false,
         },
       ]
     `)
@@ -41,7 +40,7 @@ describe('basic', () => {
   test('computed getter', async () => {
     const colour = ref('yellow')
     const head = createHead()
-    head.addReactiveEntry(
+    head.push(
       () => ({
         bodyAttrs: {
           style: () => `background: ${colour.value}`,
@@ -49,33 +48,25 @@ describe('basic', () => {
         },
       }),
     )
-    expect(head.headEntries).toMatchInlineSnapshot(`
+    expect(head.headEntries()).toMatchInlineSnapshot(`
       [
         {
-          "id": 0,
-          "input": {
-            "bodyAttrs": {
-              "class": "bg-yellow-500",
-              "style": "background: yellow",
-            },
-          },
-          "options": {},
-          "resolved": true,
+          "_i": 0,
+          "_sde": {},
+          "input": [Function],
         },
       ]
     `)
 
-    expect(resolveHeadEntriesToTags(head.headEntries)).toMatchInlineSnapshot(`
+    expect(await head.resolveTags()).toMatchInlineSnapshot(`
       [
         {
-          "options": {},
+          "_d": "bodyAttrs",
+          "_e": 0,
+          "_p": 0,
           "props": {
             "class": "bg-yellow-500",
             "style": "background: yellow",
-          },
-          "runtime": {
-            "entryId": 0,
-            "position": 0,
           },
           "tag": "bodyAttrs",
         },

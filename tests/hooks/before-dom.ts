@@ -6,12 +6,14 @@ import { createHead, useHead } from '../../src'
 describe('toggle dom render', () => {
   test('basic', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       title: 'test',
     })
 
     let pauseDOMUpdates = true
-    head.hooks['before:dom'].push(() => !pauseDOMUpdates)
+    head.hooks.hook('dom:beforeRender', (ctx) => {
+      ctx.shouldRender = !pauseDOMUpdates
+    })
 
     const dom = new JSDOM(
       '<!DOCTYPE html><html><head></head><body></body></html>',
@@ -35,7 +37,10 @@ describe('toggle dom render', () => {
     const app = createSSRApp({
       async setup() {
         let pauseDOMUpdates = true
-        head.hooks['before:dom'].push(() => !pauseDOMUpdates)
+
+        head.hooks.hook('dom:beforeRender', (ctx) => {
+          ctx.shouldRender = !pauseDOMUpdates
+        })
         const title = ref('')
         useHead({
           title,

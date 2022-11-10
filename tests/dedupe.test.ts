@@ -1,9 +1,10 @@
-import { createHead, renderHeadToString } from '../src'
+import { renderSSRHead } from '@unhead/ssr'
+import { createHead } from '../src'
 
 describe('dedupe', () => {
   it('dedupes desc', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       meta: [
         {
           name: 'something-else',
@@ -16,7 +17,7 @@ describe('dedupe', () => {
       ],
     },
     )
-    head.addEntry({
+    head.push({
       meta: [
         {
           name: 'description',
@@ -25,21 +26,26 @@ describe('dedupe', () => {
       ],
     },
     )
-    const { headTags } = await renderHeadToString(head)
+    const { headTags } = await renderSSRHead(head)
     expect(
-      headTags.includes('<meta name="description" content="desc 2">'),
+      headTags.includes('<meta name="description" content="desc 2"'),
     ).toBeTruthy()
     expect(headTags.split('description').length === 2).toBeTruthy()
   })
 
   it('dedupes key', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       meta: [
         {
           myCustomMeta: 'first',
           key: 'custom',
         },
+      ],
+    },
+    )
+    head.push({
+      meta: [
         {
           myCustomMeta: 'second',
           key: 'custom',
@@ -47,19 +53,24 @@ describe('dedupe', () => {
       ],
     },
     )
-    const { headTags } = await renderHeadToString(head)
-    expect(headTags.startsWith('<meta myCustomMeta="second">')).toBeTruthy()
+    const { headTags } = await renderSSRHead(head)
+    expect(headTags.startsWith('<meta myCustomMeta="second"')).toBeTruthy()
     expect(headTags.split('myCustomMeta').length === 2).toBeTruthy()
   })
 
   test('dedupes canonical', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       link: [
         {
           rel: 'canonical',
           href: 'https://website.com',
         },
+      ],
+    },
+    )
+    head.push({
+      link: [
         {
           rel: 'canonical',
           href: 'https://website.com/new',
@@ -67,10 +78,10 @@ describe('dedupe', () => {
       ],
     },
     )
-    const { headTags } = await renderHeadToString(head)
+    const { headTags } = await renderSSRHead(head)
     expect(
       headTags.startsWith(
-        '<link rel="canonical" href="https://website.com/new">',
+        '<link rel="canonical" href="https://website.com/new"',
       ),
     ).toBeTruthy()
     expect(headTags.split('canonical').length === 2).toBeTruthy()
@@ -78,51 +89,48 @@ describe('dedupe', () => {
 
   test('dedupes charset', async () => {
     const head = createHead()
-    head.addEntry(
+    head.push(
       {
         meta: [
           {
             charset: 'utf-8-overridden',
           },
-          {
-            charset: 'utf-8-two',
-          },
         ],
       },
     )
-    head.addEntry({
+    head.push({
       meta: [
         {
           charset: 'utf-8',
         },
       ],
     })
-    const { headTags } = await renderHeadToString(head)
-    expect(headTags.startsWith('<meta charset="utf-8">')).toBeTruthy()
+    const { headTags } = await renderSSRHead(head)
+    expect(headTags.startsWith('<meta charset="utf-8"')).toBeTruthy()
     expect(headTags.split('charset').length === 2).toBeTruthy()
   })
 
   test('dedupes base', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       base: {
         href: '/old',
         target: '_blank',
       },
     })
-    head.addEntry({
+    head.push({
       base: {
         href: '/',
       },
     })
-    const { headTags } = await renderHeadToString(head)
+    const { headTags } = await renderSSRHead(head)
     expect(headTags.split('base').length === 2).toBeTruthy()
-    expect(headTags.startsWith('<base href="/">')).toBeTruthy()
+    expect(headTags.startsWith('<base href="/"')).toBeTruthy()
   })
 
   test('dedupes http-equiv', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       meta: [
         {
           'http-equiv': 'content-security-policy',
@@ -130,7 +138,7 @@ describe('dedupe', () => {
         },
       ],
     })
-    head.addEntry({
+    head.push({
       meta: [
         {
           'http-equiv': 'content-security-policy',
@@ -139,27 +147,30 @@ describe('dedupe', () => {
         },
       ],
     })
-    const { headTags } = await renderHeadToString(head)
+    const { headTags } = await renderSSRHead(head)
     expect(headTags.split('http-equiv').length === 2).toBeTruthy()
   })
 
   test('issue #104', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       link: [
         { rel: 'icon', href: '/favicon.ico' }, // <-- this and,
         { rel: 'canonical', href: 'https://mydomain.me' }, // <-- this. Please reverse the order to be sure.
       ],
     })
-    const { headTags } = await renderHeadToString(head)
+    const { headTags } = await renderSSRHead(head)
     expect(headTags).toMatchInlineSnapshot(
-      '"<link rel=\\"icon\\" href=\\"/favicon.ico\\"><link rel=\\"canonical\\" href=\\"https://mydomain.me\\"><meta name=\\"head:count\\" content=\\"2\\">"',
+      `
+      "<link rel=\\"icon\\" href=\\"/favicon.ico\\" data-h-8c81e0=\\"\\">
+      <link rel=\\"canonical\\" href=\\"https://mydomain.me\\" data-h-e3fa78=\\"\\">"
+    `,
     )
   })
 
   test('doesn\'t dedupe over tag types', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       meta: [
         {
           key: 'icon',
@@ -169,15 +180,18 @@ describe('dedupe', () => {
       ],
       link: [{ rel: 'icon', href: '/favicon.ico', key: 'icon' }],
     })
-    const { headTags } = await renderHeadToString(head)
+    const { headTags } = await renderSSRHead(head)
     expect(headTags).toMatchInlineSnapshot(
-      '"<meta name=\\"description\\" content=\\"test\\"><link rel=\\"icon\\" href=\\"/favicon.ico\\"><meta name=\\"head:count\\" content=\\"2\\">"',
+      `
+      "<meta name=\\"description\\" content=\\"test\\" data-h-7c33d6=\\"\\">
+      <link rel=\\"icon\\" href=\\"/favicon.ico\\" data-h-ca40d5=\\"\\">"
+    `,
     )
   })
 
   test('dedupes legacy', async () => {
     const head = createHead()
-    head.addEntry({
+    head.push({
       meta: [
         {
           'unknown-key': 'description',
@@ -186,7 +200,7 @@ describe('dedupe', () => {
         },
       ],
     })
-    head.addEntry({
+    head.push({
       meta: [
         {
           'unknown-key': 'description',
@@ -195,9 +209,12 @@ describe('dedupe', () => {
         },
       ],
     })
-    const { headTags } = await renderHeadToString(head)
+    const { headTags } = await renderSSRHead(head)
     expect(headTags).toMatchInlineSnapshot(
-      '"<meta unknown-key=\\"description\\" content=\\"test\\"><meta unknown-key=\\"description\\" content=\\"test 2\\"><meta name=\\"head:count\\" content=\\"2\\">"',
+      `
+      "<meta unknown-key=\\"description\\" content=\\"test\\" data-h-1dcf99=\\"\\">
+      <meta unknown-key=\\"description\\" content=\\"test 2\\" data-h-62a5e1=\\"\\">"
+    `,
     )
   })
 })
