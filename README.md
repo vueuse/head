@@ -29,7 +29,7 @@ Created by <a href="https://github.com/sponsors/egoist">egoist</a>, maintained b
 
 ## Features
 
-- 💎 Fully typed augmentable Schema powered by [zhead](https://github.com/harlan-zw/zhead)
+- 💎 Fully typed augmentable Schema
 - 🧑‍🤝‍🧑 Side-effect based DOM patching, plays nicely your existing other tags and attributes
 - 🍣 Intuitive deduping, sorting, title templates, class merging and more
 - 🪝 Extensible hook / plugin based API
@@ -78,6 +78,32 @@ Vue.use(head)
 new Vue({
   render: h => h(App),
 }).$mount('#app')
+```
+
+### SSR Rendering
+
+```ts
+import { renderToString } from "@vue/server-renderer"
+import { renderHeadToString } from "@vueuse/head"
+
+const appHTML = await renderToString(yourVueApp)
+
+// `head` is created from `createHead()`
+const { headTags, htmlAttrs, bodyAttrs, bodyTags } = renderHeadToString(head)
+
+const finalHTML = `
+<html${htmlAttrs}>
+
+  <head>
+    ${headTags}
+  </head>
+
+  <body${bodyAttrs}>
+    <div id="app">${appHTML}</div>
+    ${bodyTags}
+  </body>
+
+</html>`
 ```
 
 ## Further Documentation
