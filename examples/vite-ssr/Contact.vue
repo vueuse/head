@@ -1,8 +1,20 @@
 <script setup>
 import { ref } from 'vue'
-import { Head } from '../../src'
+import { Head, useHead } from '../../src'
 
 const count = ref(0)
+
+useHead({
+  script: [
+    {
+      src: 'https://js.stripe.com/v3/',
+      defer: true,
+      onload: (e) => {
+        console.log(e);
+      },
+    },
+  ],
+})
 
 const style = 'button {color: red}'
 </script>

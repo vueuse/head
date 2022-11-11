@@ -20,8 +20,8 @@ describe('encoding', () => {
     })
     const { htmlAttrs, headTags } = await renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot(`
-      "<script src=\\"javascript:console.log('xss');\\" data-h-d123ac=\\"\\">alert(2)</script>
-      <noscript data-h-9c0282=\\"\\"><iframe src=\\"https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX\\" height=\\"0\\" width=\\"0\\" style=\\"display:none;visibility:hidden\\"></iframe></noscript>"
+      "<script src=\\"javascript:console.log('xss');\\">alert(2)</script>
+      <noscript><iframe src=\\"https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX\\" height=\\"0\\" width=\\"0\\" style=\\"display:none;visibility:hidden\\"></iframe></noscript>"
     `)
     expect(htmlAttrs).toMatchInlineSnapshot('" onload=\\"console.log(\'executed\')\\""')
   })
@@ -40,7 +40,7 @@ describe('encoding', () => {
     const { headTags } = await renderHeadToString(head)
     // valid html (except for the tag name)
     expect(headTags).toMatchInlineSnapshot(
-      '"<meta > console.alert(\\"test\\")=\\"<style>body { background: red; }</style>\\" data-h-51b1fe=\\"\\">"',
+      '"<meta > console.alert(\\"test\\")=\\"<style>body { background: red; }</style>\\">"',
     )
   })
 
@@ -65,9 +65,9 @@ describe('encoding', () => {
     expect(ssr).toMatchInlineSnapshot(`
       {
         "bodyAttrs": "",
-        "bodyTags": "<script src=\\"https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly\\" data-key=\\"AIzaSyD9hQ0Z7Y9XQX8Zjwq7Q9Z2YQ9Z2YQ9Z2Y\\" defer=\\"\\" data-h-59c90a=\\"\\"></script>",
+        "bodyTags": "<script src=\\"https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly\\" data-key=\\"AIzaSyD9hQ0Z7Y9XQX8Zjwq7Q9Z2YQ9Z2YQ9Z2Y\\" defer=\\"\\"></script>",
         "bodyTagsOpen": "",
-        "headTags": "<script src=\\"https://polyfill.io/v3/polyfill.min.js?features=default\\" data-h-5c07d0=\\"\\"></script>",
+        "headTags": "<script src=\\"https://polyfill.io/v3/polyfill.min.js?features=default\\"></script>",
         "htmlAttrs": "",
       }
     `)
@@ -86,7 +86,7 @@ describe('encoding', () => {
     head.push(externalApiHeadData)
     const { headTags } = await renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot(
-      '"<script data-h-7c3bfc=\\"\\">console.alert(\\"xss\\")</script>"',
+      '"<script>console.alert(\\"xss\\")</script>"',
     )
   })
 

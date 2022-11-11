@@ -61,15 +61,15 @@ describe('reactivity', () => {
     expect(headResult).toMatchInlineSnapshot(`
       {
         "bodyAttrs": " data-some-body-attr=\\"some-value\\"",
-        "bodyTags": "<style data-h-5845cb=\\"\\">* { color: red }</style>",
+        "bodyTags": "<style>* { color: red }</style>",
         "bodyTagsOpen": "",
         "headTags": "<title>hello - My site</title>
-      <meta name=\\"description\\" content=\\"test\\" data-h-889faf=\\"\\">
-      <meta name=\\"description\\" content=\\"desc 2\\" data-h-889faf5=\\"\\">
-      <meta property=\\"og:locale:alternate\\" content=\\"fr\\" data-h-3f7248=\\"\\">
-      <meta property=\\"og:locale:alternate\\" content=\\"zh\\" data-h-321fb4=\\"\\">
-      <link as=\\"style\\" href=\\"/style.css\\" data-h-230b58=\\"\\">
-      <script src=\\"foo.js\\" data-h-d66090=\\"\\"></script>",
+      <meta name=\\"description\\" content=\\"test\\">
+      <meta name=\\"description\\" content=\\"desc 2\\">
+      <meta property=\\"og:locale:alternate\\" content=\\"fr\\">
+      <meta property=\\"og:locale:alternate\\" content=\\"zh\\">
+      <link as=\\"style\\" href=\\"/style.css\\">
+      <script src=\\"foo.js\\"></script>",
         "htmlAttrs": " lang=\\"zh\\"",
       }
     `)
@@ -149,11 +149,11 @@ describe('reactivity', () => {
     expect(headResult.headTags).toMatchInlineSnapshot(
       `
       "<title>hello</title>
-      <meta name=\\"description\\" content=\\"hello this is my description\\" data-unknown-attr=\\"test\\" data-h-889faf=\\"\\">
-      <meta property=\\"og:fake-prop\\" content=\\"test\\" data-h-38add9=\\"\\">
-      <meta name=\\"fake-name-prop\\" content=\\"test\\" data-h-624d02=\\"\\">
-      <meta property=\\"og:url\\" content=\\"test\\" data-h-79e151=\\"\\">
-      <script src=\\"foo.js\\" data-h-ed7ece=\\"\\"></script>"
+      <meta name=\\"description\\" content=\\"hello this is my description\\" data-unknown-attr=\\"test\\">
+      <meta property=\\"og:fake-prop\\" content=\\"test\\">
+      <meta name=\\"fake-name-prop\\" content=\\"test\\">
+      <meta property=\\"og:url\\" content=\\"test\\">
+      <script src=\\"foo.js\\"></script>"
     `,
     )
   })
@@ -197,10 +197,10 @@ describe('reactivity', () => {
     expect(headResult.headTags).toMatchInlineSnapshot(
       `
       "<title>my title</title>
-      <script src=\\"foo.js\\" data-h-ed7ece=\\"\\"></script>
-      <meta name=\\"test\\" content=\\"test\\" data-h-d5992c=\\"\\">
-      <meta name=\\"some-flag-test\\" content=\\"test\\" data-h-40328b=\\"\\">
-      <meta property=\\"og:fake-prop\\" content=\\"test\\" data-h-38add9=\\"\\">"
+      <script src=\\"foo.js\\"></script>
+      <meta name=\\"test\\" content=\\"test\\">
+      <meta name=\\"some-flag-test\\" content=\\"test\\">
+      <meta property=\\"og:fake-prop\\" content=\\"test\\">"
     `,
     )
     test.value = 'test2'
@@ -208,10 +208,10 @@ describe('reactivity', () => {
     expect(headResult2.headTags).toMatchInlineSnapshot(
       `
       "<title>my title</title>
-      <script src=\\"foo.js\\" data-h-ed7ece=\\"\\"></script>
-      <meta name=\\"test2\\" content=\\"test2\\" data-h-836155=\\"\\">
-      <meta name=\\"some-flag-test2\\" content=\\"test\\" data-h-6682bb=\\"\\">
-      <meta property=\\"og:fake-prop\\" content=\\"test2\\" data-h-38add9=\\"\\">"
+      <script src=\\"foo.js\\"></script>
+      <meta name=\\"test2\\" content=\\"test2\\">
+      <meta name=\\"some-flag-test2\\" content=\\"test\\">
+      <meta property=\\"og:fake-prop\\" content=\\"test2\\">"
     `,
     )
   })
@@ -244,10 +244,10 @@ describe('reactivity', () => {
     expect(headResult.headTags).toMatchInlineSnapshot(
       `
       "<title>my title</title>
-      <meta name=\\"123\\" data-unknown-attr=\\"test\\" data-h-24abca=\\"\\">
-      <meta name=\\"some-flag\\" content=\\"\\" data-h-6a4798=\\"\\">
-      <meta property=\\"og:fake-prop\\" content=\\"test1\\" data-h-28f8b0=\\"\\">
-      <meta property=\\"og:fake-prop\\" content=\\"test2\\" data-h-b8eef8=\\"\\">"
+      <meta name=\\"123\\" data-unknown-attr=\\"test\\">
+      <meta name=\\"some-flag\\" content=\\"\\">
+      <meta property=\\"og:fake-prop\\" content=\\"test1\\">
+      <meta property=\\"og:fake-prop\\" content=\\"test2\\">"
     `,
     )
   })

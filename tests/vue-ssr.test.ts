@@ -40,11 +40,11 @@ describe('vue ssr', () => {
     expect(headResult.headTags).toMatchInlineSnapshot(
       `
       "<title>hello</title>
-      <meta name=\\"description\\" content=\\"desc\\" data-h-889faf=\\"\\">
-      <meta name=\\"description\\" content=\\"desc 2\\" data-h-889faf3=\\"\\">
-      <meta property=\\"og:locale:alternate\\" content=\\"fr\\" data-h-3f7248=\\"\\">
-      <meta property=\\"og:locale:alternate\\" content=\\"zh\\" data-h-321fb4=\\"\\">
-      <script src=\\"foo.js\\" data-h-ed7ece=\\"\\"></script>"
+      <meta name=\\"description\\" content=\\"desc\\">
+      <meta name=\\"description\\" content=\\"desc 2\\">
+      <meta property=\\"og:locale:alternate\\" content=\\"fr\\">
+      <meta property=\\"og:locale:alternate\\" content=\\"zh\\">
+      <script src=\\"foo.js\\"></script>"
     `,
     )
     expect(headResult.htmlAttrs).toEqual(' lang="zh"')
@@ -92,8 +92,8 @@ describe('vue ssr', () => {
     const { headTags } = await renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot(
       `
-      "<meta property=\\"test1\\" content=\\"test1\\" data-h-051b9d=\\"\\">
-      <meta property=\\"test2\\" content=\\"test2\\" data-h-7449ef=\\"\\">"
+      "<meta property=\\"test1\\" content=\\"test1\\">
+      <meta property=\\"test2\\" content=\\"test2\\">"
     `,
     )
   })
@@ -110,7 +110,7 @@ describe('vue ssr', () => {
     })
 
     expect(headResult.headTags).toMatchInlineSnapshot(
-      '"<script data-h-2abb7d=\\"\\">console.log(\'hi\')</script>"',
+      '"<script>console.log(\'hi\')</script>"',
     )
   })
 
@@ -133,8 +133,8 @@ describe('vue ssr', () => {
 
     expect(headResult.headTags).toMatchInlineSnapshot(
       `
-      "<script src=\\"test\\" data-h-229264=\\"\\">console.log('A')</script>
-      <script data-h-2292641=\\"\\">console.log('B')</script>"
+      "<script src=\\"test\\">console.log('A')</script>
+      <script>console.log('B')</script>"
     `,
     )
   })
@@ -157,8 +157,8 @@ describe('vue ssr', () => {
 
     expect(headResult.headTags).toMatchInlineSnapshot(
       `
-      "<link href=\\"/\\" data-h-877ffb=\\"\\">
-      <link rel=\\"icon\\" type=\\"image/svg\\" href=\\"/favicon.svg\\" data-h-ce747c=\\"\\">"
+      "<link href=\\"/\\">
+      <link rel=\\"icon\\" type=\\"image/svg\\" href=\\"/favicon.svg\\">"
     `,
     )
   })

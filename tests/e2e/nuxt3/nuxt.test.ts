@@ -56,7 +56,7 @@ describe('e2e: nuxt 3', () => {
         "headTagCount": 0,
         "headTags": [],
         "htmlAttrs": [],
-        "title": "Hello world: 3.2.44 | Title Site",
+        "title": "test 0 - Nuxt module playground",
       }
     `)
     await expectNoClientErrors('/')

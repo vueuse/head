@@ -162,8 +162,8 @@ describe('dedupe', () => {
     const { headTags } = await renderSSRHead(head)
     expect(headTags).toMatchInlineSnapshot(
       `
-      "<link rel=\\"icon\\" href=\\"/favicon.ico\\" data-h-8c81e0=\\"\\">
-      <link rel=\\"canonical\\" href=\\"https://mydomain.me\\" data-h-e3fa78=\\"\\">"
+      "<link rel=\\"icon\\" href=\\"/favicon.ico\\">
+      <link rel=\\"canonical\\" href=\\"https://mydomain.me\\">"
     `,
     )
   })
@@ -183,8 +183,8 @@ describe('dedupe', () => {
     const { headTags } = await renderSSRHead(head)
     expect(headTags).toMatchInlineSnapshot(
       `
-      "<meta name=\\"description\\" content=\\"test\\" data-h-7c33d6=\\"\\">
-      <link rel=\\"icon\\" href=\\"/favicon.ico\\" data-h-ca40d5=\\"\\">"
+      "<meta name=\\"description\\" content=\\"test\\">
+      <link rel=\\"icon\\" href=\\"/favicon.ico\\">"
     `,
     )
   })
@@ -212,8 +212,8 @@ describe('dedupe', () => {
     const { headTags } = await renderSSRHead(head)
     expect(headTags).toMatchInlineSnapshot(
       `
-      "<meta unknown-key=\\"description\\" content=\\"test\\" data-h-1dcf99=\\"\\">
-      <meta unknown-key=\\"description\\" content=\\"test 2\\" data-h-62a5e1=\\"\\">"
+      "<meta unknown-key=\\"description\\" content=\\"test\\">
+      <meta unknown-key=\\"description\\" content=\\"test 2\\">"
     `,
     )
   })

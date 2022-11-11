@@ -74,6 +74,7 @@ export const createApp = async () => {
       useHead({
         script: [
           {
+            ['data-home-mount']: true,
             children: 'console.log(\'home mount\')',
             body: true,
           },

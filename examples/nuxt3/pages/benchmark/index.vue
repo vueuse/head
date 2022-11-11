@@ -41,9 +41,7 @@ const count = ref(0)
 console.timeEnd('useHead x1000')
 const react = () => {
   console.time('patch')
-  count.value += 1
-  page.value.title = `Updated title: ${count.value}`
-  console.log(page.value.title)
+  page.value.title = `Updated ${count.value++}`
   nextTick(() => {
     console.timeEnd('patch')
   })

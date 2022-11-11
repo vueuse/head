@@ -120,8 +120,8 @@ describe('tag priority', () => {
     })
     const { headTags } = await renderHeadToString(head)
     expect(headTags).toMatchInlineSnapshot(`
-      "<script src=\\"/very-important-script.js\\" data-h-420dfb=\\"\\"></script>
-      <script src=\\"/not-important-script.js\\" data-h-a4dbdb=\\"\\"></script>"
+      "<script src=\\"/very-important-script.js\\"></script>
+      <script src=\\"/not-important-script.js\\"></script>"
     `)
     expect(
       headTags.startsWith('<script src="/very-important-script.js"'),

@@ -35,7 +35,7 @@ describe('custom augmentation', () => {
     expect(headResult.headTags).toMatchInlineSnapshot(
       `
       "<title></title>
-      <link data-test=\\"test\\" href=\\"link-one\\" data-h-1051b2=\\"\\">"
+      <link data-test=\\"test\\" href=\\"link-one\\">"
     `,
     )
   })
