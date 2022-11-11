@@ -2,6 +2,11 @@
 
 No unreleased changes.
 
+## 1.0.0-next.3
+
+- chore: expose `VueHeadMixin`
+- chore: bump unhead
+
 ## 1.0.0-next.2
 
 - chore: bump unhead, update tests and examples
