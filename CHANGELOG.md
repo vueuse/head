@@ -2,6 +2,14 @@
 
 No unreleased changes.
 
+## 1.0.0
+
+- chore: prepare v1 release
+- doc: update readme
+- v1 release (#162)
+- chore: add v1 announcement
+- chore: fix typo (#159)
+
 ## 1.0.0-next.3
 
 - chore: expose `VueHeadMixin`
