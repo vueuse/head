@@ -1,40 +1,74 @@
+import { ref } from 'vue'
 import { createHead } from '../src'
 
 describe('basic', () => {
   test('removing head works', async () => {
     const head = createHead()
-    head.addHeadObjs(
-      () => ({
-        title: 'old',
-        link: [
-          {
-            href: '/',
-          },
-        ],
-      }),
-    )
-    const rm = head.addHeadObjs(
-      () => ({
-        title: 'test',
-      }),
-    )
-    rm()
+    head.push({
+      title: 'old',
+      link: [
+        {
+          href: '/',
+        },
+      ],
+    })
 
-    expect(head.headTags).toMatchInlineSnapshot(`
+    const { dispose } = head.push({
+      title: 'test',
+    })
+    dispose()
+
+    expect(head.headEntries().length).toBe(1)
+    expect(head.headEntries()).toMatchInlineSnapshot(`
       [
         {
-          "_position": 0,
-          "props": {
-            "textContent": "old",
+          "_i": 0,
+          "_sde": {},
+          "input": {
+            "link": [
+              {
+                "href": "/",
+              },
+            ],
+            "title": "old",
           },
-          "tag": "title",
         },
+      ]
+    `)
+  })
+
+  test('computed getter', async () => {
+    const colour = ref('yellow')
+    const head = createHead()
+    head.push(
+      () => ({
+        bodyAttrs: {
+          style: () => `background: ${colour.value}`,
+          class: () => `bg-${colour.value}-500`,
+        },
+      }),
+    )
+    expect(head.headEntries()).toMatchInlineSnapshot(`
+      [
         {
-          "_position": 1,
+          "_i": 0,
+          "_sde": {},
+          "input": [Function],
+        },
+      ]
+    `)
+
+    expect(await head.resolveTags()).toMatchInlineSnapshot(`
+      [
+        {
+          "_d": "bodyAttrs",
+          "_e": 0,
+          "_p": 0,
           "props": {
-            "href": "/",
+            "class": "bg-yellow-500",
+            "style": "background: yellow",
           },
-          "tag": "link",
+          "tag": "bodyAttrs",
         },
       ]
     `)

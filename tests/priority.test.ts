@@ -3,7 +3,7 @@ import { createHead, renderHeadToString } from '../src'
 describe('tag priority', () => {
   test('charset first', async () => {
     const head = createHead()
-    head.addHeadObjs(() => ({
+    head.push({
       script: [
         {
           src: '/my-important-script.js',
@@ -19,21 +19,21 @@ describe('tag priority', () => {
           content: 'desc',
         },
       ],
-    }))
-    head.addHeadObjs(() => ({
+    })
+    head.push({
       meta: [
         {
           charset: 'utf-8',
         },
       ],
-    }))
-    const { headTags } = renderHeadToString(head)
-    expect(headTags.startsWith('<meta charset="utf-8">')).toBeTruthy()
+    })
+    const { headTags } = await renderHeadToString(head)
+    expect(headTags.startsWith('<meta charset="utf-8"')).toBeTruthy()
   })
 
   test('base early', async () => {
     const head = createHead()
-    head.addHeadObjs(() => ({
+    head.push({
       script: [
         {
           src: '/my-important-script.js',
@@ -49,8 +49,8 @@ describe('tag priority', () => {
           content: 'desc',
         },
       ],
-    }))
-    head.addHeadObjs(() => ({
+    })
+    head.push({
       meta: [
         {
           charset: 'utf-8',
@@ -59,16 +59,16 @@ describe('tag priority', () => {
       base: {
         href: '/base',
       },
-    }))
-    const { headTags } = renderHeadToString(head)
+    })
+    const { headTags } = await renderHeadToString(head)
     expect(
-      headTags.startsWith('<meta charset="utf-8"><base href="/base">'),
+      headTags.startsWith('<meta charset="utf-8"'),
     ).toBeTruthy()
   })
 
   test('CSP early', async () => {
     const head = createHead()
-    head.addHeadObjs(() => ({
+    head.push({
       script: [
         {
           src: '/my-important-script.js',
@@ -84,46 +84,47 @@ describe('tag priority', () => {
           content: 'desc',
         },
       ],
-    }))
-    head.addHeadObjs(() => ({
+    })
+    head.push({
       meta: [
         {
           'http-equiv': 'content-security-policy',
           'content': 'test',
         },
       ],
-    }))
-    const { headTags } = renderHeadToString(head)
+    })
+    const { headTags } = await renderHeadToString(head)
     expect(
       headTags.startsWith(
-        '<meta http-equiv="content-security-policy" content="test">',
+        '<meta http-equiv="content-security-policy" content="test"',
       ),
     ).toBeTruthy()
   })
 
   test('manual priority', async () => {
     const head = createHead()
-    head.addHeadObjs({
+    head.push({
       script: [
         {
           src: '/not-important-script.js',
         },
       ],
     })
-    head.addHeadObjs({
+    head.push({
       script: [
         {
           src: '/very-important-script.js',
-          renderPriority: 1,
+          tagPriority: 1,
         },
       ],
     })
-    const { headTags } = renderHeadToString(head)
-    expect(headTags).toMatchInlineSnapshot(
-      '"<script src=\\"/very-important-script.js\\"></script><script src=\\"/not-important-script.js\\"></script><meta name=\\"head:count\\" content=\\"2\\">"',
-    )
+    const { headTags } = await renderHeadToString(head)
+    expect(headTags).toMatchInlineSnapshot(`
+      "<script src=\\"/very-important-script.js\\"></script>
+      <script src=\\"/not-important-script.js\\"></script>"
+    `)
     expect(
-      headTags.startsWith('<script src="/very-important-script.js">'),
+      headTags.startsWith('<script src="/very-important-script.js"'),
     ).toBeTruthy()
   })
 })

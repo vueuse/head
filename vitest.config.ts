@@ -7,12 +7,13 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   resolve: {
     alias: {
-      '@vueuse/head': resolve(__dirname),
+      '@vueuse/head': resolve(__dirname, 'src'),
     },
   },
   test: {
+    // note: we can't use a dom environment otherwise the tests will think we're
+    // browser based
     globals: true,
-    environment: 'jsdom',
     reporters: 'dot',
     isolate: true,
   },

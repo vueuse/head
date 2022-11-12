@@ -2,6 +2,109 @@
 
 No unreleased changes.
 
+## 1.0.0-next.3
+
+- chore: expose `VueHeadMixin`
+- chore: bump unhead
+
+## 1.0.0-next.2
+
+- chore: bump unhead, update tests and examples
+- chore: improve doc
+
+## 1.0.0-next.1
+
+- chore: document install
+- Merge branch 'main' of github.com:vueuse/head into v1
+- chore(ci): switch to next channel
+- chore(pkg): bump deps
+- chore: fix typo (#159)
+- chore: readme link fix
+- feat: migrate core to unhead (#157)
+- Release v0.9.8
+- chore: bump deps
+
+## 1.0.0-rc.14
+
+- chore(pkg): ignore eslint in vue2 example
+- fix: Vue 2.7 compatibility (#150)
+
+## 1.0.0-rc.13
+
+- fix: dedupe `htmlAttrs` and `bodyAttrs` for csr (#149)
+- chore(pkg): bump deps
+- add vue 2.7 compatibility to Head component (#147)
+
+## 1.0.0-rc.12
+
+- chore(pkg): bump zhead
+- fix: vue 2.7 globalProperties, fixes #141
+
+## 1.0.0-rc.11
+
+- Merge branch 'v1' of github.com:vueuse/head into v1
+- chore(pkg): bump deps
+- fix: ensure csr elements are created equally (#145)
+- fix: ensure single pass of `htmlAttr` sanitization, fixes #142 (#143)
+
+## 1.0.0-rc.10
+
+- chore(pkg): bump deps
+
+## 1.0.0-rc.9
+
+- fix: ensure tags props are immutable (#139)
+
+## 1.0.0-rc.8
+
+- chore(pkg): bump deps
+- chore: linting
+- chore: test issue #138
+- chore: bump deps
+
+## 1.0.0-rc.7
+
+- fix(titleTemplate): allow titleTemplate to resolve the title (#137)
+- chore(pkg): bump deps
+
+## 1.0.0-rc.6
+
+- chore: add missing `type`
+- fix(types): export `MaybeComputedRef`
+
+## 1.0.0-rc.5
+
+- chore: useHeadSafe types
+- refactor!: useHeadRaw -> useHeadSafe (#136)
+- fix: add legacy `addHeadObjs` (#135)
+
+## 1.0.0-rc.4
+
+- fix: add `headTags` for backwards compatibility (#133)
+- chore: prefer runtime prop for id & position (#134)
+- feat: improved hook api (#132)
+- fix: use simpler API for tags (#131)
+- fix(ci): use --pre
+
+## 1.0.0-rc.3
+
+- fix(ci): remove broken --pre
+- Merge branch 'v1' of github.com:vueuse/head into v1
+- fix: ensure empty attrs reset attrs (#130)
+
+## 1.0.0-rc.2
+
+- fix(ci): release on rc
+
+## 1.0.0-rc.1
+
+- Release v1.0.0-rc.0
+- chore: bump version
+
+## 1.0.0-rc.0
+
+- chore: bump version
+
 ## 0.9.8
 
 - chore: bump deps

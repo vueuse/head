@@ -1,12 +1,18 @@
 {
   "name": "@vueuse/head",
-  "version": "0.9.8",
+  "version": "1.0.0-next.3",
   "packageManager": "pnpm@7.5.0",
   "description": "Document head manager for Vue 3. SSR ready.",
   "author": {
     "name": "EGOIST",
     "url": "https://egoist.sh"
   },
+  "maintainers": [
+    {
+      "name": "Harlan Wilton",
+      "url": "https://harlanzw.com"
+    }
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -23,15 +29,16 @@
     "access": "public"
   },
   "sideEffects": false,
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
+    "stub": "unbuild --stub",
+    "build": "unbuild",
     "play:vite": "vite examples/vite-ssr",
-    "build": "tsup src/index.ts --format esm,cjs --dts",
     "prepublishOnly": "npm run build",
     "test": "nuxi prepare examples/nuxt3 && vitest",
     "test:e2e": "vitest tests/e2e",
@@ -42,36 +49,36 @@
     "vue": ">=2.7 || >=3"
   },
   "dependencies": {
-    "@vueuse/shared": "^9.3.0",
-    "@zhead/schema": "^0.8.5",
-    "@zhead/schema-vue": "^0.8.5"
+    "@unhead/schema": "^0.5.1",
+    "@unhead/ssr": "^0.5.1",
+    "@unhead/vue": "^0.5.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.27.0",
-    "@nuxt/kit": "3.0.0-rc.11",
-    "@nuxt/test-utils": "3.0.0-rc.11",
-    "@vitejs/plugin-vue": "^3.1.2",
-    "@vitejs/plugin-vue-jsx": "^2.0.1",
-    "@vue/compiler-sfc": "^3.2.40",
-    "@vue/server-renderer": "^3.2.40",
+    "@antfu/eslint-config": "^0.29.4",
+    "@nuxt/kit": "3.0.0-rc.13",
+    "@nuxt/test-utils": "3.0.0-rc.13",
+    "@vitejs/plugin-vue": "^3.2.0",
+    "@vitejs/plugin-vue-jsx": "^2.1.1",
+    "@vue/compiler-sfc": "^3.2.45",
+    "@vue/server-renderer": "^3.2.45",
     "cheerio": "1.0.0-rc.12",
-    "eslint": "^8.25.0",
+    "eslint": "^8.27.0",
     "execa": "^6.1.0",
     "get-port-please": "^2.6.1",
-    "jsdom": "^20.0.1",
+    "jsdom": "^20.0.2",
     "kanpai": "^0.11.0",
     "lint-staged": "^13.0.3",
     "mlly": "^0.5.16",
-    "nuxt": "3.0.0-rc.11",
+    "nuxt": "^3.0.0-rc.12",
     "pathe": "^0.3.9",
-    "playwright": "^1.27.0",
-    "simple-git-hooks": "^2.8.0",
-    "tsup": "^6.2.3",
+    "playwright": "^1.27.1",
+    "simple-git-hooks": "^2.8.1",
     "typescript": "^4.8.4",
-    "vite": "^3.1.7",
-    "vitest": "^0.24.0",
-    "vue": "^3.2.40",
-    "vue-router": "^4.1.5"
+    "unbuild": "^0.9.4",
+    "vite": "^3.2.3",
+    "vitest": "^0.25.1",
+    "vue": "^3.2.45",
+    "vue-router": "^4.1.6"
   },
   "resolutions": {
     "@vueuse/head": "link:."

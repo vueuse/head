@@ -19,7 +19,7 @@ useHead({
   ],
 })
 
-useHeadRaw({
+useHead({
   script: [
     {
       children: `
