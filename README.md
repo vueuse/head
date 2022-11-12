@@ -41,9 +41,9 @@ Read the announcement [post](https://harlanzw.com/blog/vue-use-head-v1), provide
 ## Installation
 
 ```bash
-npm i @vueuse/head@next
+npm i @vueuse/head
 # Or Yarn
-yarn add @vueuse/head@next
+yarn add @vueuse/head
 ```
 
 > Requires vue >= v3 or >=2.7
