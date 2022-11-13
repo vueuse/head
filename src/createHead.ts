@@ -1,5 +1,5 @@
 import type { HeadTag, MaybeComputedRef, MergeHead, ReactiveHead, VueHeadClient } from '@unhead/vue'
-import { createHead as createUnhead, debouncedRenderDOMHead, renderDOMHead } from '@unhead/vue'
+import { createHead as createUnhead, debouncedRenderDOMHead, renderDOMHead, useHead } from '@unhead/vue'
 import type { ActiveHeadEntry, Head, HeadEntry, HeadEntryOptions, Unhead } from '@unhead/schema'
 import type { App } from 'vue'
 
@@ -117,8 +117,11 @@ export function createHead<T extends MergeHead = {}>(initHeadObject?: Head<T>): 
       return unhead.push(input, options)
     },
     addReactiveEntry(input, options) {
-      const api = unhead.push(input, options)
-      return api.dispose
+      const api = useHead(input, options)
+      if (typeof api !== 'undefined')
+        return api.dispose
+
+      return () => {}
     },
     removeHeadObjs() {
       // not able to handle this
