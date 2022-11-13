@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.1
+
+- fix: add v1 RC props back
+
 ## 1.0.0
 
 - chore: prepare v1 release
