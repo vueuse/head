@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.4
+
+- fix: Nuxt v3 useHead reactivity
+
 ## 1.0.3
 
 - chore: linting
