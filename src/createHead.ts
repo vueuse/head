@@ -141,6 +141,14 @@ export function createHead<T extends MergeHead = {}>(initHeadObject?: Head<T>): 
     },
   }
 
+  // we need to load a bunch of the pre v1 @vueuse/head functions on to the unhead instance as this is what is returned
+  // from the injection
+
+  // @ts-expect-error runtime hack to fix legacy implementations
+  unhead.addHeadObjs = legacyHead.addHeadObjs
+  // @ts-expect-error runtime hack to fix legacy implementations
+  unhead.updateDOM = legacyHead.updateDOM
+
   unhead.hooks.hook('dom:beforeRender', (ctx) => {
     for (const hook of legacyHead.hooks['before:dom']) {
       if (hook() === false)
