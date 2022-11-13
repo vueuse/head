@@ -139,10 +139,9 @@ export function createHead<T extends MergeHead = {}>(initHeadObject?: Head<T>): 
   }
 
   unhead.hooks.hook('dom:beforeRender', (ctx) => {
-    for (const hook of legacyHead.hooks['before:dom']){
-      if (hook() === false) {
+    for (const hook of legacyHead.hooks['before:dom']) {
+      if (hook() === false)
         ctx.shouldRender = false
-      }
     }
   })
 
