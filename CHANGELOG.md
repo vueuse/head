@@ -2,6 +2,11 @@
 
 No unreleased changes.
 
+## 1.0.3
+
+- chore: linting
+- fix: Nuxt v3 hook compatibility
+
 ## 1.0.2
 
 - fix: full < v1 compatibility
