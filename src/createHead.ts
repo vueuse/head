@@ -1,32 +1,33 @@
-import type { HeadTag, MaybeComputedRef, MergeHead, ReactiveHead } from '@unhead/vue'
+import type { HeadTag, MaybeComputedRef, MergeHead, ReactiveHead, VueHeadClient } from '@unhead/vue'
 import { createHead as createUnhead, debouncedRenderDOMHead, renderDOMHead } from '@unhead/vue'
-import type { ActiveHeadEntry, Head, HeadEntryOptions, Unhead } from '@unhead/schema'
-import type { Plugin } from 'vue'
+import type { ActiveHeadEntry, Head, HeadEntry, HeadEntryOptions, Unhead } from '@unhead/schema'
+import type { App } from 'vue'
 
-export type HookBeforeDomUpdate = ((tags: Record<string, HeadTag[]>) => void | boolean)[]
-export type HookTagsResolved = ((tags: HeadTag[]) => void)[]
+export type HookBeforeDomUpdate = (() => Promise<void | boolean> | void | boolean)
+export type HookTagsResolved = ((tags: HeadTag[]) => Promise<void> | void)
+export type HookEntriesResolved = ((entries: HeadEntry<any>[]) => Promise<void> | void)
 
-export interface LegacyHeadClient<T> {
-  headTags: () => Promise<HeadTag[]>
+export interface HeadClient<T extends MergeHead = {}> {
+  install: (app: App) => void
 
+  resolveTags: () => Promise<HeadTag[]>
+
+  headEntries: () => HeadEntry<MaybeComputedRef<ReactiveHead<T>>>[]
+  push: (entry: MaybeComputedRef<ReactiveHead<T>>, options?: HeadEntryOptions) => ActiveHeadEntry<MaybeComputedRef<ReactiveHead<T>>>
   /**
-   * @deprecated
+   * @deprecated use `push`
    */
-  addEntry: (objs: Head, options?: HeadEntryOptions) => ActiveHeadEntry<Head>
+  addEntry: (entry: MaybeComputedRef<ReactiveHead<T>>, options?: HeadEntryOptions) => ActiveHeadEntry<MaybeComputedRef<ReactiveHead<T>>>
   /**
-   * @deprecated
+   * @deprecated use `push`
    */
-  addReactiveEntry: (objs: MaybeComputedRef<ReactiveHead>, options?: HeadEntryOptions) => ActiveHeadEntry<MaybeComputedRef<ReactiveHead>>
+  addReactiveEntry: (objs: MaybeComputedRef<ReactiveHead<T>>, options?: HeadEntryOptions) => () => void
   /**
-   * @deprecated
-   */
-  addHeadObjs: (objs: T, options?: HeadEntryOptions) => ActiveHeadEntry<T>
-  /**
-   * @deprecated
+   * @deprecated use `@unhead/dom`
    */
   updateDOM: (document?: Document, force?: boolean) => void
 
-
+  hooks:
   /**
    * Array of user provided functions to hook into before the DOM is updated.
    *
@@ -34,60 +35,84 @@ export interface LegacyHeadClient<T> {
    * between page transitions.
    *
    * You are able to modify the payload of hook using this.
-   *
-   * @deprecated
    */
-  hookBeforeDomUpdate: HookBeforeDomUpdate
+  Record<'before:dom', HookBeforeDomUpdate[]> &
+  Record<'resolved:entries', HookEntriesResolved[]> &
   /**
-   * Array of user provided functions to hook into after the tags have been resolved (deduped and sorted).
-   * @deprecated
+     * Array of user provided functions to hook into after the tags have been resolved (deduped and sorted).
+     */
+  Record<'resolved:tags', HookTagsResolved[]> | Unhead['hooks']
+
+  /**
+   * Backwards compatibility function to fetch the headTags.
+   *
+   * This function forces reactivity resolving and is not performant.
+   *
+   * @deprecated Use `unhead.resolveTags()`.
    */
-  hookTagsResolved: HookTagsResolved
+  headTags: () => Promise<HeadTag[]>
+  /**
+   * Backwards compatibility function to add a head obj.
+   *
+   * Note: This will not support reactivity. Use `addReactiveEntry` instead.
+   *
+   * @deprecated Use addEntry
+   */
+  addHeadObjs: (entry: MaybeComputedRef<ReactiveHead<T>>, options?: HeadEntryOptions) => ActiveHeadEntry<MaybeComputedRef<ReactiveHead<T>>>
+
+  /**
+   * Access the underlying unhead instance.
+   */
+  unhead: VueHeadClient<T>
 }
 
-export type UseHeadInput<T extends MergeHead> = MaybeComputedRef<ReactiveHead<T>>
-
-export type VueUseHead<T extends MergeHead = {}> = Unhead<UseHeadInput<T>> & LegacyHeadClient<UseHeadInput<T>> & Plugin
-
-export function createHead<T extends MergeHead = {}>(initHeadObject?: Head<T>): VueUseHead<T> {
-  const head = createUnhead() as VueUseHead<T>
-
-  const hookBeforeDomUpdate: HookBeforeDomUpdate = []
-  const hookTagsResolved: HookTagsResolved = []
+export function createHead<T extends MergeHead = {}>(initHeadObject?: Head<T>): HeadClient<T> {
+  const unhead = createUnhead<T>()
 
   // make migration easier
-  const legacyHead: LegacyHeadClient<ReactiveHead<T>> = {
+  const legacyHead: HeadClient<T> = {
+    unhead,
+
+    install(app) {
+      // vue 3 only
+      if (app.config.globalProperties)
+        app.config.globalProperties.$head = unhead
+      app.provide('usehead', unhead)
+    },
+    resolveTags() {
+      return unhead.resolveTags()
+    },
+    headEntries() {
+      return unhead.headEntries()
+    },
     headTags() {
-      return head.resolveTags()
+      return unhead.resolveTags()
+    },
+    push(input, options) {
+      return unhead.push(input, options)
     },
     addEntry(input, options) {
-      return head.push(input, options)
+      return unhead.push(input, options)
     },
     addHeadObjs(input, options) {
-      return head.push(input, options)
+      return unhead.push(input, options)
     },
     addReactiveEntry(input, options) {
-      return head.push(input, options)
+      const api = unhead.push(input, options)
+      return api.dispose
     },
     updateDOM(document, force) {
       if (force)
-        renderDOMHead(head, { document })
+        renderDOMHead(unhead, { document })
       else
-        debouncedRenderDOMHead(head, { delayFn: fn => setTimeout(() => fn(), 50), document })
+        debouncedRenderDOMHead(unhead, { delayFn: fn => setTimeout(() => fn(), 50), document })
     },
-    hookBeforeDomUpdate,
-    hookTagsResolved,
+
+    hooks: unhead.hooks,
   }
 
-  head.headTags = legacyHead.headTags
-  // @ts-expect-error untyped
-  head.addHeadObjs = legacyHead.addHeadObjs
-  head.addEntry = legacyHead.addEntry
-  head.addReactiveEntry = legacyHead.addReactiveEntry
-  head.updateDOM = legacyHead.updateDOM
-
   if (initHeadObject)
-    head.push(initHeadObject)
+    legacyHead.addHeadObjs(initHeadObject)
 
-  return head
+  return legacyHead
 }
