@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.2
+
+- fix: full < v1 compatibility
+
 ## 1.0.1
 
 - fix: add v1 RC props back
