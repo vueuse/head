@@ -26,7 +26,7 @@ describe('dedupe', () => {
       ],
     },
     )
-    const { headTags } = await renderSSRHead(head)
+    const { headTags } = await renderSSRHead(head.unhead)
     expect(
       headTags.includes('<meta name="description" content="desc 2"'),
     ).toBeTruthy()
@@ -53,7 +53,7 @@ describe('dedupe', () => {
       ],
     },
     )
-    const { headTags } = await renderSSRHead(head)
+    const { headTags } = await renderSSRHead(head.unhead)
     expect(headTags.startsWith('<meta myCustomMeta="second"')).toBeTruthy()
     expect(headTags.split('myCustomMeta').length === 2).toBeTruthy()
   })
@@ -78,7 +78,7 @@ describe('dedupe', () => {
       ],
     },
     )
-    const { headTags } = await renderSSRHead(head)
+    const { headTags } = await renderSSRHead(head.unhead)
     expect(
       headTags.startsWith(
         '<link rel="canonical" href="https://website.com/new"',
@@ -105,7 +105,7 @@ describe('dedupe', () => {
         },
       ],
     })
-    const { headTags } = await renderSSRHead(head)
+    const { headTags } = await renderSSRHead(head.unhead)
     expect(headTags.startsWith('<meta charset="utf-8"')).toBeTruthy()
     expect(headTags.split('charset').length === 2).toBeTruthy()
   })
@@ -123,7 +123,7 @@ describe('dedupe', () => {
         href: '/',
       },
     })
-    const { headTags } = await renderSSRHead(head)
+    const { headTags } = await renderSSRHead(head.unhead)
     expect(headTags.split('base').length === 2).toBeTruthy()
     expect(headTags.startsWith('<base href="/"')).toBeTruthy()
   })
@@ -147,7 +147,7 @@ describe('dedupe', () => {
         },
       ],
     })
-    const { headTags } = await renderSSRHead(head)
+    const { headTags } = await renderSSRHead(head.unhead)
     expect(headTags.split('http-equiv').length === 2).toBeTruthy()
   })
 
@@ -159,7 +159,7 @@ describe('dedupe', () => {
         { rel: 'canonical', href: 'https://mydomain.me' }, // <-- this. Please reverse the order to be sure.
       ],
     })
-    const { headTags } = await renderSSRHead(head)
+    const { headTags } = await renderSSRHead(head.unhead)
     expect(headTags).toMatchInlineSnapshot(
       `
       "<link rel=\\"icon\\" href=\\"/favicon.ico\\">
@@ -180,7 +180,7 @@ describe('dedupe', () => {
       ],
       link: [{ rel: 'icon', href: '/favicon.ico', key: 'icon' }],
     })
-    const { headTags } = await renderSSRHead(head)
+    const { headTags } = await renderSSRHead(head.unhead)
     expect(headTags).toMatchInlineSnapshot(
       `
       "<meta name=\\"description\\" content=\\"test\\">
@@ -209,7 +209,7 @@ describe('dedupe', () => {
         },
       ],
     })
-    const { headTags } = await renderSSRHead(head)
+    const { headTags } = await renderSSRHead(head.unhead)
     expect(headTags).toMatchInlineSnapshot(
       `
       "<meta unknown-key=\\"description\\" content=\\"test\\">

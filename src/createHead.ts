@@ -7,6 +7,17 @@ export type HookBeforeDomUpdate = (() => Promise<void | boolean> | void | boolea
 export type HookTagsResolved = ((tags: HeadTag[]) => Promise<void> | void)
 export type HookEntriesResolved = ((entries: HeadEntry<any>[]) => Promise<void> | void)
 
+export interface LegacyHeadOptions {
+  /**
+   * @deprecated
+   */
+  resolved?: boolean
+  /**
+   * @deprecated
+   */
+  raw?: boolean
+}
+
 export interface HeadClient<T extends MergeHead = {}> {
   install: (app: App) => void
 
@@ -17,16 +28,21 @@ export interface HeadClient<T extends MergeHead = {}> {
   /**
    * @deprecated use `push`
    */
-  addEntry: (entry: MaybeComputedRef<ReactiveHead<T>>, options?: HeadEntryOptions) => ActiveHeadEntry<MaybeComputedRef<ReactiveHead<T>>>
+  addEntry: (entry: MaybeComputedRef<ReactiveHead<T>>, options?: HeadEntryOptions & LegacyHeadOptions) => ActiveHeadEntry<MaybeComputedRef<ReactiveHead<T>>>
   /**
    * @deprecated use `push`
    */
-  addReactiveEntry: (objs: MaybeComputedRef<ReactiveHead<T>>, options?: HeadEntryOptions) => () => void
+  addReactiveEntry: (objs: MaybeComputedRef<ReactiveHead<T>>, options?: HeadEntryOptions & LegacyHeadOptions) => () => void
   /**
    * @deprecated use `@unhead/dom`
    */
   updateDOM: (document?: Document, force?: boolean) => void
 
+  internalHooks: Unhead['hooks']
+
+  /**
+   * @deprecated
+   */
   hooks:
   /**
    * Array of user provided functions to hook into before the DOM is updated.
@@ -41,7 +57,7 @@ export interface HeadClient<T extends MergeHead = {}> {
   /**
      * Array of user provided functions to hook into after the tags have been resolved (deduped and sorted).
      */
-  Record<'resolved:tags', HookTagsResolved[]> | Unhead['hooks']
+  Record<'resolved:tags', HookTagsResolved[]>
 
   /**
    * Backwards compatibility function to fetch the headTags.
@@ -59,7 +75,10 @@ export interface HeadClient<T extends MergeHead = {}> {
    * @deprecated Use addEntry
    */
   addHeadObjs: (entry: MaybeComputedRef<ReactiveHead<T>>, options?: HeadEntryOptions) => ActiveHeadEntry<MaybeComputedRef<ReactiveHead<T>>>
-
+  /**
+   * @deprecated Does not do anything
+   */
+  removeHeadObjs: (entry: MaybeComputedRef<ReactiveHead<T>>) => void
   /**
    * Access the underlying unhead instance.
    */
@@ -101,6 +120,9 @@ export function createHead<T extends MergeHead = {}>(initHeadObject?: Head<T>): 
       const api = unhead.push(input, options)
       return api.dispose
     },
+    removeHeadObjs() {
+      // not able to handle this
+    },
     updateDOM(document, force) {
       if (force)
         renderDOMHead(unhead, { document })
@@ -108,8 +130,21 @@ export function createHead<T extends MergeHead = {}>(initHeadObject?: Head<T>): 
         debouncedRenderDOMHead(unhead, { delayFn: fn => setTimeout(() => fn(), 50), document })
     },
 
-    hooks: unhead.hooks,
+    internalHooks: unhead.hooks,
+    hooks: {
+      'before:dom': [],
+      'resolved:tags': [],
+      'resolved:entries': [],
+    },
   }
+
+  unhead.hooks.hook('dom:beforeRender', (ctx) => {
+    for (const hook of legacyHead.hooks['before:dom']){
+      if (hook() === false) {
+        ctx.shouldRender = false
+      }
+    }
+  })
 
   if (initHeadObject)
     legacyHead.addHeadObjs(initHeadObject)
