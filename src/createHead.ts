@@ -1,5 +1,6 @@
 import type { HeadTag, MaybeComputedRef, MergeHead, ReactiveHead, VueHeadClient } from '@unhead/vue'
-import { createHead as createUnhead, debouncedRenderDOMHead, renderDOMHead, useHead } from '@unhead/vue'
+import { createHead as createUnhead, useHead } from '@unhead/vue'
+import { debouncedRenderDOMHead, renderDOMHead } from '@unhead/dom'
 import type { ActiveHeadEntry, Head, HeadEntry, HeadEntryOptions, Unhead } from '@unhead/schema'
 import type { App } from 'vue'
 
