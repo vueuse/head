@@ -10,7 +10,7 @@ specifiers:
   '@unhead/dom': ^0.6.5
   '@unhead/schema': ^0.6.5
   '@unhead/ssr': ^0.6.5
-  '@unhead/vue': ^0.6.4
+  '@unhead/vue': ^0.6.5
   '@vitejs/plugin-vue': ^3.2.0
   '@vitejs/plugin-vue-jsx': ^2.1.1
   '@vue/compiler-sfc': ^3.2.45
@@ -38,7 +38,7 @@ dependencies:
   '@unhead/dom': 0.6.5
   '@unhead/schema': 0.6.5
   '@unhead/ssr': 0.6.5
-  '@unhead/vue': 0.6.4_vue@3.2.45
+  '@unhead/vue': 0.6.5_vue@3.2.45
 
 devDependencies:
   '@antfu/eslint-config': 0.30.1_rmayb2veg2btbq6mbmnyivgasy
@@ -1295,13 +1295,6 @@ packages:
       '@unhead/schema': 0.6.5
     dev: false
 
-  /@unhead/schema/0.6.4:
-    resolution: {integrity: sha512-PqsqIzxFPXFzsTWU9Rkl3JXJt6yY3V0xKVvUwVM3XhxaiIceb8nKon6MwZAG4tU5dFMrITZlIoaEV4vH8avhiQ==}
-    dependencies:
-      '@zhead/schema': 1.0.0-beta.13
-      hookable: 5.4.1
-    dev: false
-
   /@unhead/schema/0.6.5:
     resolution: {integrity: sha512-a9OQ0yCoT+ej3QfEWlh/GS6hNBBmD0pag0M6JyncrWUYXVGZw1LP8jD8X5zw9tPtN0SLR2hYlsmDj1VH+6rhXA==}
     dependencies:
@@ -1315,12 +1308,12 @@ packages:
       '@unhead/schema': 0.6.5
     dev: false
 
-  /@unhead/vue/0.6.4_vue@3.2.45:
-    resolution: {integrity: sha512-lIKH2LV8hPywKprYbjYwbSwhIaPa+ATBGmfI2wtVj4vApmifVkDyEr+TAzFEOCDuEUtnSpXzIiMFupbiHZ/+OA==}
+  /@unhead/vue/0.6.5_vue@3.2.45:
+    resolution: {integrity: sha512-qRLJXG0GkGZhV/o57hEIpBZxbu9QQZ1is3v+lZlhNI44KXeZS3YVfdqsvGK1VHRjEGyo4HAuNzFeDRjVV3M5cQ==}
     peerDependencies:
       vue: '>=2.7 || >=3'
     dependencies:
-      '@unhead/schema': 0.6.4
+      '@unhead/schema': 0.6.5
       hookable: 5.4.1
       vue: 3.2.45
     dev: false

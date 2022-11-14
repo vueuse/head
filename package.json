@@ -52,7 +52,7 @@
     "@unhead/dom": "^0.6.5",
     "@unhead/schema": "^0.6.5",
     "@unhead/ssr": "^0.6.5",
-    "@unhead/vue": "^0.6.4"
+    "@unhead/vue": "^0.6.5"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.30.1",
