@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.7
+
+- chore: bump unhead
+
 ## 1.0.6
 
 - fix: add legacy functions to unhead instance
