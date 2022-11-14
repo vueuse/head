@@ -7,9 +7,9 @@ specifiers:
   '@antfu/eslint-config': ^0.30.1
   '@nuxt/kit': 3.0.0-rc.13
   '@nuxt/test-utils': 3.0.0-rc.13
-  '@unhead/dom': ^0.6.4
-  '@unhead/schema': ^0.6.4
-  '@unhead/ssr': ^0.6.4
+  '@unhead/dom': ^0.6.5
+  '@unhead/schema': ^0.6.5
+  '@unhead/ssr': ^0.6.5
   '@unhead/vue': ^0.6.4
   '@vitejs/plugin-vue': ^3.2.0
   '@vitejs/plugin-vue-jsx': ^2.1.1
@@ -35,9 +35,9 @@ specifiers:
   vue-router: ^4.1.6
 
 dependencies:
-  '@unhead/dom': 0.6.4
-  '@unhead/schema': 0.6.4
-  '@unhead/ssr': 0.6.4
+  '@unhead/dom': 0.6.5
+  '@unhead/schema': 0.6.5
+  '@unhead/ssr': 0.6.5
   '@unhead/vue': 0.6.4_vue@3.2.45
 
 devDependencies:
@@ -1289,10 +1289,10 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: true
 
-  /@unhead/dom/0.6.4:
-    resolution: {integrity: sha512-GBvVDwOdQqcBE181eZJCjo66P25GENWld2jeah0TlDBF8HMUd77nJtlATwhAxhmpwrJyu4ydVrIeO7TUHXf95w==}
+  /@unhead/dom/0.6.5:
+    resolution: {integrity: sha512-WjxjWAaePUQAPzMwSOmO8fTRpmaVmhfoVIxySUHTHD3bOcbkQTNN13q5YB3ljxMmQ56iZfGnuXoaJ+hNYHqscw==}
     dependencies:
-      '@unhead/schema': 0.6.4
+      '@unhead/schema': 0.6.5
     dev: false
 
   /@unhead/schema/0.6.4:
@@ -1302,10 +1302,17 @@ packages:
       hookable: 5.4.1
     dev: false
 
-  /@unhead/ssr/0.6.4:
-    resolution: {integrity: sha512-+vmCCFj2hKLtwmSw1rc4BvKR29VWwUMBLlF7+EgugS0EFYyuT/ad0YopVVoaNaMP2VmKF3/wmg6oXQs8/bLozg==}
+  /@unhead/schema/0.6.5:
+    resolution: {integrity: sha512-a9OQ0yCoT+ej3QfEWlh/GS6hNBBmD0pag0M6JyncrWUYXVGZw1LP8jD8X5zw9tPtN0SLR2hYlsmDj1VH+6rhXA==}
     dependencies:
-      '@unhead/schema': 0.6.4
+      '@zhead/schema': 1.0.0-beta.13
+      hookable: 5.4.1
+    dev: false
+
+  /@unhead/ssr/0.6.5:
+    resolution: {integrity: sha512-8KxWD5rxgEuAWJ0dAygE711B87D2aCQqThKtg0D5bLdr5HtxIckfNIH+AuurD7h5z3fOizyCZsQ/BqJpzlknQA==}
+    dependencies:
+      '@unhead/schema': 0.6.5
     dev: false
 
   /@unhead/vue/0.6.4_vue@3.2.45:
