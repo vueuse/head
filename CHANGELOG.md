@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.10
+
+- chore: bump `@unhead/vue`
+
 ## 1.0.9
 
 - chore: bump unhead
