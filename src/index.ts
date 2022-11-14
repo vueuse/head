@@ -3,7 +3,7 @@ export * from './legacy'
 export * from './components'
 export type { Unhead, HeadEntryOptions, MaybeComputedRef, UseHeadInput, MergeHead, ReactiveHead, HeadTag } from '@unhead/vue'
 // export opt-in utils
-export { VueHeadMixin, unheadVueComposablesImports, Vue2ProvideUnheadPlugin } from '@unhead/vue'
+export { VueHeadMixin, unheadVueComposablesImports, Vue2ProvideUnheadPlugin, createHeadCore } from '@unhead/vue'
 // export composables
 export {
   injectHead,
@@ -11,6 +11,7 @@ export {
   useTagTitle,
   useTagBase,
   useTagMeta,
+  useSeoMeta,
   useTagMetaFlat,
   useTagLink,
   useTagScript,
