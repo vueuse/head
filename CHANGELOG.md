@@ -2,6 +2,11 @@
 
 No unreleased changes.
 
+## 1.0.8
+
+- fix: export all `@unhead/vue` composables
+- types: export missing useHead types
+
 ## 1.0.7
 
 - chore: bump unhead
