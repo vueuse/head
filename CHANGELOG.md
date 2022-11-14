@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.9
+
+- chore: bump unhead
+
 ## 1.0.8
 
 - fix: export all `@unhead/vue` composables
