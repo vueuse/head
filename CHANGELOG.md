@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.12
+
+- types: expose `ActiveHeadEntry`
+
 ## 1.0.11
 
 - fix: expose `useSeoMeta`, `createHeadCore`
