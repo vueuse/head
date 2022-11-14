@@ -1,5 +1,5 @@
 export * from './createHead'
 export * from './legacy'
 export * from './components'
-export type { Unhead, HeadEntryOptions, MaybeComputedRef } from '@unhead/vue'
+export type { Unhead, HeadEntryOptions, MaybeComputedRef, UseHeadInput, MergeHead, ReactiveHead } from '@unhead/vue'
 export { useHead, useServerHead, VueHeadMixin } from '@unhead/vue'
