@@ -2,6 +2,11 @@
 
 No unreleased changes.
 
+## 1.0.11
+
+- fix: expose `useSeoMeta`, `createHeadCore`
+- types: export `HeadTag`
+
 ## 1.0.10
 
 - chore: bump `@unhead/vue`
