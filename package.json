@@ -49,10 +49,10 @@
     "vue": ">=2.7 || >=3"
   },
   "dependencies": {
-    "@unhead/dom": "^0.6.6",
-    "@unhead/schema": "^0.6.6",
-    "@unhead/ssr": "^0.6.6",
-    "@unhead/vue": "^0.6.6"
+    "@unhead/dom": "^0.6.7",
+    "@unhead/schema": "^0.6.7",
+    "@unhead/ssr": "^0.6.7",
+    "@unhead/vue": "^0.6.7"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.30.1",
@@ -69,15 +69,15 @@
     "jsdom": "^20.0.2",
     "kanpai": "^0.11.0",
     "lint-staged": "^13.0.3",
-    "mlly": "^0.5.16",
+    "mlly": "^1.0.0",
     "nuxt": "^3.0.0-rc.12",
-    "pathe": "^0.3.9",
+    "pathe": "^1.0.0",
     "playwright": "^1.27.1",
     "simple-git-hooks": "^2.8.1",
     "typescript": "^4.8.4",
     "unbuild": "^0.9.4",
     "vite": "^3.2.3",
-    "vitest": "^0.25.1",
+    "vitest": "^0.25.2",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"
   },
