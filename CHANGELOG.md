@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.13
+
+- chore: bump unhead
+
 ## 1.0.12
 
 - types: expose `ActiveHeadEntry`
