@@ -1,7 +1,7 @@
 <script setup lang="ts">
 useHead({
   htmlAttrs: {
-    style: 'background: red',
+    style: new Promise(resolve => setTimeout(() => resolve('background: red'), 500)),
   },
   title: 'red',
 })

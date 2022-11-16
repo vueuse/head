@@ -6,5 +6,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "nuxt:prepare": "nuxt prepare"
+  },
+  "resolutions": {
+    "@vueuse/head": "../../"
   }
 }
