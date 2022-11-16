@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.16
+
+- chore(deps): bump unhead / nuxt
+
 ## 1.0.15
 
 - chore: bump unhead
