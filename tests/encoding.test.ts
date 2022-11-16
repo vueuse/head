@@ -10,7 +10,7 @@ describe('encoding', () => {
       },
       script: [{
         src: 'javascript:console.log(\'xss\');',
-        innerHTML: new Promise(resolve => resolve('alert(2)'))
+        innerHTML: new Promise(resolve => resolve('alert(2)')),
       }],
       noscript: [
         {
