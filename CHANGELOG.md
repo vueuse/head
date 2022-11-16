@@ -2,6 +2,12 @@
 
 No unreleased changes.
 
+## 1.0.14
+
+- chore: sync lock file
+- chore: experimenting with async props
+- chore: bump unhead and dev deps
+
 ## 1.0.13
 
 - chore: bump unhead
