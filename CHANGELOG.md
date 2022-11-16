@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.15
+
+- chore: bump unhead
+
 ## 1.0.14
 
 - chore: sync lock file
