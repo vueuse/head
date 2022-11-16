@@ -49,10 +49,10 @@
     "vue": ">=2.7 || >=3"
   },
   "dependencies": {
-    "@unhead/dom": "^0.7.1",
-    "@unhead/schema": "^0.7.1",
-    "@unhead/ssr": "^0.7.1",
-    "@unhead/vue": "^0.7.1"
+    "@unhead/dom": "^1.0.0",
+    "@unhead/schema": "^1.0.0",
+    "@unhead/ssr": "^1.0.0",
+    "@unhead/vue": "^1.0.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.30.1",
