@@ -2,6 +2,11 @@
 
 No unreleased changes.
 
+## 1.0.19
+
+- chore(deps): bump deps, unhead
+- chore(deps): bump deps, unhead
+
 ## 1.0.18
 
 - chore(deps): bump unhead
