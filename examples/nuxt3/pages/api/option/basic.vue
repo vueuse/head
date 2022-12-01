@@ -1,20 +1,32 @@
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineNuxtComponent } from '#imports'
 import type { MetaObject } from '@nuxt/schema'
 
-export default defineComponent({
-  head: {
-    title: 'Options',
-    meta: [
-      {
-        hid: 'description',
-        name: 'description',
-        content: 'My basic description',
-      },
-    ],
-    link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-    ],
+export default defineNuxtComponent({
+  data() {
+    return {
+      test: 'Options API',
+    }
+  },
+  methods: {
+    update() {
+      this.test = 'new val'
+    }
+  },
+  head() {
+    return {
+      title: () => this.test,
+      meta: [
+        {
+          hid: 'description',
+          name: 'description',
+          content: () => this.test,
+        },
+      ],
+      link: [
+        {rel: 'icon', type: 'image/x-icon', href: '/favicon.ico'},
+      ],
+    }
   },
 })
 </script>
@@ -22,5 +34,8 @@ export default defineComponent({
 <template>
 <div>
   options api - basic
+  <button @click="update">
+    update
+  </button>
 </div>
 </template>
