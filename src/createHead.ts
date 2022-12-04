@@ -3,6 +3,7 @@ import { createHead as createUnhead, useHead } from '@unhead/vue'
 import { debouncedRenderDOMHead, renderDOMHead } from '@unhead/dom'
 import type { ActiveHeadEntry, Head, HeadEntry, HeadEntryOptions, Unhead } from '@unhead/schema'
 import type { App } from 'vue'
+import { version } from 'vue'
 
 export type HookBeforeDomUpdate = (() => Promise<void | boolean> | void | boolean)
 export type HookTagsResolved = ((tags: HeadTag[]) => Promise<void> | void)
@@ -95,9 +96,10 @@ export function createHead<T extends MergeHead = {}>(initHeadObject?: Head<T>): 
 
     install(app) {
       // vue 3 only
-      if (app.config.globalProperties)
+      if (version.startsWith('3')) {
         app.config.globalProperties.$head = unhead
-      app.provide('usehead', unhead)
+        app.provide('usehead', unhead)
+      }
     },
     resolveTags() {
       return unhead.resolveTags()
