@@ -2,6 +2,11 @@
 
 No unreleased changes.
 
+## 1.0.20
+
+- chore(pkg): bump deps
+- fix: support Vue 2.7
+
 ## 1.0.19
 
 - chore(deps): bump deps, unhead
