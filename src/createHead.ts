@@ -1,7 +1,7 @@
 import type { HeadTag, MaybeComputedRef, MergeHead, ReactiveHead, VueHeadClient } from '@unhead/vue'
 import { createHead as createUnhead, useHead } from '@unhead/vue'
 import { debouncedRenderDOMHead, renderDOMHead } from '@unhead/dom'
-import type { ActiveHeadEntry, Head, HeadEntry, HeadEntryOptions, Unhead } from '@unhead/schema'
+import type { ActiveHeadEntry, Head, HeadEntry, HeadEntryOptions, HeadPlugin, Unhead } from '@unhead/schema'
 import type { App } from 'vue'
 import { version } from 'vue'
 
@@ -24,6 +24,8 @@ export interface HeadClient<T extends MergeHead = {}> {
   install: (app: App) => void
 
   resolveTags: () => Promise<HeadTag[]>
+
+  use: (plugin: HeadPlugin) => void
 
   headEntries: () => HeadEntry<MaybeComputedRef<ReactiveHead<T>>>[]
   push: (entry: MaybeComputedRef<ReactiveHead<T>>, options?: HeadEntryOptions) => ActiveHeadEntry<MaybeComputedRef<ReactiveHead<T>>>
@@ -100,6 +102,9 @@ export function createHead<T extends MergeHead = {}>(initHeadObject?: Head<T>): 
         app.config.globalProperties.$head = unhead
         app.provide('usehead', unhead)
       }
+    },
+    use(plugin) {
+      unhead.use(plugin)
     },
     resolveTags() {
       return unhead.resolveTags()
