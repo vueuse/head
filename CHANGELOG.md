@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.21
+
+- chore(deps): bump deps, unhead
+
 ## 1.0.20
 
 - chore(pkg): bump deps
