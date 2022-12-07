@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.22
+
+- fix: expose `use` function for plugins
+
 ## 1.0.21
 
 - chore(deps): bump deps, unhead
