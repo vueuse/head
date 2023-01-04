@@ -93,7 +93,7 @@ import { renderHeadToString } from "@vueuse/head"
 const appHTML = await renderToString(yourVueApp)
 
 // `head` is created from `createHead()`
-const { headTags, htmlAttrs, bodyAttrs, bodyTags } = renderHeadToString(head)
+const { headTags, htmlAttrs, bodyAttrs, bodyTags } = await renderHeadToString(head)
 
 const finalHTML = `
 <html${htmlAttrs}>
