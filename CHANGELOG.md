@@ -2,6 +2,11 @@
 
 No unreleased changes.
 
+## 1.0.23
+
+- chore: bump deps
+- doc: readme renderHeadToString missing await (#176)
+
 ## 1.0.22
 
 - fix: expose `use` function for plugins
