@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.0.24
+
+- chore: bump deps
+
 ## 1.0.23
 
 - chore: bump deps
