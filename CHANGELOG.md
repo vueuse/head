@@ -2,6 +2,11 @@
 
 No unreleased changes.
 
+## 1.0.26
+
+- chore: drop git hook linting, causing errors
+- chore: bump unhead to 1.0.22
+
 ## 1.0.25
 
 - chore: unhead 1.0.21
