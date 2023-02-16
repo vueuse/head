@@ -10,7 +10,7 @@
 
 
 <p align="center">
-Super-charged document head management for Vue, powered by <a href="https://unhead.harlanzw.com/">unhead</a>.
+Document head management for Vue. Powered by <a href="https://unhead.harlanzw.com/">Unhead</a>.
 </p>
 
 <p align="center">
