@@ -1,7 +1,7 @@
 {
   "name": "@vueuse/head",
   "version": "1.0.25",
-  "packageManager": "pnpm@7.5.0",
+  "packageManager": "pnpm@7.25.0",
   "description": "Document head manager for Vue 3. SSR ready.",
   "author": {
     "name": "EGOIST",
@@ -68,28 +68,18 @@
     "get-port-please": "^3.0.1",
     "jsdom": "^21.1.0",
     "kanpai": "^0.11.0",
-    "lint-staged": "^13.1.2",
     "mlly": "^1.1.0",
     "nuxt": "^3.2.0",
     "pathe": "^1.1.0",
     "playwright": "^1.30.0",
-    "simple-git-hooks": "^2.8.1",
     "typescript": "^4.9.5",
     "unbuild": "^1.1.1",
     "vite": "^4.1.1",
-    "vitest": "^0.28.5",
+    "vitest": "^0.28.4",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"
   },
   "resolutions": {
     "@vueuse/head": "link:."
-  },
-  "simple-git-hooks": {
-    "pre-commit": "npx lint-staged"
-  },
-  "lint-staged": {
-    "*.{ts,vue,json,yml,tsx}": [
-      "eslint \"**/*.{ts,vue,json,yml,tsx}\" --fix"
-    ]
   }
 }
