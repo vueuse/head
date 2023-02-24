@@ -2,6 +2,14 @@
 
 No unreleased changes.
 
+## 1.1.0
+
+- doc: simplify announcement
+- doc: simplify announcement
+- doc: link 1.1 release
+- feat: unhead 1.1.0
+- doc: clean up
+
 ## 1.0.26
 
 - chore: drop git hook linting, causing errors
