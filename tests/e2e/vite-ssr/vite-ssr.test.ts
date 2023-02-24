@@ -65,12 +65,12 @@ describe('e2e: vite ssr', async () => {
     }
     let tags = await getHeadTags() as HeadTag[]
     expect(
-      tags.find(t => t.tag === 'title')!.children,
+      tags.find(t => t.tag === 'title')!.textContent,
     ).toMatchInlineSnapshot('"0 | @vueuse/head"')
     await page.click('button')
     tags = await getHeadTags()
     expect(
-      tags.find(t => t.tag === 'title')!.children,
+      tags.find(t => t.tag === 'title')!.textContent,
     ).toMatchInlineSnapshot('"1 | @vueuse/head"')
   })
 

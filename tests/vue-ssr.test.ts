@@ -171,7 +171,7 @@ describe('vue ssr', () => {
     }))
 
     expect(headResult.htmlAttrs).toMatchInlineSnapshot(
-      '" data-something=\\"\\""',
+      '" data-something=\\"true\\""',
     )
   })
 })

@@ -18,9 +18,9 @@ describe('addHeadObjs', () => {
           "_d": "title",
           "_e": 0,
           "_p": 0,
-          "children": "test",
           "props": {},
           "tag": "title",
+          "textContent": "test",
         },
         {
           "_e": 0,

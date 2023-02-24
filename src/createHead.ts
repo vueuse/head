@@ -1,7 +1,15 @@
 import type { HeadTag, MaybeComputedRef, MergeHead, ReactiveHead, VueHeadClient } from '@unhead/vue'
 import { createHead as createUnhead, useHead } from '@unhead/vue'
 import { debouncedRenderDOMHead, renderDOMHead } from '@unhead/dom'
-import type { ActiveHeadEntry, Head, HeadEntry, HeadEntryOptions, HeadPlugin, Unhead } from '@unhead/schema'
+import type {
+  ActiveHeadEntry,
+  CreateHeadOptions,
+  Head,
+  HeadEntry,
+  HeadEntryOptions,
+  HeadPlugin,
+  Unhead
+} from '@unhead/schema'
 import type { App } from 'vue'
 import { version } from 'vue'
 
@@ -89,8 +97,8 @@ export interface HeadClient<T extends MergeHead = {}> {
   unhead: VueHeadClient<T>
 }
 
-export function createHead<T extends MergeHead = {}>(initHeadObject?: Head<T>): HeadClient<T> {
-  const unhead = createUnhead<T>()
+export function createHead<T extends MergeHead = {}>(initHeadObject?: Head<T>, options?: CreateHeadOptions): HeadClient<T> {
+  const unhead = createUnhead<T>(options || {})
 
   // make migration easier
   const legacyHead: HeadClient<T> = {
