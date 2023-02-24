@@ -27,9 +27,13 @@ Created by <a href="https://github.com/sponsors/egoist">egoist</a>, maintained b
 </table>
 </p>
 
-## ✨ v1 released!
+## ✨ v1.1.0 released!
 
-Read the announcement [post](https://harlanzw.com/blog/vue-use-head-v1), provide any feedback or questions in [this discussion](https://github.com/vueuse/head/discussions/161)
+- :sparkles: New Tag: `templateParams`
+- 🎉 New `useHeadSafe`
+- and much more!
+
+Read the [release notes](https://github.com/unjs/unhead/releases/tag/v1.1.0).
 
 ## Features
 
