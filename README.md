@@ -29,8 +29,6 @@ Created by <a href="https://github.com/sponsors/egoist">egoist</a>, maintained b
 
 ### v1.1.0 released
 
-Unhead, the engine powering `@vueuse/head`, has been released in v1.1.0.
-
 - :sparkles: New Tag: `templateParams`
 - 🎉 New `useHeadSafe`
 - and much more!
