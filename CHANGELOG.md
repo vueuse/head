@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.1.9
+
+- chore: bump unhead 1.1.9
+
 ## 1.1.8
 
 - chore: bump unhead 1.1.8
