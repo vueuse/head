@@ -7,10 +7,10 @@ specifiers:
   '@antfu/eslint-config': ^0.35.3
   '@nuxt/kit': 3.2.2
   '@nuxt/test-utils': 3.2.2
-  '@unhead/dom': ^1.1.8
-  '@unhead/schema': ^1.1.8
-  '@unhead/ssr': ^1.1.8
-  '@unhead/vue': ^1.1.8
+  '@unhead/dom': ^1.1.9
+  '@unhead/schema': ^1.1.9
+  '@unhead/ssr': ^1.1.9
+  '@unhead/vue': ^1.1.9
   '@vitejs/plugin-vue': ^4.0.0
   '@vitejs/plugin-vue-jsx': ^3.0.0
   '@vue/compiler-sfc': ^3.2.47
@@ -33,10 +33,10 @@ specifiers:
   vue-router: ^4.1.6
 
 dependencies:
-  '@unhead/dom': 1.1.8
-  '@unhead/schema': 1.1.8
-  '@unhead/ssr': 1.1.8
-  '@unhead/vue': 1.1.8_vue@3.2.47
+  '@unhead/dom': 1.1.9
+  '@unhead/schema': 1.1.9
+  '@unhead/ssr': 1.1.9
+  '@unhead/vue': 1.1.9_vue@3.2.47
 
 devDependencies:
   '@antfu/eslint-config': 0.35.3_7kw3g6rralp5ps6mg3uyzz6azm
@@ -1705,11 +1705,11 @@ packages:
       '@unhead/shared': 1.1.7
     dev: true
 
-  /@unhead/dom/1.1.8:
-    resolution: {integrity: sha512-CS+6ncid6GqeBV8ALh4lht5Mios3r8rZNLJvvti0kwGHl9cnGWtURqZpEIoqljde9Me2Tcv5Y5sFYWSx1h64xw==}
+  /@unhead/dom/1.1.9:
+    resolution: {integrity: sha512-VwI/rnY4mwEiv3V0mef++2agvHaP4qf+pqM3jbaCXiSQmsGIGIbd5LmStg1yOWvc0XMDVAr+B2MkbmB+rnn+3w==}
     dependencies:
-      '@unhead/schema': 1.1.8
-      '@unhead/shared': 1.1.8
+      '@unhead/schema': 1.1.9
+      '@unhead/shared': 1.1.9
     dev: false
 
   /@unhead/schema/1.1.7:
@@ -1719,8 +1719,8 @@ packages:
       zhead: 2.0.4
     dev: true
 
-  /@unhead/schema/1.1.8:
-    resolution: {integrity: sha512-m4tg2pd7jVF8+TuduWur6Qrr+MDF2R9gq3z9s9UlFJ+f3gZZQ863w1nqIZ2KP38Tnld0jgrKOr2gs08VT9gfIw==}
+  /@unhead/schema/1.1.9:
+    resolution: {integrity: sha512-ATOZr+486dkVcP5B08bkS9EZJ4phZ3u29/vsDf2f7PCBUauqeGovWHcUjCEdB9aBPhjgzvw1rfDPkCF54LENjg==}
     dependencies:
       hookable: 5.4.2
       zhead: 2.0.4
@@ -1731,26 +1731,26 @@ packages:
       '@unhead/schema': 1.1.7
     dev: true
 
-  /@unhead/shared/1.1.8:
-    resolution: {integrity: sha512-NokzfbCGHP5d6sxgnxaANGe6Cf3Ld786CtuPt+m9WtUWiXm15TjK9sXPq/P66a3IjxwcgRhkJ9F5KB+w+1XEtQ==}
+  /@unhead/shared/1.1.9:
+    resolution: {integrity: sha512-dUUntXrMTD1KtbFuG2Ra6PibhvE370iqIhQOGCXRpCBiu0LBYxG2IqETbdrXCpn5woWg/GxIW2oQLdno4JzhlQ==}
     dependencies:
-      '@unhead/schema': 1.1.8
+      '@unhead/schema': 1.1.9
 
-  /@unhead/ssr/1.1.8:
-    resolution: {integrity: sha512-edAyGQjxz+hMjAYsnnf6iG/O48lyQtBz8uukpe3lTLSqg1sdZTRQ+bDAosVK3ognwPguR73/NUkXVXB3+hvptA==}
+  /@unhead/ssr/1.1.9:
+    resolution: {integrity: sha512-qHAWtyIyD7yrBX6slZEvIxYx2H2edR0BlzN/FQZ6+wM2+IEtrwz5pXcMGvAI8Hdji6j3W6hr2vP4Fae57YBHGQ==}
     dependencies:
-      '@unhead/schema': 1.1.8
-      '@unhead/shared': 1.1.8
+      '@unhead/schema': 1.1.9
+      '@unhead/shared': 1.1.9
 
-  /@unhead/vue/1.1.8_vue@3.2.47:
-    resolution: {integrity: sha512-O7MZ9fbH1rrI6Nb5RvIaTW2UdCX5ptOuABmLfIxs0BQ0pNgDfeF/+tU5KEEfXaqpdj9bcR9fGFf8IYQuKYd8ag==}
+  /@unhead/vue/1.1.9_vue@3.2.47:
+    resolution: {integrity: sha512-Q0f1z5YIYJrwogIpSNNd78qP1I6k9MXhGaDumCFRbau8vUtm0iXJVq4auWeulMsf6er+LR8jV3NgazPMwwps5w==}
     peerDependencies:
       vue: '>=2.7 || >=3'
     dependencies:
-      '@unhead/schema': 1.1.8
-      '@unhead/shared': 1.1.8
+      '@unhead/schema': 1.1.9
+      '@unhead/shared': 1.1.9
       hookable: 5.4.2
-      unhead: 1.1.8
+      unhead: 1.1.9
       vue: 3.2.47
     dev: false
 
@@ -5326,7 +5326,7 @@ packages:
       '@nuxt/telemetry': 2.1.10
       '@nuxt/ui-templates': 1.1.1
       '@nuxt/vite-builder': 3.2.2_xm23t445qiu3adkd5mllr75iei
-      '@unhead/ssr': 1.1.8
+      '@unhead/ssr': 1.1.9
       '@vue/reactivity': 3.2.47
       '@vue/shared': 3.2.47
       '@vueuse/head': 'link:'
@@ -6981,12 +6981,12 @@ packages:
       packrup: 0.1.0
     dev: true
 
-  /unhead/1.1.8:
-    resolution: {integrity: sha512-I6QlutXf60mmcgIAtB4cupN9LFdoWvjaNX8sP3SHSHVRLAFYa4cINALwBHtzrzOQ+VTouXpYCKgAulZcfm6H7g==}
+  /unhead/1.1.9:
+    resolution: {integrity: sha512-MLRbAcVRvW3tUmvY1mlTxMF6HhADqJTidEa5Knhp7q4tz/F8QCU2eQ2966eiJoEomoiO0RTrXTpME/JknISdnA==}
     dependencies:
-      '@unhead/dom': 1.1.8
-      '@unhead/schema': 1.1.8
-      '@unhead/shared': 1.1.8
+      '@unhead/dom': 1.1.9
+      '@unhead/schema': 1.1.9
+      '@unhead/shared': 1.1.9
       hookable: 5.4.2
       packrup: 0.1.0
     dev: false
