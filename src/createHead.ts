@@ -8,7 +8,7 @@ import type {
   HeadEntry,
   HeadEntryOptions,
   HeadPlugin,
-  Unhead
+  Unhead,
 } from '@unhead/schema'
 import type { App } from 'vue'
 import { version } from 'vue'
