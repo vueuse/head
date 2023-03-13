@@ -173,7 +173,6 @@ export function createHead<T extends MergeHead = {}>(initHeadObject?: Head<T>, o
   })
 
   if (initHeadObject)
-    // @ts-expect-error untyped
     legacyHead.addHeadObjs(initHeadObject)
 
   return legacyHead
