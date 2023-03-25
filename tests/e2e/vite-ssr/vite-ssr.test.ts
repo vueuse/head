@@ -34,7 +34,7 @@ describe('e2e: vite ssr', async () => {
           <meta http-equiv=\\"X-UA-Compatible\\" content=\\"IE=edge\\">
           <meta name=\\"viewport\\" content=\\"width=device-width, initial-scale=1.0\\">
           <title>count: 0 | @vueuse/head</title>
-        <base href=\\"/\\"><meta name=\\"custom-priority\\" content=\\"of 1\\"><meta name=\\"global-meta\\" content=\\"some global meta tag\\"><style>body {background: salmon}</style><noscript>This app requires javascript to work</noscript><meta name=\\"description\\" content=\\"desc\\"><meta name=\\"description\\" content=\\"desc 2\\"><meta property=\\"og:locale:alternate\\" content=\\"fr\\"><meta property=\\"og:locale:alternate\\" content=\\"zh\\"><link href=\\"/foo\\" rel=\\"stylesheet\\"><script>console.log(\\"counter mount\\")</script>"
+        <base href=\\"/\\"><meta name=\\"custom-priority\\" content=\\"of 1\\"><meta name=\\"global-meta\\" content=\\"some global meta tag\\"><style>body {background: salmon}</style><noscript>This app requires javascript to work</noscript><meta name=\\"description\\" content=\\"desc\\"><meta name=\\"description\\" content=\\"desc 2\\"><meta property=\\"og:locale:alternate\\" content=\\"fr\\"><meta property=\\"og:locale:alternate\\" content=\\"zh\\"><link href=\\"/foo\\" rel=\\"stylesheet\\"><script data-h-1a4cc2a=\\"\\">console.log(\\"counter mount\\")</script>"
     `)
 
     await page.click('button.counter')

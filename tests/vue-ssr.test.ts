@@ -133,8 +133,8 @@ describe('vue ssr', () => {
 
     expect(headResult.headTags).toMatchInlineSnapshot(
       `
-      "<script src=\\"test\\">console.log('A')</script>
-      <script>console.log('B')</script>"
+      "<script src=\\"test\\" data-h-722c761=\\"\\">console.log('A')</script>
+      <script data-h-722c761=\\"\\">console.log('B')</script>"
     `,
     )
   })

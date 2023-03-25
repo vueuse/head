@@ -69,7 +69,7 @@ describe('reactivity', () => {
       <meta property=\\"og:locale:alternate\\" content=\\"fr\\">
       <meta property=\\"og:locale:alternate\\" content=\\"zh\\">
       <link as=\\"style\\" href=\\"/style.css\\">
-      <script src=\\"foo.js\\"></script>",
+      <script src=\\"foo.js\\" data-h-e959ceb=\\"\\"></script>",
         "htmlAttrs": " lang=\\"zh\\"",
       }
     `)
