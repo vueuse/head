@@ -27,7 +27,7 @@ Created by <a href="https://github.com/sponsors/egoist">egoist</a>, maintained b
 </table>
 </p>
 
-### :warn: Sunsetting @vueuse/head
+### 🌇 Sunsetting @vueuse/head
 
 The `@vueuse/head` package is a simple compatible wrapper around [Unhead](https://unhead.harlanzw.com/), they share an almost identical API.
 In the coming months, the `@vueuse/head` package will be deprecated.
