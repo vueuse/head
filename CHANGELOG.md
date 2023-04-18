@@ -2,6 +2,12 @@
 
 No unreleased changes.
 
+## 1.1.26
+
+- chore: bump unhead 1.1.26
+- doc: fix emoji
+- doc: sunsetting @vueuse/head
+
 ## 1.1.23
 
 - chore: bump unhead 1.1.23
