@@ -27,13 +27,14 @@ Created by <a href="https://github.com/sponsors/egoist">egoist</a>, maintained b
 </table>
 </p>
 
-### v1.1.0 released
+### :warn: Sunsetting @vueuse/head
 
-- :sparkles: New Tag: `templateParams`
-- 🎉 New `useHeadSafe`
-- and much more!
-
-Read the [release notes](https://github.com/unjs/unhead/releases/tag/v1.1.0).
+The `@vueuse/head` package is a simple compatible wrapper around [Unhead](https://unhead.harlanzw.com/), they share an almost identical API.
+In the coming months, the `@vueuse/head` package will be deprecated.
+If you're setting up this package on a new project, you should
+use the `@unhead/vue` package directly.
+Further documentation, guides and announcements will be out soon,
+for now you can follow the [installation guide](https://unhead.harlanzw.com/integrations/vue/setup).
 
 ## Features
 
