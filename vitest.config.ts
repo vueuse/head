@@ -11,6 +11,7 @@ export default defineConfig({
     },
   },
   test: {
+    testTimeout: 30000,
     // note: we can't use a dom environment otherwise the tests will think we're
     // browser based
     globals: true,

@@ -23,7 +23,6 @@ describe('basic', () => {
       [
         {
           "_i": 0,
-          "_sde": {},
           "input": {
             "link": [
               {
@@ -52,7 +51,6 @@ describe('basic', () => {
       [
         {
           "_i": 0,
-          "_sde": {},
           "input": [Function],
         },
       ]

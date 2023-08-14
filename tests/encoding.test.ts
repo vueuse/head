@@ -55,7 +55,7 @@ describe('encoding', () => {
           'src': 'https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly',
           'data-key': 'AIzaSyD9hQ0Z7Y9XQX8Zjwq7Q9Z2YQ9Z2YQ9Z2Y',
           'defer': true,
-          'body': true,
+          tagPosition: 'bodyClose',
         },
       ],
     })

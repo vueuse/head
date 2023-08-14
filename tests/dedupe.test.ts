@@ -181,12 +181,10 @@ describe('dedupe', () => {
       link: [{ rel: 'icon', href: '/favicon.ico', key: 'icon' }],
     })
     const { headTags } = await renderSSRHead(head.unhead)
-    expect(headTags).toMatchInlineSnapshot(
-      `
+    expect(headTags).toMatchInlineSnapshot(`
       "<meta name=\\"description\\" content=\\"test\\">
-      <link rel=\\"icon\\" href=\\"/favicon.ico\\" data-h-e16a2dd=\\"\\">"
-    `,
-    )
+      <link rel=\\"icon\\" href=\\"/favicon.ico\\" data-hid=\\"e16a2dd\\">"
+    `)
   })
 
   test('dedupes legacy', async () => {

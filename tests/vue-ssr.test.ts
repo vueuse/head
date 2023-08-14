@@ -131,12 +131,10 @@ describe('vue ssr', () => {
       }),
     )
 
-    expect(headResult.headTags).toMatchInlineSnapshot(
-      `
-      "<script src=\\"test\\" data-h-722c761=\\"\\">console.log('A')</script>
-      <script data-h-722c761=\\"\\">console.log('B')</script>"
-    `,
-    )
+    expect(headResult.headTags).toMatchInlineSnapshot(`
+      "<script src=\\"test\\" data-hid=\\"722c761\\">console.log('A')</script>
+      <script data-hid=\\"722c761\\">console.log('B')</script>"
+    `)
   })
 
   test('#issue 138', async () => {

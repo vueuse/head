@@ -48,6 +48,7 @@ describe('reactivity', () => {
         {
           children: '* { color: red }',
           body: true,
+          tagPosition: 'bodyClose',
         },
       ],
       script: [
@@ -69,7 +70,7 @@ describe('reactivity', () => {
       <meta property=\\"og:locale:alternate\\" content=\\"fr\\">
       <meta property=\\"og:locale:alternate\\" content=\\"zh\\">
       <link as=\\"style\\" href=\\"/style.css\\">
-      <script src=\\"foo.js\\" data-h-e959ceb=\\"\\"></script>",
+      <script src=\\"foo.js\\" data-hid=\\"e959ceb\\"></script>",
         "htmlAttrs": " lang=\\"zh\\"",
       }
     `)
