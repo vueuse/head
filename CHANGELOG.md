@@ -2,6 +2,10 @@
 
 No unreleased changes.
 
+## 1.3.1
+
+- feat: upgrade to `unhead@1.3.0`
+
 ## 1.1.26
 
 - chore: bump unhead 1.1.26
