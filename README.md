@@ -33,8 +33,8 @@ The `@vueuse/head` package is a simple compatible wrapper around [Unhead](https:
 In the coming months, the `@vueuse/head` package will be deprecated.
 If you're setting up this package on a new project, you should
 use the `@unhead/vue` package directly.
-Further documentation, guides and announcements will be out soon,
-for now you can follow the [installation guide](https://unhead.harlanzw.com/integrations/vue/setup).
+Further documentation, guides, and announcements will be out soon,
+for now you can follow the [installation guide](https://unhead.unjs.io/setup/vue/installation).
 
 ## Features
 
