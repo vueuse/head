@@ -1,4 +1,4 @@
-<h1 align='center'>@vueuse/head</h1>
+<h1 align='center'>@vueuse/head - 🌇 Sunset</h1>
 
 <p align="center">
 <a href='https://github.com/harlan-zw/unhead/actions/workflows/test.yml'>
@@ -29,95 +29,26 @@ Created by <a href="https://github.com/sponsors/egoist">egoist</a>, maintained b
 
 ### 🌇 Sunsetting @vueuse/head
 
-The `@vueuse/head` package is a simple compatible wrapper around [Unhead](https://unhead.harlanzw.com/), they share an almost identical API.
-In the coming months, the `@vueuse/head` package will be deprecated.
-If you're setting up this package on a new project, you should
-use the `@unhead/vue` package directly.
-Further documentation, guides, and announcements will be out soon,
-for now you can follow the [installation guide](https://unhead.unjs.io/setup/vue/installation).
+The `@vueuse/head` package has been sunset in favour of Unhead.
 
-## Features
+[Unhead](https://unhead.unjs.io) is a any-framework document head manager with a focus on delightful DX and performance. 
+It's used in the Nuxt core and is part of the UnJS ecosystem. 
 
-- 💎 Fully typed augmentable Schema
-- 🧑‍🤝‍🧑 Side-effect based DOM patching, plays nicely your existing other tags and attributes
-- 🍣 Intuitive deduping, sorting, title templates, class merging and more
-- 🪝 Extensible hook / plugin based API
+This package and Unhead share an almost identical API and migrating in most cases will just involve updating the package names.
 
-## Installation
+The `@vueuse/head` package will continue to receive bug fixes and security updates for the foreseeable future.
 
-```bash
-npm i @vueuse/head
-# Or Yarn
-yarn add @vueuse/head
-```
+[Installation guide](https://unhead.unjs.io/setup/vue/installation)
 
-> Requires vue >= v3 or >=2.7
+## Docs
 
-## Usage
+[Unhead documentation](https://unhead.unjs.io/setup/vue/installation)
 
-### Vue 3
+## Migrating to Unhead from @vueuse/head
 
-Register the Vue plugin:
+Replace all imports of `@vueuse/head` with `@unhead/vue`.
 
-```ts
-import { createApp } from "vue"
-import { createHead } from "@vueuse/head"
-
-const app = createApp()
-const head = createHead()
-
-app.use(head)
-
-app.mount("#app")
-```
-
-### Vue 2
-
-Register the Vue plugin:
-
-```ts
-import Vue from 'vue'
-import { createHead, HeadVuePlugin } from "@vueuse/head"
-
-const head = createHead()
-// needed for Vue 2
-Vue.use(HeadVuePlugin, head)
-Vue.use(head)
-
-new Vue({
-  render: h => h(App),
-}).$mount('#app')
-```
-
-### SSR Rendering
-
-```ts
-import { renderToString } from "@vue/server-renderer"
-import { renderHeadToString } from "@vueuse/head"
-
-const appHTML = await renderToString(yourVueApp)
-
-// `head` is created from `createHead()`
-const { headTags, htmlAttrs, bodyAttrs, bodyTags } = await renderHeadToString(head)
-
-const finalHTML = `
-<html${htmlAttrs}>
-
-  <head>
-    ${headTags}
-  </head>
-
-  <body${bodyAttrs}>
-    <div id="app">${appHTML}</div>
-    ${bodyTags}
-  </body>
-
-</html>`
-```
-
-## Further Documentation
-
-Refer to the [unhead documentation](https://unhead.harlanzw.com/) for full API reference and more.
+If you're using the `<Head>` component you will need to import it from `@unhead/vue/components`.
 
 ## Sponsors
 
