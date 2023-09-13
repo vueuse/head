@@ -29,7 +29,8 @@ Created by <a href="https://github.com/sponsors/egoist">egoist</a>, maintained b
 
 ### 🌇 Sunsetting @vueuse/head
 
-The `@vueuse/head` package has been sunset in favour of Unhead.
+The `@vueuse/head` package has been sunset in favour of Unhead. This means no new features will be added to this package and
+installation of this package directly will be discouraged.
 
 [Unhead](https://unhead.unjs.io) is a any-framework document head manager with a focus on delightful DX and performance. 
 It's used in the Nuxt core and is part of the UnJS ecosystem. 
