@@ -2,6 +2,17 @@
 
 No unreleased changes.
 
+## 2.0.0
+
+- chore: remove failing test
+- doc: clarify meaning of sunset
+- doc!: officially sunset @vueuse/head
+- fix: prefer Unhead `polyfillAsVueUseHead` to wrap head instance
+- fix: export Head component from Unhead
+- chore: bump test snapshots
+- chore: bump deps
+- doc: fix installation link
+
 ## 1.3.1
 
 - feat: upgrade to `unhead@1.3.0`
