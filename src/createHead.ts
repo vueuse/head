@@ -4,7 +4,9 @@ import type {
   CreateHeadOptions,
   Head,
 } from '@unhead/schema'
+// @ts-expect-error broken types
 import type { VueHeadClientPollyFill } from '@unhead/vue/polyfill'
+// @ts-expect-error broken types
 import { polyfillAsVueUseHead } from '@unhead/vue/polyfill'
 
 export function createHead<T extends MergeHead = {}>(initHeadObject?: Head<T>, options?: CreateHeadOptions): VueHeadClientPollyFill<T> {
