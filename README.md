@@ -47,6 +47,11 @@ The `@vueuse/head` package will continue to receive bug fixes and security updat
 
 ## Migrating to Unhead from @vueuse/head
 
+```ts
+pnpm remove @vueuse/head
+pnpm add @unhead/vue
+```
+
 Replace all imports of `@vueuse/head` with `@unhead/vue`.
 
 If you're using the `<Head>` component you will need to import it from `@unhead/vue/components`.
