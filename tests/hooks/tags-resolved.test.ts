@@ -6,7 +6,7 @@ describe('hook tags resolved', () => {
     const head = createHead()
 
     const hookTags = new Promise((resolve) => {
-      head.internalHooks.hook('tags:resolve', (ctx) => {
+      head.unhead.hooks.hook('tags:resolve', (ctx) => {
         resolve(ctx.tags)
       })
     })
@@ -40,7 +40,7 @@ describe('hook tags resolved', () => {
     const head = createHead()
 
     const hookTags = new Promise((resolve) => {
-      head.internalHooks.hook('tags:resolve', (ctx) => {
+      head.unhead.hooks.hook('tags:resolve', (ctx) => {
         for (const k in ctx.tags)
           ctx.tags[k].props.extra = true
 

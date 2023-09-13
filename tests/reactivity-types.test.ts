@@ -245,8 +245,7 @@ describe('reactivity', () => {
     expect(headResult.headTags).toMatchInlineSnapshot(
       `
       "<title>my title</title>
-      <meta name=\\"123\\" data-unknown-attr=\\"test\\">
-      <meta name=\\"some-flag\\" content=\\"\\">
+      <meta name=\\"some-flag\\" content>
       <meta property=\\"og:fake-prop\\" content=\\"test1\\">
       <meta property=\\"og:fake-prop\\" content=\\"test2\\">"
     `,

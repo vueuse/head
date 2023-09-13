@@ -55,7 +55,7 @@ describe('encoding', () => {
           'src': 'https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly',
           'data-key': 'AIzaSyD9hQ0Z7Y9XQX8Zjwq7Q9Z2YQ9Z2YQ9Z2Y',
           'defer': true,
-          tagPosition: 'bodyClose',
+          'tagPosition': 'bodyClose',
         },
       ],
     })
@@ -65,7 +65,7 @@ describe('encoding', () => {
     expect(ssr).toMatchInlineSnapshot(`
       {
         "bodyAttrs": "",
-        "bodyTags": "<script src=\\"https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly\\" data-key=\\"AIzaSyD9hQ0Z7Y9XQX8Zjwq7Q9Z2YQ9Z2YQ9Z2Y\\" defer=\\"\\"></script>",
+        "bodyTags": "<script src=\\"https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly\\" data-key=\\"AIzaSyD9hQ0Z7Y9XQX8Zjwq7Q9Z2YQ9Z2YQ9Z2Y\\" defer></script>",
         "bodyTagsOpen": "",
         "headTags": "<script src=\\"https://polyfill.io/v3/polyfill.min.js?features=default\\"></script>",
         "htmlAttrs": "",
