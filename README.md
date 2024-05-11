@@ -10,7 +10,7 @@
 
 
 <p align="center">
-Document head management for Vue. Powered by <a href="https://unhead.harlanzw.com/">Unhead</a>.
+Document head management for Vue. Powered by <a href="unhead.unjs.io">Unhead</a>.
 </p>
 
 <p align="center">
