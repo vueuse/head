@@ -39,11 +39,11 @@ This package and Unhead share an almost identical API and migrating in most case
 
 The `@vueuse/head` package will continue to receive bug fixes and security updates for the foreseeable future.
 
-[Installation guide](https://unhead.unjs.io/setup/vue/installation)
+[Installation guide](https://unhead.unjs.io/docs/vue/head/guides/get-started/installation)
 
 ## Docs
 
-[Unhead documentation](https://unhead.unjs.io/setup/vue/installation)
+[Unhead documentation](https://unhead.unjs.io/docs/vue/head/guides/get-started/installation)
 
 ## Migrating to Unhead from @vueuse/head
 
